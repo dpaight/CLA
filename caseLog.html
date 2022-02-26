@@ -14,6 +14,7 @@
     <?!= include('moment_js'); ?>
     <?!= include('caseLogCss'); ?>
     <?!= include('idleScript'); ?>
+
   <!-- jQuery library -->
   <!-- <script src="https://code.jquery.com/jquery-3.5.1.sldm.min.js"
     integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
@@ -117,9 +118,8 @@
               Form</a>
 
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item"
-              href="https://docs.google.com/forms/d/1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg/edit?usp=sharing"
-              target="_blank">Open Present Levels Ques.</a>
+            <p class="dropdown-item"
+              onclick="getPrefilledLevels()">Create Prefilled Present Levels Ques.</a>
           </div>
         </li>
         <!-- <button onclick="emParents()">em par</button> -->
@@ -131,11 +131,11 @@
 
       <!-- card for roster list -->
       <div class="card col-sm-12 col-lg-3 col-md-6 p-0 m-0 rosterList" style="background-color: white;">
-        <div class="card-header">
+        <div class="card-header" style="margin-bottom:0; padding-bottom: 0;">
           <h5>Roster</h5>
-          <p>Click a name to view more information.</p>
-          <button class="btn btn-sm btn-success" onclick="openRosterChecklistModal()" style="font-weight: bold;">+
-            Checklist</button>
+          <p style="line-height: 16px; font-size: small;">Click a name to view more information.</p>
+          <!-- <button class="btn btn-sm btn-success" onclick="openRosterChecklistModal()" style="font-weight: bold;">+
+            Checklist</button> -->
         </div>
         <div class="card-body p-0 m-0">
 

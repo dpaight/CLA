@@ -60,7 +60,7 @@ function sndMl() {
         "NB: This email was sent automatically. If you have already responded, please ignore this request." +
         "<h2><a href=" + "levelsUrl" + ">Levels of Performance for " + stuName + "</a></h2>");
 }
-function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail = "dpaight@hemetusd.org") {
+function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail) {
     Logger.log('stuName: %s, stuId: %s, teachemail: %s', stuName, stuId, teachemail);
     // stuName = 'Wanda Wanderer', stuId = 'WandererWanda123456', teachemail = 'dpaight@hemetusd.org';
     // 1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg  
@@ -68,6 +68,7 @@ function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail = "dpa
     var form = FormApp.openById(formId);
     var respArray = [stuName, stuId];
     var formResponse = form.createResponse();
+    form.setCollectEmail(true);
     var items = form.getItems();
     for (var i = 0; i < 2; i++) {
         var item = items[i];
@@ -77,23 +78,29 @@ function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail = "dpa
         formResponse.withItemResponse(itemResponse);
     }
     var levelsUrl = formResponse.toPrefilledUrl();
-    try {
-        MailApp.sendEmail({
-            to: teachemail,
-            subject: stuName + "'s levels of performance",
-            htmlBody: "<p>The IEP for " + stuName + " is coming up, and I need some information, please. " +
-                "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
-                "information you provide as data for the IEP. Thank you for your time.<br><br>" +
-                "NB: This email was sent automatically. If you have already responded, please ignore this request.</p>" +
-                "<h2><a href=" + levelsUrl + ">Levels of Performance for " + stuName + "</a></h2>"
-        });
-        saveLogEntry([stuId, "levels ques sent: " + teachemail]);
-    }
-    catch (err) {
-        Logger.log('failed at email try: %s', err);
-    }
     var confirmationMsg = form.getConfirmationMessage() + "; " + formResponse.getEditResponseUrl();
-    return stuId; // picked up by success handler (focus())
+    var content = teachemail + "\n\nThe IEP for " + stuName + " is coming up, and I need some information, please. " +
+                "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
+                "information you provide as data for the IEP. Thank you for your time." + "\n\n" +
+                "If you have already responded, please ignore this request.\n\n" +
+                levelsUrl
+
+    // try {
+    //     MailApp.sendEmail({
+    //         to: teachemail,
+    //         subject: stuName + "'s levels of performance",
+            // htmlBody: "<p>The IEP for " + stuName + " is coming up, and I need some information, please. " +
+            //     "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
+            //     "information you provide as data for the IEP. Thank you for your time.<br><br>" +
+            //     "NB: This email was sent automatically. If you have already responded, please ignore this request.</p>" +
+            //     "<h2><a href=" + levelsUrl + ">Levels of Performance for " + stuName + "</a></h2>"
+    //     });
+    //     saveLogEntry([stuId, "levels ques sent: " + teachemail]);
+    // }
+    // catch (err) {
+    //     Logger.log('failed at email try: %s', err);
+    // }
+    return content; // picked up by success handler
 }
 // function saveLastId(id) {
 //     PropertiesService.getScriptProperties()
@@ -676,7 +683,7 @@ function printSelectedLogEntries(stuName, sDate, eDate, array) {
 // this returns table data to the success Handler on the client side
 function getTableData_roster() {
     var [headings, values, sheet, range, lastR, lastC] = rosterGet();
-    return values;
+    return JSON.stringify(values);
 }
 /**
  * @returns [[data from meetings sheet]]
@@ -1544,24 +1551,10 @@ function markNoGo() {
     SpreadsheetApp.flush();
     dest.setValues(times);
 }
-function getRecord(id = 2041374) {
+function getRecord(id) {
     // record was not cached; search for it
-    var [headings, values_a, sheet, range, lastR, lastC] = rosterGet();
-    var [flat_note_headings, flat_note_values, flat_note_sheet, flat_note_range, flat_note_lastR, flat_note_lastC] = myGet('notes', 1, true);
-    var [note_headings, note_values, note_sheet, note_range, note_lastR, note_lastC] = myGet('notes');
-
-    var values = [];
-    for (let i = 0; i < values_a.length; i++) {
-        const el = values_a[i];
-        try {
-            var idx = flat_note_values.indexOf(el[0].toString());
-            el.push(note_values[idx][1]);
-
-        } catch (error) {
-            el.push("");
-        }
-        values.push(el);
-    }
+    if (id == undefined) { throw "no id at getRecord" };
+    var [headings, values, sheet, range, lastR, lastC] = rosterGet();
 
     // values.shift();
     for (var i = 0; i < values.length; i++) {

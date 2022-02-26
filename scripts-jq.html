@@ -309,8 +309,9 @@
             var stuName = $("#stuName").val();
             var teachemail = $("#teachemail").val();
             // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
+            
             google.script.run
-                .withSuccessHandler(contactInfo)
+                .withSuccessHandler(openDoc)
                 .sendLevelsForm(stuName, id, "dpaight@hemetusd.org");
         });
 

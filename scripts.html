@@ -16,7 +16,7 @@
       document.body.style.cursor = "wait";
       google.script.run
         .withSuccessHandler(showRosterTable)
-        .rosterGet();
+        .getTableData_roster();
 
       focus(id);
     }
@@ -531,10 +531,10 @@
   }
 
   // display table of names sorted by due dates
-  function showRosterTable(array) {
-    var [headings, data, sheet, range, lastR, lastC] = rosterGet();
+  function showRosterTable(dataStr) {
+    console.log('data is %s', dataStr);
+    var data = JSON.parse(dataStr);
     var loc = 'loc00';
-
     var pending = ['#ffffff', '#000000'];
     for (let i = 0; i < data.length; i++) {
       const el = data[i];
@@ -696,7 +696,7 @@
     window.getSelection().addRange(range);
     document.execCommand('copy');
     document.body.removeChild(container);
-    showToast('data copied to clipboard as a TextBlaze-compatible list');
+    showToast('data copied to clipboard');
 
     // alert("The data has been copied as a TextBlaze key-value list to the clipboard.");
   }
@@ -992,4 +992,19 @@
   function openFolder(url) {
     window.open(url, target = "_blank");
   }
+  function getPrefilledLevels() {
+
+    var id = $("#seis_id").val();
+    var stuName = $("#stuName").val();
+    var teachemail = $("#teachemail").val();
+    // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
+
+    google.script.run
+      .withSuccessHandler(copyToClipboard)
+      .sendLevelsForm(stuName, id, teachemail);
+  }
+  function openDoc(url) {
+    copyToClipboard(url);
+    // window.open(url, "_blank");
+  };
 </script>

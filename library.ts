@@ -11,19 +11,19 @@ var ss = SpreadsheetApp.getActiveSpreadsheet();
 function rosterGet() {
     var sheetName = 'roster';
     var values = [];
-    var [sheet, headings, avalues, range, lastR, lastC] = myGet('roster');
+    var [headings, avalues, sheet, range, lastR, lastC] = myGet('roster');
 
-    var [nsht, nhead, nval, nrang, nlr, nlc] = myGet('notes');
-    var [nfsht, nfhead, nfval, nfrang, nfr, nflc] = myGet('notes', 1, true);
-
+    var [nhead, nval, nsht, nrang, nlr, nlc] = myGet('notes');
+    var [nfhead, nfval, nfsht, nfrang, nfr, nflc] = myGet('notes', 1, true);
+    nfval.shift();
     for (let i = 0; i < avalues.length; i++) {
-        const el = avalues[i];
-        const index = nfval.indexOf(el[0]);
+        var el = avalues[i];
+        var index = nfval.indexOf(el[0]);
         if (index == -1) {
             var note = "no notes";
             el.push(note);
         } else {
-            note = nfval[index];
+            note = nval[index][1];
             el.push(note);
         }
         values.push(el);
@@ -32,7 +32,7 @@ function rosterGet() {
 
     }
 
-    return [sheet, headings, values, range, lastR, lastC];
+    return [headings, values, sheet, range, lastR, lastC];
 }
 
 /**
