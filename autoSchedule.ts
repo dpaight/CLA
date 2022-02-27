@@ -3,7 +3,7 @@
 function getMembers(grpId) {
     // grpId = 'B';
     grpId = grpId.toString().toLowerCase();
-    var [headings, values, sheet, range, lastR, lastC] = get('assignToSched');
+    var [headings, values, sheet, range, lastR, lastC] = myGet('assignToSched');
     var groups = getGroups();
     var thisGroup = groups[grpId.toString()];
     var a = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
@@ -20,7 +20,7 @@ function getMembers(grpId) {
     return line;
 }
 function formatSchedule() {
-    var [headings, values, sheet, range, lastR, lastC] = get('assignToSched');
+    var [headings, values, sheet, range, lastR, lastC] = myGet('assignToSched');
     var schedSheet = ss.getSheetByName('sched by grades v2');
     var schedRange = schedSheet.getRange(3, 1, 8, 8);
     var week = schedRange.getValues();
@@ -41,7 +41,7 @@ function formatSchedule() {
     }
 }
 function getGroups() {
-    var [headings, values, sheet, range, lastR, lastC] = get('groups');
+    var [headings, values, sheet, range, lastR, lastC] = myGet('groups');
     var ids = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
     var grpsObj = {};
     for (let i = 0; i < values.length; i++) {

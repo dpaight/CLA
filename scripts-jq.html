@@ -25,8 +25,6 @@
         $(".pleaseHide").hide();
         // document.body.style.cursor = "wait";
 
-        $("td[data-stuId|='1010101']").css("color", "light-yellow");
-
         $("body").on("dblclick dbl-tap", ".goalList", function (e) {
             // console.log('event triggered a[name=goalList clicked');
             e.preventDefault();
@@ -34,7 +32,7 @@
             // console.log('this is %s', JSON.stringify($(this).text()));
             var thisGoal = JSON.parse($(this).text());
             var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
-            // console.log('gId = %s', gId);
+            console.log('gId = %s', gId);
             google.script.run
                 .withSuccessHandler(editGoalInModal)
                 .getGoal(gId);
@@ -43,6 +41,7 @@
         $("body").on("click", ".goalList", function (e) {
             // console.log('put the goal number into a gl field');
             if (e.shiftKey) {
+                e.preventDefault();
                 var item = JSON.parse($(this).text());
                 var gId = item[item.length - 1]
                 // item = item.toString().match(/\d+$/);
@@ -62,6 +61,7 @@
         // click builds text blaze snippet from data in table
         $("body").on("click", "input[name=gls]", function (event) {
             if (event.shiftKey) {
+                e.preventDefault();
                 $(this).val("");
                 $(this).attr("title", "");
             } else {
@@ -125,6 +125,7 @@
         // if shift key is down turning the cursor into a trash can and then delete on click (next function)
         $("body").on("mousemove", "input[name='gls']", function () {
             if (event.shiftKey) {
+                e.preventDefault();
                 $("input[name='gls'").css("cursor", "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto");
             } else {
                 $("input[name='gls'").css("cursor", "pointer");
@@ -321,7 +322,7 @@
 
         $("body").on("dblclick", ".logEntry", function (e) {
             // console.log('event triggered a[name=goalList clicked');
-            e.preventDefault();
+            // e.preventDefault();
             // open goal for editing
             var log_entry_id = $(this).data("entry_id");
             //       console.log('log entry id is %s', log_entry_id);

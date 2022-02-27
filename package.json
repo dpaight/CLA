@@ -1,25 +1,27 @@
 {
     "name": "contactloghelper",
-  "version": "4.0.0",
-  "description": "record keeping for sped",
-  "main": "Code.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Dan Paight",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dpaight/dan-CL-retry.git"
-  },
-  "keywords": [
-    "special",
-    "ed",
-    "log"
-  ],
-  "bugs": {
-    "url": "https://github.com/dpaight/dan-CL-retry/issues"
-  },
-  "homepage": "https://github.com/dpaight/dan-CL-retry#readme"
+    "version": "4.0.0",
+    "description": "record keeping for sped",
+    "main": "Code.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Dan Paight",
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dpaight/dan-CL-retry.git"
+    },
+    "keywords": [
+        "special",
+        "ed",
+        "log"
+    ],
+    "bugs": {
+        "url": "https://github.com/dpaight/dan-CL-retry/issues"
+    },
+    "homepage": "https://github.com/dpaight/dan-CL-retry#readme",
+    "dependencies": {
+        "jquery": "^3.6.0"
+    }
 }
-

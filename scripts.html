@@ -3,7 +3,7 @@
   // calls function on server side to return data for this student
   function startup(id) {
     $('#spinner01').show();
-    id = getPointer();
+    // id = getPointer();
     if (id == undefined || id == null) {
       google.script.run
         .withSuccessHandler(setPointerAndStart)
@@ -29,6 +29,10 @@
     google.script.run
       .withSuccessHandler(showRosterTable)
       .getTableData_roster(id);
+
+    google.script.run
+      .withSuccessHandler(showLog)
+      .getLogEntries(id);
 
     focus(id);
   }
@@ -63,7 +67,7 @@
       var val = JSON.stringify(elAll[1]);
       localStorage.setItem(key, val);
     }
-    focus();
+    focus(localStorage.getItem("lastId"));
   }
 
   function contactInfo(id = localStorage.getItem('lastId')) {
@@ -324,7 +328,22 @@
       .createDraftEmail(buttonVal, JSON.stringify(params));
   }
   function editGoalInModal(goal) {
+    
     $('#spinner01').show();
+    var myModal = new bootstrap.Modal(document.getElementById('goalModal'), {focus: true});
+    $('#glEditId').val(goal.id);
+    $('#glEditLvl').val(goal.lvl);
+    $('#glEditStrand').val(goal.strand);
+    $('#glEditAnnual').val(goal.annual);
+    $('#glEditArea').val(goal.area);
+    $('#glEditStandard').val(goal.standard);
+    $('#glEditobj1').val(goal.objective1);
+    $('#glEditobj2').val(goal.objective2);
+    $('#glEditobj3').val(goal.objective3);
+    $('#timestamp').val(goal.timestamp);
+
+    myModal.show();
+    $('#spinner01').hide();
 
     // goal is a goal object from 'getGoal'
     // this.id = id;
@@ -337,22 +356,12 @@
     // this.objective2 = objctv2;
     // this.objective3 = objctv3;
 
-    $('#goalModal').modal({
-      focus: true
-    });
 
-    $('#glEditId').val(goal.id);
-    $('#glEditLvl').val(goal.lvl);
-    $('#glEditStrand').val(goal.strand);
-    $('#glEditAnnual').val(goal.annual);
-    $('#glEditArea').val(goal.area);
-    $('#glEditStandard').val(goal.standard);
-    $('#glEditobj1').val(goal.objective1);
-    $('#glEditobj2').val(goal.objective2);
-    $('#glEditobj3').val(goal.objective3);
-    $('#timestamp').val(goal.timestamp);
 
-    $('#spinner01').hide();
+    // $('#goalModal').modal({
+    //   focus: true
+    // });
+
   }
   function clearEmailFields() {
     $("textarea.email").val("");
@@ -468,14 +477,14 @@
         Timestamp, email, studentMC, log_entry, log_entry_id, seis_id, Last_Name, First_Name, First_Name, Student_ID
       ] = el;
       list.append(
-        '<tr class="table table-sm d-flex">' +
+        '<tr class="d-flex">' +
         '<td data-entry_id=' +
         log_entry_id + ' class="col-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
         moment(el[0]).format("YYYY-MM-DD") +
         '</td>' +
         '<td data-entry_id=' + log_entry_id + ' class="logEntry col-9">' +
-        el[3].toString() +
+        el[3] +
         '</td>' +
         '</tr>'
       );
@@ -822,11 +831,16 @@
   function editLogEntryInModal(logEntry) {
     logEntry = JSON.parse(logEntry);
     //     console.log('the log record is %s', JSON.stringify(logEntry));
-    $('#logEntryModal').modal({ focus: true });
+    // $('#logEntryModal').modal({ focus: true });
+    var theDate = moment(logEntry.timestamp, 'YYYY-MM-DDTHH:mm:ss.SSSZ').toDate();
+
+    document.getElementById("timestamp").valueAsDate = theDate;
+    
+    var myModal = new bootstrap.Modal(document.getElementById('logEntryModal'), {focus: true});
     $('#lelog_entry_id').val(logEntry.log_entry_id);
     $('#leEntry').val(logEntry.entry);
-    var theDate = moment(logEntry.timestamp, 'YYYY-MM-DDTHH:mm:ss.SSSZ').toDate();
-    document.getElementById("timestamp").valueAsDate = theDate;
+    myModal.show();
+    $('#spinner01').hide();
   }
 
   function saveEditedEntry(option) {

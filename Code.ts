@@ -80,20 +80,20 @@ function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail) {
     var levelsUrl = formResponse.toPrefilledUrl();
     var confirmationMsg = form.getConfirmationMessage() + "; " + formResponse.getEditResponseUrl();
     var content = teachemail + "\n\nThe IEP for " + stuName + " is coming up, and I need some information, please. " +
-                "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
-                "information you provide as data for the IEP. Thank you for your time." + "\n\n" +
-                "If you have already responded, please ignore this request.\n\n" +
-                levelsUrl
+        "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
+        "information you provide as data for the IEP. Thank you for your time." + "\n\n" +
+        "If you have already responded, please ignore this request.\n\n" +
+        levelsUrl
 
     // try {
     //     MailApp.sendEmail({
     //         to: teachemail,
     //         subject: stuName + "'s levels of performance",
-            // htmlBody: "<p>The IEP for " + stuName + " is coming up, and I need some information, please. " +
-            //     "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
-            //     "information you provide as data for the IEP. Thank you for your time.<br><br>" +
-            //     "NB: This email was sent automatically. If you have already responded, please ignore this request.</p>" +
-            //     "<h2><a href=" + levelsUrl + ">Levels of Performance for " + stuName + "</a></h2>"
+    // htmlBody: "<p>The IEP for " + stuName + " is coming up, and I need some information, please. " +
+    //     "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
+    //     "information you provide as data for the IEP. Thank you for your time.<br><br>" +
+    //     "NB: This email was sent automatically. If you have already responded, please ignore this request.</p>" +
+    //     "<h2><a href=" + levelsUrl + ">Levels of Performance for " + stuName + "</a></h2>"
     //     });
     //     saveLogEntry([stuId, "levels ques sent: " + teachemail]);
     // }
@@ -305,6 +305,7 @@ function getGoal(gId = 47) {
         ;
         // return false;
     }
+    Logger.log('the goal object is %s', JSON.stringify(goal));
     return goal;
 }
 function getLogEntry(logEntryID = '1') {
