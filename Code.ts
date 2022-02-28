@@ -1701,6 +1701,538 @@ function makeInstructionalNotesFiles() {
         }
     }
 }
+
+//  from "logTimers.ts"
+/**
+ * @param fname (arguments.callee.toString().match(/function ([^\(]+)/)[1])
+ *
+ */
+function lt_logLogTimeStart(funcName) {
+    var d1 = new Date();
+}
+function lt_logLogTimeEnd(funcName) {
+    var d2 = new Date();
+}
+
+// 
+
+// from 'library.ts'
+function rosterGet() {
+    var sheetName = 'roster';
+    var values = [];
+    var [headings, avalues, sheet, range, lastR, lastC] = myGet('roster');
+
+    var [nhead, nval, nsht, nrang, nlr, nlc] = myGet('notes');
+    var [nfhead, nfval, nfsht, nfrang, nfr, nflc] = myGet('notes', 1, true);
+    nfval.shift();
+    for (let i = 0; i < avalues.length; i++) {
+        var el = avalues[i];
+        var index = nfval.indexOf(el[0]);
+        if (index == -1) {
+            var note = "no notes";
+            el.push(note);
+        } else {
+            note = nval[index][1];
+            el.push(note);
+        }
+        values.push(el);
+        headings.push('notes2');
+        lastC = lastC++;
+
+    }
+
+    return [headings, values, sheet, range, lastR, lastC];
+}
+
+/**
+ *
+ * @param sheetName : string
+ * @param column : number
+ * @param flat :boolean
+ * @returns : [headings, values, sheet, range, lastR, lastC]
+ */
+function myGet(sheetName, column = -1, flat = false) {
+    if (!sheetName) {
+        Logger.log('missing value');
+    }
+    else {
+        Logger.log(sheetName);
+    }
+    ;
+    var sheet, headings, values, range, lastR, lastC;
+    sheet = ss.getSheetByName(sheetName);
+    lastR = findLastRow(sheetName, 1);
+    lastC = sheet.getLastColumn();
+    range = (column == -1) ?
+        sheet.getRange(1, 1, lastR, lastC) :
+        sheet.getRange(1, column, lastR, 1);
+    values = (flat == undefined || flat == false) ?
+        range.getValues() :
+        range.getValues().flat();
+    headings = (column == -1) ?
+        values.shift() :
+        null;
+    return [headings, values, sheet, range, lastR, lastC];
+}
+
+
+function getById(fileId, sheetName, column = -1, flat = false) {
+    var ss = SpreadsheetApp.openById(fileId);
+    if (!sheetName) {
+        Logger.log('missing value');
+    }
+    else {
+        Logger.log(sheetName);
+    }
+    var sheet, headings, values, range, lastR, lastC;
+    sheet = ss.getSheetByName(sheetName);
+    lastR = findLastRowById(fileId, sheetName, 1);
+    lastC = sheet.getLastColumn();
+    range = (column == -1) ?
+        sheet.getRange(1, 1, lastR, lastC) :
+        sheet.getRange(1, column, lastR, 1);
+    values = (flat == undefined || flat == false) ?
+        range.getValues() :
+        range.getValues().flat();
+    headings = values.shift();
+    return [headings, values, sheet, range, lastR, lastC];
+}
+function getDisp(sheetName, column = -1, flat = false) {
+    if (!sheetName) {
+        Logger.log('missing value');
+    }
+    else {
+        Logger.log(sheetName);
+    }
+    ;
+    var sheet, headings, values, range, lastR, lastC;
+    sheet = ss.getSheetByName(sheetName);
+    lastR = findLastRow(sheetName, 1);
+    lastC = sheet.getLastColumn();
+    range = (column == -1) ?
+        sheet.getRange(1, 1, lastR, lastC) :
+        sheet.getRange(1, column, lastR, 1);
+    values = (flat == undefined || flat == false) ?
+        range.getDisplayValues() :
+        range.getDisplayValues().flat();
+    headings = values.shift();
+    return [headings, values, sheet, range, lastR, lastC];
+}
+/**
+ *
+ * @param sheet: String (name of sheet)
+ * @param column : the column number to check
+ * @returns number (last row with data)
+ */
+function findLastRow(sheet, column) {
+    var theSheet = ss.getSheetByName(sheet);
+    var theValues = theSheet.getRange(1, column, theSheet.getLastRow(), 1)
+        .getValues();
+    var last = (theValues.filter(String).length > 0) ?
+        theValues.filter(String).length :
+        1;
+    return last;
+}
+function findLastRowById(fileId, sheet, column) {
+    var ss = SpreadsheetApp.openById(fileId);
+    var theSheet = ss.getSheetByName(sheet);
+    var theValues = theSheet.getRange(1, column, theSheet.getLastRow(), 1)
+        .getValues();
+    var last = (theValues.filter(String).length > 0) ?
+        theValues.filter(String).length :
+        1;
+    return last;
+}
+// from updateRoster.ts
+function updateRoster() {
+    // get seis data
+    // get seis data
+    var seisValues = parseCSV("1DLxHwR7QlDloES0RCAkuN2bBawdAaAp9", "roster_seis.csv");
+    var seisHeadings_1 = seisValues.shift();
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster_seis');
+    var seisHeadings = seisHeadings_1.map(function (x, n, arr) {
+        return x.replace(/[^A-z^0-9+]/ig, "_").toLowerCase();
+    });
+    var prefOrder = [];
+    prefOrder.push("seis_id", "last_name", "first_name", "date_of_birth", "case_manager", "gender", "grade_code", "date_of_last_annual_plan_review", "date_of_next_annual_plan_review", "date_of_last_eligibility_evaluation", "date_of_next_eligibility_evaluation", "date_of_initial_parent_consent", "parent_guardian_1_name", "parent_1_email", "parent_1_cell_phone", "parent_1_home_phone", "parent_1_work_phone_h1", "parent_1_other_phone", "parent_1_mail_address", "parent_1_mail_city", "parent_1_mail_zip", "disability_1_code", "disability_2_code");
+    if (seisHeadings.length !== prefOrder.length) {
+        throw "There is a missing or extra field name somewhere. The var prefOrder has a length of " + prefOrder.length + "; headings has a length of " + seisHeadings.length + ".";
+    }
+    // get current data
+    // importXLS_2(); 
+    var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
+    var last = roster.getRange('a1:a').getValues().filter(String).length;
+    var rosterVals = roster.getRange(1, 1, last, seisHeadings.length).getDisplayValues();
+    var rosterHeadings = rosterVals.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
+    var curIndices = [];
+    var newData = [];
+    var row = [];
+    for (let i = 0; i < prefOrder.length; i++) {
+        const el = prefOrder[i];
+        if (seisHeadings.indexOf(el) == -1) {
+            throw "One of the data fields was unexpected: '" + el + "' is in the seis csv file, but was not found in the coded field list.";
+        }
+        curIndices.push(seisHeadings.indexOf(el));
+    }
+    for (let i = 0; i < seisValues.length; i++) {
+        const el = seisValues[i];
+        for (let j = 0; j < el.length; j++) {
+            const data = el[curIndices[j]];
+            row.push(data);
+        }
+        newData.push(row);
+        row = [];
+    }
+    var newDataWithHeadings = [prefOrder].concat(newData);
+    var merged = getFromAeriesData(newDataWithHeadings);
+    // Logger.log(JSON.stringify(newData));
+    // var seis_aeries_merge = getFromAeriesData(newDataWithHeadings);
+    var dest = ss.getSheetByName('roster');
+    var destRng = dest.getRange(1, 1, merged.length, merged[0].length);
+    destRng.setValues(merged);
+    SpreadsheetApp.flush();
+    // Utilities.sleep(5000);
+    return ScriptApp.getService().getUrl().toString();
+}
+function parseCSV(folderId, fName) {
+    var folder = DriveApp.getFolderById(folderId);
+    var files = folder.getFiles();
+    var fileIds = [];
+    // looking for .csv file
+    var found = false;
+    while (files.hasNext() && found == false) {
+        var file = files.next();
+        var fileName = file.getName();
+        var status; // '1' if parse function is successful
+        var re = /(fName)/;
+        if (fileName.toString() == fName.toString()) {
+            found = true;
+            var csvFile = file.getBlob().getDataAsString();
+            fileIds.push(file.getId());
+            var data = Utilities.parseCsv(csvFile);
+            // var iObj = getIndicesByHeading(data[0]);
+            return data;
+        }
+    }
+}
+function matchRosterFieldsToSeis(rosH, seisH) {
+    var fieldMatches = {};
+    for (let i = 0; i < rosH.length; i++) {
+        var thisFieldName = rosH[i];
+        var thisFieldIndexes = fieldMatches[thisFieldName] = [];
+        thisFieldIndexes.push(i);
+        thisFieldIndexes.push(seisH.indexOf(thisFieldName));
+    }
+    Logger.log('fieldMatches = %s', JSON.stringify(fieldMatches));
+    return fieldMatches;
+}
+/**
+ * @returns allPupils table from file currentRamonaStudents
+ */
+function getAllPupilsList() {
+    var sheet, last, range, values, keys;
+    var ss2 = allPupilsSheet();
+    sheet = ss2.getSheetByName('allPupils');
+    last = sheet.getRange('a1:a').getValues().filter(String).length;
+    range = sheet.getRange(1, 1, last - 1, sheet.getLastColumn());
+    values = range.getDisplayValues();
+    return values;
+}
+function getAeriesData() {
+    var data = myGet('roster');
+    var [headings, values, sheet, range, lastR, lastC] = data;
+    var aeriesData = getAllPupilsList();
+    var aerHeadings = aeriesData.shift();
+    var teachNameIdx = aerHeadings.indexOf('teachname');
+    var corrIdx = aerHeadings.indexOf('corrlng');
+    var teachEmailIdx = aerHeadings.indexOf('teachemail');
+    var idIdx = aerHeadings.indexOf('student_id');
+    var stuemailIdx = aerHeadings.indexOf('stuemail');
+    var nmjdobIdx = aerHeadings.indexOf('nmjdob');
+    var teachName_R_Idx = headings.indexOf('teachname');
+    var corr_R_Idx = headings.indexOf('corrlng');
+    var teachEmail_R_Idx = headings.indexOf('teachemail');
+    var id_R_Idx = headings.indexOf('student_id');
+    var stuemail_R_Idx = headings.indexOf('stuemail');
+    var nmjdob_R_Idx = headings.indexOf('nmjdob');
+    for (let i = 0; i < values.length; i++) {
+        const elR = values[i];
+        for (let j = 0; j < aeriesData.length; j++) {
+            const elA = aeriesData[j];
+            if (elA[nmjdobIdx] == elR[nmjdob_R_Idx]) {
+                elR.splice(id_R_Idx, 1, elA[idIdx]);
+                elR.splice(teachName_R_Idx, 1, elA[teachNameIdx]);
+                elR.splice(teachEmail_R_Idx, 1, elA[teachEmailIdx]);
+                elR.splice(corr_R_Idx, 1, elR[corr_R_Idx]);
+                elR.splice(stuemail_R_Idx, 1, elA[stuemailIdx]);
+            }
+        }
+    }
+    var destR = ss.getSheetByName('roster')
+        .getRange(2, 1, values.length, values[0].length);
+    destR.setValues(values);
+}
+function updateContactInfo(seisId, fldNm, fieldVal) {
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster');
+    var data = [];
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        // get the index of the seis_id field
+        var si = headings.indexOf("seis_id");
+        if (el[si].toString() == seisId.toString()) {
+            // get the index of the edited field
+            try {
+                const fi = headings.indexOf(fldNm);
+                var destCell = sheet.getRange(i + 2, fi + 1, 1, 1);
+                destCell.setValue(fieldVal);
+                data.push([seisId, fi, fieldVal]);
+                // if it's a meeting date, update the other "next" date
+                if (fldNm == "date_of_last_annual_plan_review") {
+                    const fi = headings.indexOf("date_of_next_annual_plan_review");
+                    var destCell = sheet.getRange(i + 2, fi + 1, 1, 1);
+                    destCell.setValue(moment(fieldVal, "MM/DD/YYYY").add(1, "y").format("MM/DD/YYYY"));
+                    data.push([seisId, fi, fieldVal]);
+                }
+                if (fldNm == "date_of_last_eligibility_evaluation") {
+                    const fi = headings.indexOf("date_of_next_eligibility_evaluation");
+                    var destCell = sheet.getRange(i + 2, fi + 1, 1, 1);
+                    destCell.setValue(moment(fieldVal, "MM/DD/YYYY").add(3, "y").format("MM/DD/YYYY"));
+                    data.push([seisId, fi, fieldVal]);
+                }
+                SpreadsheetApp.flush();
+                Logger.log('data = %s', JSON.stringify(data));
+                return data;
+            }
+            catch (error) {
+                alert(error);
+                return false;
+            }
+        }
+    }
+}
+// from 'lookForTeachers.ts
+function lookForTeachers(id, refresh) {
+    if (refresh) {
+        parseClassListReport();
+    }
+    var [c_headings, c_values, sheet, range, lastR, lastC] = myGet('coursesTeachers');
+    var [rost_headings, rost_values, rost_sheet, rost_range, rost_lastR, rost_lastC] = myGet('roster');
+    var ctStuIdIdx = c_headings.indexOf('Student ID');
+    var seisIdIdx = rost_headings.indexOf('seis_id');
+    var husdIdIdx = rost_headings.indexOf('student_id');
+    var foundCodes = [];
+    var teachersInfo = "Current teachers: ";
+    // "teachName", "teachEmail", "Student ID", "studentName"
+    var tnIdx = c_headings.indexOf('teachName');
+    for (let i = 0; i < rost_values.length; i++) {
+        const el = rost_values[i];
+        if (el[seisIdIdx] == id) {
+            var husd_id = el[husdIdIdx];
+            for (let j = 0; j < c_values.length; j++) {
+                const celement = c_values[j];
+                if (celement[ctStuIdIdx] == husd_id) {
+                    if (foundCodes.indexOf(celement[0]) == -1) {
+                        foundCodes.push(celement[0]);
+                        var ti = celement[1];
+                        teachersInfo += ti + ", ";
+                    }
+                }
+            }
+        }
+    }
+    // Logger.log('the gathered codes: %s', teachersInfo);
+    // var newEntry = putTeachersSetCell([id, teachersInfo]);
+    foundCodes = [];
+    return teachersInfo;
+}
+function getTeacherInfo(tn) {
+    var [headings, values, sheet, range, lastR, lastC] = myGet('teacherCodes');
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        if (tn == el[0]) {
+            return el[4];
+        }
+    }
+}
+function putTeachersSetCell(array) {
+    var [id, teachersInfo] = array;
+    var [headings, values, sheet, range, lastR, lastC] = myGet('notes');
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        if (id == el[0]) {
+            sheet = ss.getSheetByName("notes");
+            range = sheet.getRange(i + 2, 2, 1, 1);
+            var existing = range.getValue();
+            if (existing.toString().indexOf("<< ") == -1) {
+                var newEntry = existing.toString() + "<< " + teachersInfo + " >>";
+            }
+            else {
+                newEntry = existing.toString().replace(/<< .* >>/g, "<< " + teachersInfo + " >>");
+            }
+            range.setValue(newEntry);
+        }
+    }
+    return newEntry;
+}
+// from 'seis_aeries_merge.ts
+function runUpdateForTest() {
+    updateRoster();
+}
+function getFromAeriesData(newDataWithHeadings) {
+    var merged = [[
+            "seis_id", "last_name", "first_name", "date_of_birth", "case_manager", "gender", "grade_code", "date_of_last_annual_plan_review", "date_of_next_annual_plan_review", "date_of_last_eligibility_evaluation", "date_of_next_eligibility_evaluation", "date_of_initial_parent_consent", "parent_guardian_1_name", "parent_1_email", "parent_1_cell_phone", "parent_1_home_phone", "parent_1_work_phone_h1", "parent_1_other_phone", "parent_1_mail_address", "parent_1_mail_city", "parent_1_mail_zip", "disability_1_code", "disability_2_code", "nmjdob", "student_id", "tchr_num", "teachname", "total_minutes___frequency", "frequency", "location", "firstname_lastname", "langflu", "corrlng", "teachemail", "stuemail", "firslinit", "allServices"
+        ]];
+    var [aerHeadings_1, aerValues, aerSheet, aerRange, aerLastR, aerLastC] = myGet('allPupilsFromAeries');
+    var [noteheadings, notevalues, notesheet, noterange, notelastR, notelastC] = myGet('notes');
+    var aerHeadings = aerHeadings_1.map(function (x, n, arr) {
+        return x.replace(/[^A-z^0-9+]/ig, "_").toLowerCase();
+    });
+    var servicesValues = parseCSV("1CZK4YhSS3uiihM-7D-m3sgZWVATWfBK0", "services.csv");
+    var servicesHeadings_1 = servicesValues.shift();
+    var servicesHeadings = servicesHeadings_1.map(function (x, n, arr) {
+        return x.replace(/[^A-z^0-9+]/ig, "_").toLowerCase();
+    });
+    // var [servicesHeadings_1, servicesValues, servicesSheet, servicesRange, servicesLastR, servicesLastC] = get('services');
+    // var servicesHeadings = servicesHeadings_1.map(function (x, n, arr) {
+    //     return x.replace(/[^A-z^0-9+]/ig, "_").toLowerCase();
+    // });
+    // make these variables:
+    // 
+    // var notUsedCount = merged[0].lastIndexOf("notused") + 1 - merged[0].indexOf("notused");
+    var count = newDataWithHeadings[0].length + 1;
+    for (let i = 1; i < newDataWithHeadings.length; i++) {
+        var el = newDataWithHeadings[i];
+        var [seis_id, last_name, first_name, date_of_birth, case_manager, gender, grade_code, date_of_last_annual_plan_review, date_of_next_annual_plan_review, date_of_last_eligibility_evaluation, date_of_next_eligibility_evaluation, date_of_initial_parent_consent, parent_guardian_1_name, parent_1_email, parent_1_cell_phone, parent_1_home_phone, parent_1_work_phone_h1, parent_1_other_phone, parent_1_mail_address, parent_1_mail_city, parent_1_mail_zip, disability_1_code, disability_2_code, nmjdob, student_id, tchr_num, teachname, total_minutes___frequency, frequency, location, firstname_lastname, langflu, corrlng, teachemail, stuemail, firslinit, allServices] = el;
+        // fill unused fields as needed
+        // for (let j = 0; j < notUsedCount; j++) {
+        //     el.push("");
+        // }
+        // these are the fields to create for each record
+        var nmjdob, student_id, tchr_num, teachname, total_minutes___frequency, frequency, location, firstname_lastname, langflu, corrlng, teachemail, stuemail, firslinit, allServices;
+        nmjdob = makeNmjdob(first_name, last_name, date_of_birth);
+        function makeNmjdob(fn, ln, dob) {
+            var y2 = moment(dob).format('YY');
+            var doy = moment(dob).dayOfYear();
+            var nmjdob = ln.replace(/[- ']/g, "") + fn.replace(/[- ']/g, "") + y2.toString() + doy.toString();
+            return nmjdob;
+        }
+        el.push(nmjdob);
+        function aerLookup(nmjdob, fieldIndex) {
+            for (let i = 0; i < aerValues.length; i++) {
+                const aerEl = aerValues[i];
+                if (nmjdob == aerEl[aerHeadings.indexOf("nmjdob")]) {
+                    return aerEl[fieldIndex];
+                }
+            }
+        }
+        function servicesLookup(seis_id, fieldIndex) {
+            // services fields: 
+            // ["seis_id","last_name","first_name","serviceid","code","service","marked_dnr","status","start_date","end_date","provider","npa","delivery","session_based","minutes___session","sessions___frequency","total_minutes___frequency","frequency","location","initial_start_date","comments","date_of_birth","date_of_last_annual_plan_review","gender","grade_code","date_of_next_annual_plan_review","parent_1_work_phone_h1","date_of_last_eligibility_evaluation","date_of_next_eligibility_evaluation","date_of_initial_parent_consent","parent_1_cell_phone","parent_1_home_phone","parent_1_other_phone","parent_1_email","parent_guardian_1_name","parent_1_mail_address","parent_1_mail_city","parent_1_mail_zip"]
+            for (let i = 0; i < servicesValues.length; i++) {
+                const servicesEl = servicesValues[i];
+                if (seis_id == servicesEl[servicesHeadings.indexOf("seis_id")]) {
+                    return servicesEl[fieldIndex];
+                }
+            }
+        }
+        function gatherAllServices(seis_id) {
+            var allServ = "\n<< \n";
+            for (let i = 0; i < servicesValues.length; i++) {
+                const servicesEl = servicesValues[i];
+                if (servicesEl[6] == "No" && seis_id == servicesEl[servicesHeadings.indexOf("seis_id")]) {
+                    allServ += servicesEl[4] + ", " + servicesEl[5] + "\n";
+                }
+            }
+            allServ += ">>\n";
+            for (let n = 0; n < notevalues.length; n++) {
+                const nel = notevalues[n];
+                if (nel[0].toString() == seis_id.toString()) {
+                    if (nel[1].toString().indexOf("<<") == -1) {
+                        var newNote = nel[1].toString() + allServ;
+                    }
+                    else {
+                        newNote = nel[1].toString().replace(/(<<.*\n*.*\n>>)/gm, allServ).replace(/\n+/gm, "\n").replace(/^\n+/gm, "");
+                        notevalues[n].splice(1, 1, newNote);
+                    }
+                }
+            }
+            return allServ;
+        }
+        student_id = aerLookup(nmjdob, aerHeadings.indexOf("student_id"));
+        el.push(student_id);
+        tchr_num = aerLookup(nmjdob, aerHeadings.indexOf("tchr_num"));
+        el.push(tchr_num);
+        teachname = aerLookup(nmjdob, aerHeadings.indexOf("teachname"));
+        el.push(teachname);
+        total_minutes___frequency = servicesLookup(seis_id, servicesHeadings.indexOf("total_minutes___frequency"));
+        el.push(total_minutes___frequency);
+        frequency = servicesLookup(seis_id, servicesHeadings.indexOf("frequency"));
+        el.push(frequency);
+        location = servicesLookup(seis_id, servicesHeadings.indexOf("location"));
+        el.push(location);
+        firstname_lastname = el[newDataWithHeadings[0].indexOf("first_name")] + " " + el[newDataWithHeadings[0].indexOf("last_name")];
+        el.push(firstname_lastname);
+        langflu = aerLookup(nmjdob, aerHeadings.indexOf("langflu"));
+        el.push(langflu);
+        corrlng = aerLookup(nmjdob, aerHeadings.indexOf("corrlng"));
+        el.push(corrlng);
+        teachemail = aerLookup(nmjdob, aerHeadings.indexOf("teachemail"));
+        el.push(teachemail);
+        stuemail = aerLookup(nmjdob, aerHeadings.indexOf("stuemail"));
+        el.push(stuemail);
+        firslinit = el[newDataWithHeadings[0].indexOf("first_name")] + " " + el[newDataWithHeadings[0].indexOf("last_name")][0] + ".";
+        el.push(firslinit);
+        allServices = gatherAllServices(seis_id);
+        el.push(allServices);
+        merged.push(el);
+    }
+    // notevalues = noteheadings.concat(notevalues);
+    var notesDest = ss.getSheetByName("notes");
+    var notesRange = notesDest.getRange(2, 1, notevalues.length, notevalues[0].length);
+    notesRange.setValues(notevalues);
+    // var testingDest = ss.getSheetByName('testingDest').getRange(1, 1, merged.length, merged
+    // [0].length);
+    // testingDest.clearContent();
+    // SpreadsheetApp.flush();
+    // testingDest.setValues(merged);
+    return merged;
+}
+// 
+// from 'makeDocsForNotes.ts
+function makeNewNotesDocs() {
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster');
+    var doc, fn, ln, folder, files, file, fileName, folderId;
+    values.shift();
+    var root = DriveApp.getRootFolder();
+    folderId = "13cZ2z5gmxNfTU_N2ko14XYQ9vPD_Ju0d";
+    folder = DriveApp.getFolderById(folderId);
+    files = folder.getFiles();
+    var fileNamesArr = [];
+    while (files.hasNext()) {
+        file = files.next();
+        fileName = file.getName();
+        fileNamesArr.push(fileName);
+    }
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        const fullName = el[2].toString() + " " + el[1].toString();
+        if (fileNamesArr.indexOf(fullName) == -1) {
+            try {
+                doc = DocumentApp.create(fullName);
+                const thisFile = DriveApp.getRootFolder().getFilesByName(fullName).next();
+                folder.addFile(thisFile);
+                root.removeFile(thisFile);
+            }
+            catch (error) {
+                Logger.log('there was an error: %s', error.toString());
+            }
+        }
+    }
+    var savedData = sheet.getRange(3, 1, values.length, values[0].length);
+}
+
+// 
+// 
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
