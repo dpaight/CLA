@@ -1,7 +1,7 @@
 <script>
   // named functions
   // calls function on server side to return data for this student
-  function startup(id) {
+  function startup(id = localStorage.getItem("lastId")) {
     $('#spinner01').show();
     // id = getPointer();
     if (id == undefined || id == null) {
@@ -1021,4 +1021,11 @@
     copyToClipboard(url);
     // window.open(url, "_blank");
   };
+  function goToSeisIep(){
+    var url = "https://seis.org/iep/";
+    url += $("#seis_id").val();
+    url += "/29368995/forms";
+    window.open(url, "_blank");
+
+}
 </script>
