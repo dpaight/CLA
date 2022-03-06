@@ -56,19 +56,6 @@
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  function logsToCache(allRecords) {
-    // console.log('allRecords = %s', allRecords);
-
-    allRecords = JSON.parse(allRecords);
-    for (let i = 0; i < allRecords.length; i++) {
-      const elAll = allRecords[i];
-      // these records have id numbers at 0; within each id number item lies a 2-d array with contact log entries      
-      var key = 'reclog' + elAll[0];
-      var val = JSON.stringify(elAll[1]);
-      localStorage.setItem(key, val);
-    }
-    focus(localStorage.getItem("lastId"));
-  }
 
   function contactInfo(id = localStorage.getItem('lastId')) {
     if (id == undefined || id == null || id == "") { alert('no id at contactInfo()') };
@@ -328,9 +315,9 @@
       .createDraftEmail(buttonVal, JSON.stringify(params));
   }
   function editGoalInModal(goal) {
-    
+
     $('#spinner01').show();
-    var myModal = new bootstrap.Modal(document.getElementById('goalModal'), {focus: true});
+    var myModal = new bootstrap.Modal(document.getElementById('goalModal'), { focus: true });
     $('#glEditId').val(goal.id);
     $('#glEditLvl').val(goal.lvl);
     $('#glEditStrand').val(goal.strand);
@@ -424,24 +411,6 @@
     }
   }
 
-  function openLogPrintDialog() {
-    $('#logModal').modal({
-      focus: true
-    });
-    $('#pdfUrl').empty();
-    $('#printedLogsth').empty();
-    $('#printedLogstb').empty();
-    $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
-    var start = moment().subtract(1, 'y').toDate();
-    var end = moment().toDate();
-    document.getElementById("endDtEdit").valueAsDate = end;
-    document.getElementById("stDtEdit").valueAsDate = start;
-
-    // var logEntries = filterLogEntriesByDateWindow();
-    // showLog(logEntries, 'loc04');
-    filterLogEntriesByDateWindow();
-    // $('#spinner02').hide();
-  }
   function filterLogEntriesByDateWindow() {
     //     console.log('fired');
     //     console.log('current start date: %s; end date: %s', $('#stDtEdit').val(), $('#endDtEdit').val());
@@ -458,45 +427,6 @@
     }
     localStorage.setItem('logPrintItems', JSON.stringify(keepers));
     showLog(keepers, 'loc04');
-  }
-  function showLog(logEntries, loc) { // [entries, id]
-    // input is an array containing one arrays and one string ('loc'): array contains all the log entries that correspond to that record
-    //     console.log('in "showLog" the first log entry is: %s; the loc is %s', JSON.stringify(logEntries[0]), loc);
-    //     console.log('logEntries is a type of %s', typeof logEntries);
-    if (typeof logEntries == 'string') {
-      logEntries = JSON.parse(logEntries);
-    }
-
-    var list = $("#" + loc);
-    list.empty();
-
-    var stuName = First_Name + ' ' + Last_Name;
-    for (var i = 0; i < logEntries.length; i++) {
-      var el = logEntries[i];
-      var [
-        Timestamp, email, studentMC, log_entry, log_entry_id, seis_id, Last_Name, First_Name, First_Name, Student_ID
-      ] = el;
-      list.append(
-        '<tr class="d-flex">' +
-        '<td data-entry_id=' +
-        log_entry_id + ' class="col-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
-        'title= "double-click to edit">' +
-        moment(el[0]).format("YYYY-MM-DD") +
-        '</td>' +
-        '<td data-entry_id=' + log_entry_id + ' class="logEntry col-9">' +
-        el[3] +
-        '</td>' +
-        '</tr>'
-      );
-    }
-    $("#corrlng[value='01']", function () {
-      $(this).css("background-color", "#ff0000")
-    });
-
-    $("#" + 'loc01' + "tb").show();
-
-    document.body.style.cursor = "default";
-
   }
 
 
@@ -541,7 +471,7 @@
 
   // display table of names sorted by due dates
   function showRosterTable(dataStr) {
-    console.log('data is %s', dataStr);
+    // console.log('data is %s', dataStr);
     var data = JSON.parse(dataStr);
     var loc = 'loc00';
     var pending = ['#ffffff', '#000000'];
@@ -748,12 +678,6 @@
     // console.log('returned: %s', value);
     findGoals();
   }
-  function saveLogEntrySuccess(obj) {
-    // console.log('returned: %s', JSON.stringify(obj));
-    localStorage.removeItem('reclog' + obj.seis_id);
-    focus(obj.seis_id, 'loc01');
-  }
-
 
 
   function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, timestamp) {
@@ -828,51 +752,7 @@
 
 
 
-  function editLogEntryInModal(logEntry) {
-    logEntry = JSON.parse(logEntry);
-    //     console.log('the log record is %s', JSON.stringify(logEntry));
-    // $('#logEntryModal').modal({ focus: true });
-    var theDate = moment(logEntry.timestamp, 'YYYY-MM-DDTHH:mm:ss.SSSZ').toDate();
 
-    document.getElementById("timestamp").valueAsDate = theDate;
-    
-    var myModal = new bootstrap.Modal(document.getElementById('logEntryModal'), {focus: true});
-    $('#lelog_entry_id').val(logEntry.log_entry_id);
-    $('#leEntry').val(logEntry.entry);
-    myModal.show();
-    $('#spinner01').hide();
-  }
-
-  function saveEditedEntry(option) {
-    var obj = {};
-    obj.lelog_entry_id = $('#lelog_entry_id').val();
-    obj.leEntry = $('#leEntry').val().toString();
-    obj.letimestamp = moment($('#timestamp').val(), 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-    obj.delete = (option != -1) ? false : true;
-    obj.seis_id = $("#seis_id").val();
-    //     console.log('the obj sent to saveEdidedLogEntry is %s', JSON.stringify(obj));
-    google.script.run
-      .withSuccessHandler(saveLogEntrySuccess)
-      .saveEditedLogEntry(obj);
-
-  }
-  function updateLogEntryCache(record) {
-    //     console.log('record is %s', record);
-    try {
-      record = JSON.parse(record);
-    } catch (error) {
-      console.log('error at updateLogEntryCache: %s', error);
-      return;
-    }
-    for (let i = 0; i < record.length; i++) {
-      const el = record[i];
-      var id = el[5]
-      var logs = JSON.parse(localStorage.getItem('reclog' + id));
-      logs.unshift(el);
-      localStorage.setItem('reclog' + id, JSON.stringify(logs));
-    }
-    showLog(logs, 'loc01');
-  }
 
   function deleteRecord() {
     $('#genericModal').modal({ focus: true });
@@ -1000,10 +880,10 @@
     lname = $("#last_name").val();
 
     google.script.run
-      .withSuccessHandler(openFolder)
+      .withSuccessHandler(openUrl)
       .getStuFolder(fname, lname);
   }
-  function openFolder(url) {
+  function openUrl(url) {
     window.open(url, target = "_blank");
   }
   function getPrefilledLevels() {
@@ -1021,11 +901,22 @@
     copyToClipboard(url);
     // window.open(url, "_blank");
   };
-  function goToSeisIep(){
+  function goToSeisIep() {
     var url = "https://seis.org/iep/";
     url += $("#seis_id").val();
     url += "/29368995/forms";
     window.open(url, "_blank");
 
-}
+  }
+  function sendLevelsQues() {
+    console.log('send levels button clicked');
+    var id = $("#seis_id").val();
+    var stuName = $("#stuName").val();
+    var teachemail = $("#teachemail").val();
+    // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
+
+    google.script.run
+      .withSuccessHandler(openUrl)
+      .sendLevelsForm(stuName, id, "dpaight@hemetusd.org");
+  }
 </script>

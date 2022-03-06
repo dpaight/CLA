@@ -64,7 +64,8 @@ function sndMl() {
 }
 function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail) {
     Logger.log('stuName: %s, stuId: %s, teachemail: %s', stuName, stuId, teachemail);
-    // stuName = 'Wanda Wanderer', stuId = 'WandererWanda123456', teachemail = 'dpaight@hemetusd.org';
+    // stuName = 'Wanda Wanderer', stuId = 'WandererWanda123456', 
+    teachemail = 'dpaight@hemetusd.org';
     // 1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg  
     var formId = '1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg';
     var form = FormApp.openById(formId);
@@ -81,11 +82,12 @@ function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail) {
     }
     var levelsUrl = formResponse.toPrefilledUrl();
     var confirmationMsg = form.getConfirmationMessage() + "; " + formResponse.getEditResponseUrl();
-    var content = teachemail + "\n\nThe IEP for " + stuName + " is coming up, and I need some information, please. " +
-        "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
-        "information you provide as data for the IEP. Thank you for your time." + "\n\n" +
-        "If you have already responded, please ignore this request.\n\n" +
-        levelsUrl
+    return levelsUrl; // picked up by success handler
+    // var content = teachemail + "\n\nThe IEP for " + stuName + " is coming up, and I need some information, please. " +
+    //     "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
+    //     "information you provide as data for the IEP. Thank you for your time." + "\n\n" +
+    //     "If you have already responded, please ignore this request.\n\n" +
+    //     levelsUrl
 
     // try {
     //     MailApp.sendEmail({
@@ -102,7 +104,6 @@ function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail) {
     // catch (err) {
     //     Logger.log('failed at email try: %s', err);
     // }
-    return content; // picked up by success handler
 }
 // function saveLastId(id) {
 //     PropertiesService.getScriptProperties()
@@ -131,28 +132,6 @@ function doPost(e) {
 function include(filename) {
     return HtmlService.createHtmlOutputFromFile(filename)
         .getContent();
-}
-// takes Data sent from the client side and saves it on the server side spreadsheet;
-// returns id for 'show...' function
-function saveLogEntry(input) {
-    if (input == undefined || input == null || input.length == 0) {
-        Logger.log('input empty');
-    }
-    var id = input[0], entry = input[1], nmjdob = input[2];
-    var [headings, logVals, logResp, range, last, lastC] = myGet('logRespMerged');
-    var log_entry_id = getNextLogEntryId();
-    var row = [[moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ'), Session.getActiveUser().getEmail(), nmjdob, entry, log_entry_id, id]];
-    var range = logResp.getRange(last + 1, 1, 1, row[0].length);
-    range.setValues(row);
-    row = row;
-    SpreadsheetApp.flush();
-    return JSON.stringify(row);
-}
-function getNextLogEntryId() {
-    var sheet = ss.getSheetByName('logRespMerged');
-    var last = sheet.getRange('A1:A').getValues().filter(String).length;
-    var entry_ids = sheet.getRange('E2:E' + last).getValues().flat();
-    return Math.max(...entry_ids) + 1;
 }
 /**
  *
@@ -310,28 +289,6 @@ function getGoal(gId = 47) {
     Logger.log('the goal object is %s', JSON.stringify(goal));
     return goal;
 }
-function getLogEntry(logEntryID = '1') {
-    var [headings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
-    for (let i = values.length - 1; i > -1; i--) {
-        const el = values[i];
-        if (el[4] == logEntryID) {
-            var logEntry = {
-                "timestamp": moment(el[0], 'YYYY-MM-DDTHH:mm').format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
-                "email": el[1],
-                "studentMC": el[2],
-                "entry": el[3],
-                "log_entry_id": el[4],
-                "SEIS_ID": el[5],
-                "Last_Name": el[6],
-                "First_Name": el[7],
-                "First_Name2": el[8],
-                "Student_ID": el[9]
-            };
-            Logger.log('log entry is %s', JSON.stringify(logEntry));
-            return JSON.stringify(logEntry);
-        }
-    }
-}
 function getOneGoalForEditing(gId = 47) {
     var [headings, values, sheet, range, lastR, lastC] = myGet('goals');
     for (let i = 0; i < values.length; i++) {
@@ -356,7 +313,7 @@ function getOneGoalForEditing(gId = 47) {
 //     var [headings, values, sheet, range, lastR, lastC] = rosterGet();
 //     // var values = getAllRecords('roster');
 //     var headings = headings.flat();
-//     // nmJdob	idAeries	teachemail	u1_phone	stuemail	u3_Parent_1a_Email	corrlng	langFlu	u6_teacher	seis_id	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
+//     // nmjdob	idAeries	teachemail	u1_phone	stuemail	u3_Parent_1a_Email	corrlng	langFlu	u6_teacher	seis_id	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
 //     Logger.log('seis index: ' + headings.indexOf('seis_id'));
 //     var seis_id_idx = headings.indexOf('seis_id');
 //     var u3_Parent_1a_Email_idx = headings.indexOf('u3_Parent_1a_Email`');
@@ -411,16 +368,16 @@ function makeMatchVar(data) {
 }
 /**
  *
- * @param nmJdob {string}
+ * @param nmjdob {string}
  * @param array {array} allPupils sheet in current school students spreadsheet
  * @param matchIndex {number} the index of the lastNameFirstNameDOBasJulianDate
  * @param targetIndex {number} the index of the field in current school students that is to be looked up
  * @returns data field specified in parameters for the record having the "match" variable specified
  */
-function getFieldFromNmJdob(nmJdob, array, matchIndex, targetIndex) {
+function getFieldFromnmjdob(nmjdob, array, matchIndex, targetIndex) {
     for (var i = 0; i < array.length; i++) {
         var el = array[i];
-        if (el[matchIndex] == nmJdob) {
+        if (el[matchIndex] == nmjdob) {
             return el[targetIndex];
         }
     }
@@ -773,6 +730,7 @@ function getPresentLevelsAsTextBlazeListItem(seisId = '1010101', areas = ['readi
         return wholeSnip;
     }
 }
+
 function LevelsPerformance(el) {
     this['lvls'] = {};
     this['lvls'].bhvr1play = (el[25].length > 0) ?
@@ -979,11 +937,11 @@ function addStudentByIdFromRESstudentsServer(obj) {
     destRange.setValues([newRosterRecord]);
     return seisID;
 }
-function getRecordIndex(nmJdob, allPupilsArray, allPupilsHeadings) {
+function getRecordIndex(nmjdob, allPupilsArray, allPupilsHeadings) {
     var index = allPupilsHeadings.indexOf("nmjdob");
     for (let p = 0; p < allPupilsArray.length; p++) {
         const pel = allPupilsArray[p];
-        if (nmJdob.toLowerCase() == pel[index].toLowerCase()) {
+        if (nmjdob.toLowerCase() == pel[index].toLowerCase()) {
             return p;
         }
     }
@@ -1251,87 +1209,12 @@ function getFirstPointer() {
     Logger.log(values[0]);
     return values[0].toString();
 }
-function getLogEntries(id = '1010101', loc = null, startDate, endDate) {
-    var [headings, ids, sheet, range, lastR, lastC] = myGet('roster', 1, true);
-    ids.shift(); // file has an extra headings line
-    var allRecords = [];
-    var [logTableHeadings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
-    values.sort(function (a, b) {
-        if (a[0] < b[0]) {
-            return -1;
-        }
-        else if (a[0] > b[0]) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    });
-    for (let i = 0; i < ids.length; i++) {
-        var el = ids[i];
-        var entryIDindex = (logTableHeadings.indexOf('SEIS_ID'));
-        var stuRecord = [];
-        var count = 0;
-        for (let j = values.length - 1; j > -1; j--) {
-            var log = values[j];
-            if (log[entryIDindex] == el) {
-                stuRecord.push(log);
-                count++;
-                // if (count > 10) {
-                // break;
-                // }
-            }
-        }
-        allRecords.push([el, stuRecord]);
-    }
-    // Logger.log('allRecords = %s', JSON.stringify(allRecords));
-    return JSON.stringify(allRecords, loc);
-}
+
 function deleteEntry(entryId) {
     Logger.log(entryId);
     return entryId;
 }
-function saveEditedLogEntry(obj) {
-    // obj = {
-    //     "delete": true,
-    //     "lelog_entry_id": 548
-    // };
-    var [headings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
-    for (let i = 0; i < values.length; i++) {
-        var el = values[i];
-        var entryIDindex = headings.indexOf('log_entry_id');
-        if (el[entryIDindex] == obj.lelog_entry_id) {
-            if (obj.delete == true) {
-                values.splice(i, 1);
-                sheet.clearContents();
-                values.unshift(headings);
-                range = sheet.getRange(1, 1, values.length, lastC);
-                range.setValues(values);
-            }
-            else {
-                var newEntry = [
-                    moment(obj.letimestamp, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
-                    el[1],
-                    el[2],
-                    obj.leEntry,
-                    getNextLogEntryId(),
-                    el[5],
-                    el[6],
-                    el[7],
-                    el[8],
-                    el[9]
-                ];
-                values.splice(i, 1, newEntry);
-                values.unshift(headings);
-                range = sheet.getRange(1, 1, values.length, el.length);
-                range.setValues(values);
-                // timestamp	email	studentMC	log_entry	log_entry_id	
-                // SEIS_ID	Last_Name	First_Name	First_Name2	Student_ID
-            }
-        }
-    }
-    return obj;
-}
+
 function updateLogForm() {
     var [allheadings, allvalues, allsheet, allrange, alllastR, alllastC] = rosterGet();
     var [headings, values, sheet, range, lastR, lastC] = myGet('roster', allheadings.indexOf('nmjdob') + 1, true);
@@ -1347,7 +1230,8 @@ function updateLogForm() {
  * @param e
  * adds log entry from Forms to regular sheet for log entries
  */
-function appendNewLogEntry(e) {
+function
+    appendNewLogEntry(e) {
     var v = e.namedValues;
     Logger.log('the object for the form submit event is %s', JSON.stringify(v));
     // the object for the form submit event is {"log_entry":["Here is a log entry for the person whose name is first in the alphabet"],"Student":["ArredondoHunter1555"],"Timestamp":["12/24/2021 17:16:51"],"Email Address":["dpaight@hemetusd.org"],"":[""]}
@@ -1500,7 +1384,7 @@ function importXLS_2() {
         '=ArrayFormula(iferror(vlookup($M1:$M, teacherCodes!$B$1:$H, 7,false),if(row($M1:$M) = 1, "teachEmail","")))	',
         '=ArrayFormula(iferror(vlookup($M1:$M,{teacherCodes!$B$1:$I34 }, 8,false),if(row($M$1:$M) = 1,"teachName","")))	',
         '=ArrayFormula(if(row($Z$1:$Z) <> 1, if(isBlank($A$1:$A),,if(($M$1:$M = 21) + ($M$1:$M = 100) + ($M$1:$M = 105) + sum($S$1:$S = "X") > 0, 1, 0)),"sdc||rsp"))	',
-        '=ArrayFormula(if(row(A1:A)=1,"nmJdob",regexreplace(if(isblank(A1:A),, REGEXREPLACE(C1:C & D1:D, "[ \'-]", "") & right(year(G1:G),2) & days(\"12/31/\"&(year(G1:G)-1), G1:G)),"-","")))',
+        '=ArrayFormula(if(row(A1:A)=1,"nmjdob",regexreplace(if(isblank(A1:A),, REGEXREPLACE(C1:C & D1:D, "[ \'-]", "") & right(year(G1:G),2) & days(\"12/31/\"&(year(G1:G)-1), G1:G)),"-","")))',
         '=ArrayFormula(if(isblank(id),, regexreplace(C1:C & "_" & firstName & "_" & A1:A, "[ \'-]", "")))',
         '=ArrayFormula(if(isblank(id),, REGEXREPLACE(C1:C & "_" & firstName & "_dob_" & dob, "[ \'-]", "")))',
         '=ArrayFormula(if(isblank(id),, REGEXREPLACE(C1:C & "_" & firstName, "[ \'-]", "")))',
@@ -2080,8 +1964,8 @@ function runUpdateForTest() {
 }
 function getFromAeriesData(newDataWithHeadings) {
     var merged = [[
-            "seis_id", "last_name", "first_name", "date_of_birth", "case_manager", "gender", "grade_code", "date_of_last_annual_plan_review", "date_of_next_annual_plan_review", "date_of_last_eligibility_evaluation", "date_of_next_eligibility_evaluation", "date_of_initial_parent_consent", "parent_guardian_1_name", "parent_1_email", "parent_1_cell_phone", "parent_1_home_phone", "parent_1_work_phone_h1", "parent_1_other_phone", "parent_1_mail_address", "parent_1_mail_city", "parent_1_mail_zip", "disability_1_code", "disability_2_code", "nmjdob", "student_id", "tchr_num", "teachname", "total_minutes___frequency", "frequency", "location", "firstname_lastname", "langflu", "corrlng", "teachemail", "stuemail", "firslinit", "allServices"
-        ]];
+        "seis_id", "last_name", "first_name", "date_of_birth", "case_manager", "gender", "grade_code", "date_of_last_annual_plan_review", "date_of_next_annual_plan_review", "date_of_last_eligibility_evaluation", "date_of_next_eligibility_evaluation", "date_of_initial_parent_consent", "parent_guardian_1_name", "parent_1_email", "parent_1_cell_phone", "parent_1_home_phone", "parent_1_work_phone_h1", "parent_1_other_phone", "parent_1_mail_address", "parent_1_mail_city", "parent_1_mail_zip", "disability_1_code", "disability_2_code", "nmjdob", "student_id", "tchr_num", "teachname", "total_minutes___frequency", "frequency", "location", "firstname_lastname", "langflu", "corrlng", "teachemail", "stuemail", "firslinit", "allServices"
+    ]];
     var [aerHeadings_1, aerValues, aerSheet, aerRange, aerLastR, aerLastC] = myGet('allPupilsFromAeries');
     var [noteheadings, notevalues, notesheet, noterange, notelastR, notelastC] = myGet('notes');
     var aerHeadings = aerHeadings_1.map(function (x, n, arr) {
@@ -2109,8 +1993,8 @@ function getFromAeriesData(newDataWithHeadings) {
         // }
         // these are the fields to create for each record
         var nmjdob, student_id, tchr_num, teachname, total_minutes___frequency, frequency, location, firstname_lastname, langflu, corrlng, teachemail, stuemail, firslinit, allServices;
-        nmjdob = makeNmjdob(first_name, last_name, date_of_birth);
-        function makeNmjdob(fn, ln, dob) {
+        nmjdob = makenmjdob(first_name, last_name, date_of_birth);
+        function makenmjdob(fn, ln, dob) {
             var y2 = moment(dob).format('YY');
             var doy = moment(dob).dayOfYear();
             var nmjdob = ln.replace(/[- ']/g, "") + fn.replace(/[- ']/g, "") + y2.toString() + doy.toString();
@@ -2230,11 +2114,44 @@ function makeNewNotesDocs() {
     }
     var savedData = sheet.getRange(3, 1, values.length, values[0].length);
 }
-
+function getLinks() {
+    var folder, files, file, url, name;
+    var list = [];
+    var folderUrl = "https://drive.google.com/drive/folders/1FQmYYsp5Rd1JVxW4039F0_oWQpLzEwO8?usp=sharing";
+    folder = DriveApp.getFolderById('1FQmYYsp5Rd1JVxW4039F0_oWQpLzEwO8');
+    files = folder.getFiles();
+    while (files.hasNext()) {
+        file = files.next();
+        let fileName = file.getName();
+        let name = fileName.replace(/(\d*_)(\w+)(\.pdf)/g, "$2");
+        url = file.getUrl();
+        list.push([name, url]);
+    }
+    var sheet = ss.insertSheet("urls_of_files");
+    var range = sheet.getRange(1, 1, list.length, list[0].length);
+    range.setValues(list);
+}
+function cleanOldLogEntries() {
+    var [headings, logids, sheetLogs, range, lastR, lastC] = myGet("logRespMerged");
+    var [rheads, rostids, sheet, range, lastR, lastC] = myGet("roster", 1, true);
+    var keepers = logids;
+    var toss = [];
+    var found = [];
+    logids.shift();
+    rostids.shift();
+    for (let i = 0; i < logids.length; i++) {
+        var ell = logids[i][5].toString();
+        if (rostids.indexOf(ell) == -1) {
+            ell = '-' + logids[i][5].toString();
+            logids[i][5] = ell;
+        }
+    }
+    sheetLogs.clearContents();
+    var values = [headings].concat(logids);
+    var destRange = sheetLogs.getRange(2, 1, values.length, values[0].length);
+    destRange.clearContent();
+    destRange.setValues(values);
+}
+//
 // 
-// 
-//# sourceMappingURL=module.jsx.map
-//# sourceMappingURL=module.jsx.map
-//# sourceMappingURL=module.jsx.map
-//# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
