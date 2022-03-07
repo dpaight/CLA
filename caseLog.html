@@ -123,8 +123,7 @@
                     <span style="height: auto; padding-left: 6px;">
                       <div id="logEntryButtons" class="svChngs btn-group flex-row" role="group">
                         <button id="snipThis" class="btn btn-sm btn-success snipThis">CLIP</button>
-                        <button id="delThis" onclick="deleteRecord()"
-                          class="btn btn-sm btn-danger deleteThis">REMOVE</button>
+                        
                       </div>
                     </span>
                   </span>
@@ -214,7 +213,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text p-1 " id="lastEvalDate-pre2">Last Eval</span>
                   </div>
-                  <input type="text" title="" class="form-control stuEdit  "
+                  <input type="text" title="" required-pattern="\d{4}-\d{2}-\d{2}" class="form-control stuEdit  "
                     data-fldNm='date_of_last_eligibility_evaluation' id="date_of_last_eligibility_evaluation" value="">
                 </div>
               </div>
@@ -390,7 +389,7 @@
         <div class="d-flex px-4 align-items-baseline">
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
           <i class="material-icons md-18 text-left" style="margin-right: 2rem;" data-bs-toggle="tooltip"
-            data-placement="top" title="double-click a goal to edit  shift-click to add goal to gl items">help</i>
+            data-placement="top" title="double-click a goal to edit  ctrl-click to add goal to gl items">help</i>
         </div>
         <span class="d-flex justify-content-left my-1">
           <span style="display: inline-flex;">
@@ -443,56 +442,56 @@
         <div class="d-flex" style="flex-wrap: wrap;">
           <div class="d-flex flex-column mx-2">
             <label for="gl-0"></label>
-            <input name="gls" id="gl-0" title="" type="text" value="" style="width:  30px; height: 30px;">
+            <input class="gls" id="gl-0" title="" type="text" value="" style="width:  30px;">
             gl-0
           </div>
-          <div class="d-flex flex-column mx-2">
+          <div class="d-flex  flex-column mx-2">
 
             <label for="gl-1"></label>
-            <input name="gls" id="gl-1" title="" type="text" value="" style="width:  30px;">
+            <input class="gls" id="gl-1" title="" type="text" value="" style="width:  30px;">
             gl-1
           </div>
           <div class="d-flex flex-column mx-2">
 
             <label for="gl-2"></label>
-            <input name="gls" id="gl-2" title="" type="text" value="" style="width:  30px;">
+            <input class="gls" id="gl-2" title="" type="text" value="" style="width:  30px;">
             gl-2
           </div>
           <div class="d-flex flex-column mx-2">
 
             <label for="gl-3"></label>
-            <input name="gls" id="gl-3" title="" type="text" value="" style="width:  30px;">
+            <input class="gls" id="gl-3" title="" type="text" value="" style="width:  30px;">
             gl-3
           </div>
           <div class="d-flex flex-column mx-2">
 
             <label for="gl-4"></label>
-            <input name="gls" id="gl-4" title="" type="text" value="" style="width:  30px;">
+            <input class="gls" id="gl-4" title="" type="text" value="" style="width:  30px;">
             gl-4
           </div>
           <div class="d-flex flex-column mx-2">
 
             <label for="gl-5"></label>
-            <input name="gls" id="gl-5" title="" type="text" value="" style="width:  30px;">
+            <input class="gls" id="gl-5" title="" type="text" value="" style="width:  30px;">
             gl-5
           </div>
           <div class="d-flex flex-column mx-2">
 
             <label for="gl-6"></label>
-            <input name="gls" id="gl-6" title="" type="text" value="" style="width:  30px;">
+            <input class="gls" id="gl-6" title="" type="text" value="" style="width:  30px;">
             gl-6
           </div>
           <div class="d-flex flex-column mx-2">
 
             <label for="gl-7"></label>
-            <input name="gls" id="gl-7" title="" type="text" value="" style="width:  30px;">
+            <input class="gls" id="gl-7" title="" type="text" value="" style="width:  30px;">
             gl-7
           </div>
         </div>
       </div>
     </div>
 
-    <div class="card col-2" style="height: 250px;">
+    <div class="card col-2" style="height: 250px; width: 300px;">
       <div class="list-group m-0">
         <div id="glLst" class="px-0 m-0 readonly"
           style="font-size: 0.8rem; height: 375px; overflow: scroll; background-color: white;">
@@ -524,7 +523,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text p-1" id="editEntry-pre">Date</span>
                   </div>
-                  <input type="text" title="" class="form-control " id="editDate"  value="">
+                  <input type="date" title="" class="form-control " id="editDate"  value="">
                 </div>
 
                 <div class="input-group input-group-sm mx-1 my-2">

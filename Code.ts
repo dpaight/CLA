@@ -1288,7 +1288,7 @@ function getCachedLogs() {
         return -1;
     }
 }
-function deleteRecord(id = '1010101') {
+function deleteRecord_old(id = '1010101') {
     var [headings, values, sheet, range, lastR, lastC] = rosterGet();
     var [headings_del, values_del, sheet_del, range_del, lastR_del, lastC_del] = myGet('deleted');
     var logsToRemove = [];
@@ -1308,6 +1308,22 @@ function deleteRecord(id = '1010101') {
             }
             extractLogEntries(id);
             return id;
+        }
+    }
+    throw "the id was not found, which is really odd";
+}
+function deleteRecord(id) {
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster');
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        var thisId = el[0];
+        if (thisId.toString() == id.toString()) {
+            values.splice(i, 1);
+            range = sheet.getRange(2, 1, lastR, lastC);
+            range.clearContent();
+            
+            range = sheet.getRange(2, 1, values.length, values[0].length);
+            range.setValues(values);
         }
     }
     throw "the id was not found, which is really odd";
@@ -1609,6 +1625,8 @@ function rosterGet() {
     nfval.shift();
     for (let i = 0; i < avalues.length; i++) {
         var el = avalues[i];
+        Logger.log('object is %s', JSON.stringify(el));
+
         var index = nfval.indexOf(el[0]);
         if (index == -1) {
             var note = "no notes";

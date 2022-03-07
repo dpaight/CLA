@@ -87,20 +87,24 @@
     }
 
     function saveEditedLogEntryClient(remove) {
-
+        if (remove == true) { 
+            if (confirm("Are you sure you want to remove this log entry?") == false) {
+                return;
+            };
+        }
         var entry = $("#editEntry").val();
         var date = $("#editDate").val();
         var id = $("#editId").val();
         var nmjdob = $("#nmjdob").val();
         var seis_id = $("#seis_id").val();
-        
+
         console.log('vars %s; %s; %s; %s; %s; ', entry, date, id, nmjdob, seis_id);
         var logObj = {
-            "logEntry": entry, 
-            "logDate": date, 
-            "logId": id, 
-            "nmjdob": nmjdob, 
-            "seis_id": seis_id, 
+            "logEntry": entry,
+            "logDate": date,
+            "logId": id,
+            "nmjdob": nmjdob,
+            "seis_id": seis_id,
             "remove": remove
         }
         console.log('logObj: %s', JSON.stringify(logObj));

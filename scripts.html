@@ -232,7 +232,7 @@
     $("#parent_1_home_phone").val(phoneFmt(parent_1_cell_phone) + phoneFmt(parent_1_home_phone));
     $("#u1_phone").attr("title", "work/other");
     $("#parent_1_email").val(parent_1_email);
-    $("#sex").val(gender.toString()[0]);
+    $("#sex").val(gender.toString());
     $("#teachname").val(teachname);
     $("#teachemail").val("teachemail");
     $("#addStr").val(parent_1_mail_address);
@@ -750,26 +750,25 @@
     }
   }
 
-
-
-
-
   function deleteRecord() {
-    $('#genericModal').modal({ focus: true });
-    $('#genericModalMsg').html("Remove this record?");
-    $('#genericButtons').html(
-      '<button type="button" class="btn btn-secondary" data-dismiss="modal">NO</button>' +
-      '<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="deleteRecordConfirmed()">YES</button>'
-    );
+    if (confirm("Are you sure you want to remove this record?") == true) {
+      var id = $("#seis_id").val();
+      //     console.log('the id to delete is %s', id);
+      sessionStorage.removeItem('rec' + id);
+      google.script.run
+        .withSuccessHandler() // reload
+        .withFailureHandler()
+        .deleteRecord(id);
+    }
   }
-  function deleteRecordConfirmed() {
-    var id = $("#seis_id").val();
-    //     console.log('the id to delete is %s', id);
-    google.script.run
-      .withSuccessHandler(reloadMe) // reload
-      .withFailureHandler()
-      .deleteRecord(id);
-  }
+  // function deleteRecordConfirmed() {
+  //   var id = $("#seis_id").val();
+  //   //     console.log('the id to delete is %s', id);
+  //   google.script.run
+  //     .withSuccessHandler(reloadMe) // reload
+  //     .withFailureHandler()
+  //     .deleteRecord(id);
+  // }
   function openAddStudentModal() {
     $('#addStuModal').modal({
       focus: true

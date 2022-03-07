@@ -43,13 +43,13 @@
         // console.log('sent to goal edit: %s', $(this).text());
         $("body").on("click", ".goalList", function (e) {
             // console.log('put the goal number into a gl field');
-            if (e.shiftKey) {
+            if (e.ctrlKey) {
                 e.preventDefault();
                 var item = JSON.parse($(this).text());
                 var gId = item[item.length - 1]
                 // item = item.toString().match(/\d+$/);
 
-                $("input[name='gls']").each(function (i, el) {
+                $(".gls").each(function (i, el) {
                     if ($(this).val() == "") {
                         $(this).val(gId);
                         $(this).attr("title", gId);
@@ -62,7 +62,7 @@
 
         // shift-click clears a litte goal number box
         // click builds text blaze snippet from data in table
-        $("body").on("click", "input[name=gls]", function (event) {
+        $("body").on("click", ".gls", function (event) {
             if (event.shiftKey) {
                 e.preventDefault();
                 $(this).val("");
@@ -126,12 +126,12 @@
         });
 
         // if shift key is down turning the cursor into a trash can and then delete on click (next function)
-        $("body").on("mousemove", "input[name='gls']", function () {
+        $("body").on("mousemove", ".gls", function () {
             if (event.shiftKey) {
                 e.preventDefault();
-                $("input[name='gls'").css("cursor", "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto");
+                $(".gls").css("cursor", "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto");
             } else {
-                $("input[name='gls'").css("cursor", "pointer");
+                $(".gls").css("cursor", "pointer");
             }
         });
 
