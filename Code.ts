@@ -11,7 +11,7 @@ function doGet(e) {
     ss.getSheetByName('roster').sort(2);
     ss.getSheetByName('logRespMerged').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v4.0";
+    t.version = "v4-10";
     var url = ss.getUrl();
     t.url = url;
     return t.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
@@ -62,14 +62,39 @@ function sndMl() {
         "NB: This email was sent automatically. If you have already responded, please ignore this request." +
         "<h2><a href=" + "levelsUrl" + ">Levels of Performance for " + stuName + "</a></h2>");
 }
-function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail) {
-    Logger.log('stuName: %s, stuId: %s, teachemail: %s', stuName, stuId, teachemail);
-    // stuName = 'Wanda Wanderer', stuId = 'WandererWanda123456', 
-    teachemail = 'dpaight@hemetusd.org';
-    // 1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg  
+
+/**
+ * 
+ * @param mLvlAry 
+ */
+function sendLevelsForm(mLvlAry) {
+    // var mailLvlsObj = JSON.parse();
+    var mailLvlsObj = {
+        stuName: mLvlAry[0],
+        seis_id: mLvlAry[1],
+        teachemail: mLvlAry[2],
+        recipients: "",
+        subject: "levels of performance for ",
+        body: "",
+        levelsUrl: "hold",
+        getSubject: function () {
+            return this.subject + this.stuName;
+        },
+        mkOpt: function () {
+            return '<body><p>We need some information for an approaching IEP. Thank you for your time. ' +
+                '\n\nNB: there is no need to enter Map scores or other scores (EL testing, report cards, CAASP) ' +
+                'that I can get from Aeries. I\'ll get those scores myself.\n\n</p>' +
+                '<a style="font-size: large;" href=' + this.levelsUrl + '>Short Performance Levels Questionnaire</a></body>';
+        }
+    }
+    mailLvlsObj['userEmail'] = Session.getActiveUser().getEmail();
+
     var formId = '1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg';
     var form = FormApp.openById(formId);
-    var respArray = [stuName, stuId];
+    var respArray = [mailLvlsObj.stuName, mailLvlsObj.seis_id];
+
+    Logger.log('respary is %s', JSON.stringify(respArray));
+
     var formResponse = form.createResponse();
     form.setCollectEmail(true);
     var items = form.getItems();
@@ -81,29 +106,16 @@ function sendLevelsForm(stuName = "johnny", stuId = "1234567", teachemail) {
         formResponse.withItemResponse(itemResponse);
     }
     var levelsUrl = formResponse.toPrefilledUrl();
-    var confirmationMsg = form.getConfirmationMessage() + "; " + formResponse.getEditResponseUrl();
-    return levelsUrl; // picked up by success handler
-    // var content = teachemail + "\n\nThe IEP for " + stuName + " is coming up, and I need some information, please. " +
-    //     "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
-    //     "information you provide as data for the IEP. Thank you for your time." + "\n\n" +
-    //     "If you have already responded, please ignore this request.\n\n" +
-    //     levelsUrl
 
-    // try {
-    //     MailApp.sendEmail({
-    //         to: teachemail,
-    //         subject: stuName + "'s levels of performance",
-    // htmlBody: "<p>The IEP for " + stuName + " is coming up, and I need some information, please. " +
-    //     "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
-    //     "information you provide as data for the IEP. Thank you for your time.<br><br>" +
-    //     "NB: This email was sent automatically. If you have already responded, please ignore this request.</p>" +
-    //     "<h2><a href=" + levelsUrl + ">Levels of Performance for " + stuName + "</a></h2>"
-    //     });
-    //     saveLogEntry([stuId, "levels ques sent: " + teachemail]);
-    // }
-    // catch (err) {
-    //     Logger.log('failed at email try: %s', err);
-    // }
+
+
+    mailLvlsObj.levelsUrl = levelsUrl.toString();
+    mailLvlsObj.recipients = "";
+
+    Logger.log('object is %s', JSON.stringify(mailLvlsObj));
+    var confirmationMsg = form.getConfirmationMessage() + "; " + formResponse.getEditResponseUrl();
+    var htmlBody = mailLvlsObj.mkOpt();
+    GmailApp.createDraft(mailLvlsObj.teachemail, mailLvlsObj.getSubject(), "", { "htmlBody": htmlBody });
 }
 // function saveLastId(id) {
 //     PropertiesService.getScriptProperties()
@@ -414,28 +426,14 @@ function getIndicesByHeading(array) {
     // MailApp.sendEmail("dpaight@hemetusd.org","log", JSON.stringify(headingsObj));
     return headingsObj;
 }
-function createDraftEmail(buttonVal, paramsJSN) {
-    Logger.log(paramsJSN);
-    var params = JSON.parse(paramsJSN);
-    var file = DriveApp.getFileById('1hRKDCRV0UB79E_V_KZKIF13gXpFPeW9u');
-    var mt1 = file.getMimeType();
-    var file2 = DriveApp.getFileById('1JbzZ12pxkRGTv_jSu8hccXMRheSJXso_');
-    if (params.translate == '1') {
-        params.bodySpan = LanguageApp.translate(params.body.toString(), 'en', 'es');
-        params.subjSpan = LanguageApp.translate(params.subj.toString(), 'en', 'es');
-        params.body = params.bodySpan + '\n\n' + params.body;
-        params.subj = params.subjSpan + ' / ' + params.subj;
-    }
-    if (buttonVal == 'send') {
-        GmailApp.sendEmail(params.to, params.subj, params.body, { from: "dpaight@hemetusd.org" });
-    }
-    else {
-        GmailApp.createDraft(params.to, params.subj, params.body, {
-            // @ts-ignore
-            // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
-        });
-    }
-    return params.body.toString();
+function createDrftEM() {
+    GmailApp.createDraft('dpaight@hemetusd.org', 'this', 'text');
+}
+
+function createDraftEmail([array]) {
+    var [recipients, subject, body] = array;
+    var msg = GmailApp.createDraft(recipients, subject, "", { "htmlBody": body });
+
 }
 /**
  * Retrieve and log events from the given calendar that have been modified

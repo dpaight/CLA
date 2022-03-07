@@ -24,9 +24,9 @@
             // these records have id numbers at 0; within each id number item lies a 2-d array with contact log entries      
             var key = 'reclog' + elAll[0];
             var val = JSON.stringify(elAll[1]);
-            localStorage.setItem(key, val);
+            sessionStorage.setItem(key, val);
         }
-        focus(localStorage.getItem("lastId"));
+        focus(sessionStorage.getItem("lastId"));
     }
     function openLogPrintDialog() {
         $('#logModal').modal({
@@ -113,7 +113,7 @@
     function saveLogEntrySuccess(logObjStr) {
         var logObj = JSON.parse(logObjStr);
         console.log('returned at saveLogEntrySuccess: %s', logObjStr);
-        localStorage.removeItem('reclog' + logObj.seis_id.toString());
+        sessionStorage.removeItem('reclog' + logObj.seis_id.toString());
         focus(logObj.seis_id.toString(), 'loc01');
     }
 
@@ -137,9 +137,9 @@
         var logObj = JSON.parse(logObjStr);
         console.log('caching...logObj is %s', JSON.stringify(logObj));
 
-        var logCache = JSON.parse(localStorage.getItem('reclog' + logObj.seis_id));
+        var logCache = JSON.parse(sessionStorage.getItem('reclog' + logObj.seis_id));
         logCache.unshift(JSON.parse(cacheRow));
-        localStorage.setItem('reclog' + logObj.seis_id, JSON.stringify(logCache));
+        sessionStorage.setItem('reclog' + logObj.seis_id, JSON.stringify(logCache));
 
         refreshLogDisplay(logCache, 'loc01');
     }

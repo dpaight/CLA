@@ -519,7 +519,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <p>Modal body text goes here.</p>
+                
                 <div class="input-group input-group-sm mx-1 my-2 w-50">
                   <div class="input-group-prepend">
                     <span class="input-group-text p-1" id="editEntry-pre">Date</span>
@@ -549,6 +549,45 @@
             </div>
           </div>
         </div>
+
+        <!-- send mail modal -->
+        <div class="modal fade centered" id="mailModal" tabindex="-1" role="dialog" aria-labelledby="mailModalLabel"
+          aria-hidden="true" style="margin-top: 30px;">
+          <div class="modal-dialog" style="height: 500px;" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="mailModalLabel">Send email</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body" style="text-align: left;">
+                <p>To:</p>
+                <textarea id="emailRecipients" class="editable email" style="width: 425px;"
+                  name="emaiRecipients"></textarea>
+                <p>Subject:</p>
+                <textarea id="emailSubject" class="editable email" style="width: 425px;" name="emaiSubject"></textarea>
+                <p>Body:</p>
+                <textarea id="emailBody" class="editable email" style="width: 425px; height: 300px;" name="emailBody"
+                  style="height: 400px;"></textarea>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal"
+                  onclick="sndEm('draft')">Create
+                  DRAFT</button>
+                <button type="button" class="btn btn-sm btn-success" data-bs-dismiss="modal"
+                  onclick="sndEm('send')">SEND
+                  EMAIL</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+
       </div>
       <div class="row"></div>
 
@@ -698,41 +737,6 @@
           </div>
         </div>
 
-        <!-- send mail modal -->
-        <div class="modal fade centered" id="mailModal" tabindex="-1" role="dialog" aria-labelledby="mailModalLabel"
-          aria-hidden="true" style="margin-top: 30px;">
-          <div class="modal-dialog" style="height: 500px;" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="mailModalLabel">Send email</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body" style="text-align: left;">
-                <p>To:</p>
-                <textarea id="emailRecipients" class="editable email" style="width: 425px;"
-                  name="emaiRecipients"></textarea>
-                <p>Subject:</p>
-                <textarea id="emailSubject" class="editable email" style="width: 425px;" name="emaiSubject"></textarea>
-                <p>Message:</p>
-                <textarea id="emailBody" class="editable email" style="width: 425px; height: 300px;" name="emailBody"
-                  style="height: 400px;"></textarea>
-
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">CLOSE</button>
-                <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal"
-                  onclick="sndEm('draft')">Create
-                  DRAFT</button>
-                <button type="button" class="btn btn-sm btn-success" data-bs-dismiss="modal"
-                  onclick="sndEm('send')">SEND
-                  EMAIL</button>
-              </div>
-
-            </div>
-          </div>
-        </div>
 
         <!-- levels send modal -->
         <div id="toModal" class="modal centered" tabindex="-1" role="dialog">

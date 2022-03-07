@@ -3,13 +3,13 @@
     $(document).ready(function () {
         // click student name in roster table switches to that student for both contact info and
         // log entries
-        if (localStorage.getItem('lastId') == null) {
+        if (sessionStorage.getItem('lastId') == null) {
             google.script.run
                 .withSuccessHandler(contactInfo)
                 .getFirstPointer();
 
         } else {
-            var id = localStorage.getItem('lastId');
+            var id = sessionStorage.getItem('lastId');
             contactInfo(id);
         }
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -175,14 +175,14 @@
                 alert("missing data in html");
                 return;
             }
-            // localStorage.removeItem('rec' + seisId);
+            // sessionStorage.removeItem('rec' + seisId);
             // alert('rec' + seisId + ", " + seisId + ", " + fieldVal + ", " + fldNm);
             if (fldNm.toString().search(/date/g) > -1) {
                 fieldVal = fieldVal.toString().replace(/-/g, "/");
                 $(this).val(fieldVal);
             }
             google.script.run
-                .withSuccessHandler(updateLocalStorage)
+                .withSuccessHandler(updatesessionStorage)
                 .updateContactInfo(seisId, fldNm, fieldVal);
 
             setTimeout(() => {
@@ -207,10 +207,10 @@
                 .withSuccessHandler(showNotes) // works with returned values: id, index, value
                 .getNotes([id, value]);
         });
-        function updateLocalStorage(array) {
-            var cachedRecString = localStorage.getItem('rec' + array[0][0].toString());
+        function updatesessionStorage(array) {
+            var cachedRecString = sessionStorage.getItem('rec' + array[0][0].toString());
             console.log('id = %s', JSON.stringify(array[0]));
-            var cachedRecord = JSON.parse(localStorage.getItem('rec' + array[0][0].toString()));
+            var cachedRecord = JSON.parse(sessionStorage.getItem('rec' + array[0][0].toString()));
             for (let i = 0; i < array.length; i++) {
                 const el = array[i];
                 var [id, index, value] = el;
@@ -218,7 +218,7 @@
                 cachedRecord.splice(index, 1, value);
             }
             console.log('stored: %s', JSON.stringify(cachedRecord));
-            localStorage.setItem('rec' + id, JSON.stringify(cachedRecord));
+            sessionStorage.setItem('rec' + id, JSON.stringify(cachedRecord));
 
             $("#loc00tb").empty();
             google.script.run

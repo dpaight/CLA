@@ -35,7 +35,7 @@
     "executeAs": "USER_DEPLOYING",
     "access": "MYSELF"
   },
-  "exceptionLogging": "NONE",
+  "exceptionLogging": "STACKDRIVER",
   "oauthScopes": [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/spreadsheets.readonly",
@@ -45,7 +45,12 @@
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/forms",
     "https://www.googleapis.com/auth/documents",
-    "https://www.googleapis.com/auth/script.send_mail"
+    "https://www.googleapis.com/auth/script.send_mail",
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.compose",
+    "https://www.googleapis.com/auth/gmail.modify"
+
+    
   ],
   "runtimeVersion": "V8",
   "sheets": {
