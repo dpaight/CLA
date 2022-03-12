@@ -2168,6 +2168,32 @@ function cleanOldLogEntries() {
     destRange.clearContent();
     destRange.setValues(values);
 }
+/**
+ * 
+ * @param rosterRow
+ */
+function FILLMLIST(rosterRow) {
+    var sheet, range, values, row, columns;
+    columns = [0, 1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 25, 26]; 
+    // columns are adjusted to be zero indexed
+    sheet = ss.getSheetByName('roster');
+    range = sheet.getRange(rosterRow, 1, 1, 30);
+    values = range.getValues();
+    row = [];
+    for (let i = 0; i < values[0].length; i++) {
+        const element = values[i];
+        if (columns.indexOf(i) !== -1) {
+            row.push(element);
+        }
+    }
+    row = [row];
+    var sheetM, rangeM;
+    sheetM = ss.getSheetByName('mailingList');
+    var mlRow = ss.getActiveCell().getRow();
+     var mlRng = ss.getActiveSheet().getRange(mlRow, 1, 1, 13);
+    mlRng.setValue(row);
+
+}
 //
 // 
 //# sourceMappingURL=module.jsx.map
