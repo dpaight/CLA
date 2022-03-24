@@ -11,7 +11,7 @@ function doGet(e) {
     ss.getSheetByName('roster').sort(2);
     ss.getSheetByName('logRespMerged').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v4-10";
+    t.version = "v4-11";
     var url = ss.getUrl();
     t.url = url;
     return t.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
@@ -1321,7 +1321,7 @@ function deleteRecord(id) {
             values.splice(i, 1);
             range = sheet.getRange(2, 1, lastR, lastC);
             range.clearContent();
-            
+
             range = sheet.getRange(2, 1, values.length, values[0].length);
             range.setValues(values);
         }
@@ -1496,7 +1496,7 @@ function parseClassListReport() {
     // var file = SpreadsheetApp.openById('1F52KzT7GyHnOzj8Nf2rb44rvdb-orx7bjm_61FUqaQc');
     // var sheet = file.getSheetByName('Sheet1');
     // var range = sheet.getRange('A1:Z');
-    var values = values = parseCSV("1CZK4YhSS3uiihM-7D-m3sgZWVATWfBK0", "aeries class list by section.csv");
+    var values = parseCSV("aeries class list by section.csv");
     var row = [];
     var parsed = [["teachName", "teachEmail", "Student ID", "studentName"]];
     var [theadings, tvalues, tsheet, trange, lastR, lastC] = myGet('teacherCodes', 2, true);
@@ -1747,7 +1747,7 @@ function findLastRowById(fileId, sheet, column) {
 function updateRoster() {
     // get seis data
     // get seis data
-    var seisValues = parseCSV("1DLxHwR7QlDloES0RCAkuN2bBawdAaAp9", "roster_seis.csv");
+    var seisValues = parseCSV("roster_seis.csv");
     var seisHeadings_1 = seisValues.shift();
     var [headings, values, sheet, range, lastR, lastC] = myGet('roster_seis');
     var seisHeadings = seisHeadings_1.map(function (x, n, arr) {
@@ -1794,7 +1794,8 @@ function updateRoster() {
     // Utilities.sleep(5000);
     return ScriptApp.getService().getUrl().toString();
 }
-function parseCSV(folderId, fName) {
+function parseCSV(fName) {
+    var folderId = "1DLxHwR7QlDloES0RCAkuN2bBawdAaAp9";
     var folder = DriveApp.getFolderById(folderId);
     var files = folder.getFiles();
     var fileIds = [];
@@ -1987,18 +1988,10 @@ function getFromAeriesData(newDataWithHeadings) {
     var aerHeadings = aerHeadings_1.map(function (x, n, arr) {
         return x.replace(/[^A-z^0-9+]/ig, "_").toLowerCase();
     });
-    var servicesValues = parseCSV("1CZK4YhSS3uiihM-7D-m3sgZWVATWfBK0", "services.csv");
-    var servicesHeadings_1 = servicesValues.shift();
-    var servicesHeadings = servicesHeadings_1.map(function (x, n, arr) {
-        return x.replace(/[^A-z^0-9+]/ig, "_").toLowerCase();
-    });
-    // var [servicesHeadings_1, servicesValues, servicesSheet, servicesRange, servicesLastR, servicesLastC] = get('services');
-    // var servicesHeadings = servicesHeadings_1.map(function (x, n, arr) {
-    //     return x.replace(/[^A-z^0-9+]/ig, "_").toLowerCase();
-    // });
-    // make these variables:
-    // 
-    // var notUsedCount = merged[0].lastIndexOf("notused") + 1 - merged[0].indexOf("notused");
+    var servicesValues = importCsv('services.csv');
+    var servicesHeadings = servicesValues.shift();
+
+
     var count = newDataWithHeadings[0].length + 1;
     for (let i = 1; i < newDataWithHeadings.length; i++) {
         var el = newDataWithHeadings[i];
@@ -2040,7 +2033,15 @@ function getFromAeriesData(newDataWithHeadings) {
             for (let i = 0; i < servicesValues.length; i++) {
                 const servicesEl = servicesValues[i];
                 if (servicesEl[6] == "No" && seis_id == servicesEl[servicesHeadings.indexOf("seis_id")]) {
-                    allServ += servicesEl[4] + ", " + servicesEl[5] + "\n";
+                    allServ += servicesEl[4] + ", ";
+                    if (servicesEl[4].toString() == "330") {
+                        allServ += case_manager
+                    } else if (servicesEl[4].toString() == "415") {
+                        const speech_1 = servicesHeadings.indexOf(("Licensed_Speech").toLocaleLowerCase());
+                        const speech_2 = servicesHeadings.indexOf(("Speech-Language Pathologist with Valid Credential").toLowerCase());
+                        allServ += (servicesEl[speech_1].toString() + servicesEl[speech_2]).toString();
+                    }
+                    allServ += servicesEl[5] + "\n";
                 }
             }
             allServ += ">>\n";
@@ -2082,7 +2083,8 @@ function getFromAeriesData(newDataWithHeadings) {
         el.push(stuemail);
         firslinit = el[newDataWithHeadings[0].indexOf("first_name")] + " " + el[newDataWithHeadings[0].indexOf("last_name")][0] + ".";
         el.push(firslinit);
-        allServices = gatherAllServices(seis_id);
+        
+        allServices = getServices(seis_id);
         el.push(allServices);
         merged.push(el);
     }
@@ -2174,7 +2176,7 @@ function cleanOldLogEntries() {
  */
 function FILLMLIST(rosterRow) {
     var sheet, range, values, row, columns;
-    columns = [0, 1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 25, 26]; 
+    columns = [0, 1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 25, 26];
     // columns are adjusted to be zero indexed
     sheet = ss.getSheetByName('roster');
     range = sheet.getRange(rosterRow, 1, 1, 30);
@@ -2190,9 +2192,84 @@ function FILLMLIST(rosterRow) {
     var sheetM, rangeM;
     sheetM = ss.getSheetByName('mailingList');
     var mlRow = ss.getActiveCell().getRow();
-     var mlRng = ss.getActiveSheet().getRange(mlRow, 1, 1, 13);
+    var mlRng = ss.getActiveSheet().getRange(mlRow, 1, 1, 13);
     mlRng.setValue(row);
 
+}
+function importCsv(fName = "services.csv") {
+    var data = parseCSV(fName);
+    var oldHeadings = data.shift();
+
+    var newHeadings = oldHeadings.map(function (x, i, ary) {
+        return x.toString().replace(/[ -\/]{1,4}/g, "_").toLowerCase();
+    });
+    for (let i = 0; i < newHeadings.length; i++) {
+        // newHeadings.splice(i, 1, el.replace(/[- ]/g, "_").toLowerCase().replace(/provider[_]+/g, ""));
+        var el = newHeadings[i];
+        if (el.search('adapt') != -1) {
+            newHeadings.splice(i, 1, "pvdr_425_" + el);
+
+        } else if (el.search('patho') != -1) {
+            newHeadings.splice(i, 1, "pvdr_415_" + el);
+        } else if (el.search('occup') != -1) {
+            newHeadings.splice(i, 1, "pvdr_450_" + el);
+
+        } else if (el.search(/[glp]ist/) != -1) {
+            newHeadings.splice(i, 1, "pvdr_oth_" + el);
+        }
+    }
+    data = [newHeadings].concat(data);
+    var sheet = ss.getSheetByName(fName.replace(/\.csv$/g, ""));
+    sheet.clear();
+    sheet.getRange(1, 1, data.length, data[0].length).setValues(data);
+
+    return data;
+}
+function getServices(seis_id = 1272325) {
+    var [headings, values, sheet, range, lastR, lastC] = myGet('services');
+    var services = [];
+
+    var indices = {};
+    var index_seis_id = headings.indexOf('seis_id');
+    var theSrvcs = {
+        s1: "-1",
+        p1: [],
+        s2: "-1",
+        p2: [],
+        s3: "-1",
+        p3: [],
+        s4: "-1",
+        p4: [],
+        s5: "-1",
+        p5: [],
+        s6: "-1",
+        p6: [],
+        txt: ""
+    };
+    function findPvdr(ary) {
+        var [headings, row] = ary;
+        var p = [];
+        for (let i = 0; i < row.length; i++) {
+            const element = row[i]
+            if (row[i].toString().length > 3 &&
+                headings[i].toString().search(/pvdr_/) !== -1) {
+                p.push(row[i].toString());
+            }
+        }
+        return p;
+    }
+    var n = 0;
+    for (let i = 0; i < values.length; i++) {
+        if (values[i][0].toString() == seis_id.toString()) {
+            n++;
+            theSrvcs["s" + n] = values[i][4];
+            theSrvcs["p" + n] = findPvdr([headings, values[i]]);
+            theSrvcs["txt"] += theSrvcs["s" + n] + ": " + theSrvcs["p" + n] + "\n";
+        }
+    }
+    Logger.log('object is %s', theSrvcs["txt"].toString());
+
+    return theSrvcs["txt"].toString();
 }
 //
 // 
