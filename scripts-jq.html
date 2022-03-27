@@ -182,7 +182,7 @@
                 $(this).val(fieldVal);
             }
             google.script.run
-                .withSuccessHandler(updatesessionStorage)
+                .withSuccessHandler(updateSessionStorage)
                 .updateContactInfo(seisId, fldNm, fieldVal);
 
             setTimeout(() => {
@@ -190,178 +190,147 @@
                     .withSuccessHandler(showRosterTable)
                     .getTableData_roster();
             }, 3000);
-
         });
 
-        $("body").on("change", ".logWindow", function () {
-            filterLogEntriesByDateWindow()
-        });
-        //save changes to spreadsheet
-        $("body").on("change", "#notes2", function (event) {
-            var id = $("#seis_id").val();
-            var field = $(this).attr("id");
-            var value = $(this).val();
-
-            console.log('id = %s, field = %s, value = %s', id, field, value);
-            google.script.run
-                .withSuccessHandler(showNotes) // works with returned values: id, index, value
-                .getNotes([id, value]);
-        });
-        function updatesessionStorage(array) {
-            var cachedRecString = sessionStorage.getItem('rec' + array[0][0].toString());
-            console.log('id = %s', JSON.stringify(array[0]));
-            var cachedRecord = JSON.parse(sessionStorage.getItem('rec' + array[0][0].toString()));
-            for (let i = 0; i < array.length; i++) {
-                const el = array[i];
-                var [id, index, value] = el;
-                console.log('el = %s', JSON.stringify(el));
-                cachedRecord.splice(index, 1, value);
-            }
-            console.log('stored: %s', JSON.stringify(cachedRecord));
-            sessionStorage.setItem('rec' + id, JSON.stringify(cachedRecord));
-
-            $("#loc00tb").empty();
-            google.script.run
-                .withSuccessHandler(showRosterTable)
-                .getTableData_roster();
-
-            // google.script.run
-            //   .withSuccessHandler(showContactInfo)
-            //   .getRecord(id);
-        }
-
-        // log entry saver save all data in changeable fields in the  spreadsheet
-        //     var [seis_id, logEntry, nmjdob, logId] = el;
-        //  {
-        //     "seis_id": id,
-        //     "logEntry": entry,
-        //     "nmjdob": nmjdob,
-        //     "logId": 
-        //  }
-        // var [seis_id, logEntry, nmjdob, logId] = el;
-        $("body").on("click", ".saveEntryBtn", function (event) {
-            event.preventDefault();
-            document.body.style.cursor = "wait";
-            if (entry.length > 0) {
-                var logObj = new LogEntry([$("#seis_id").val(), $("#logEntry").val(), $("#nmjdob").val(), null]);
-                // console.log('id and entry are %s and %s', id, entry);
-                console.log('saving: %s', JSON.stringify(logObj));
-
-                google.script.run
-                    .withSuccessHandler(updateLogEntryCache)
-                    .saveLogEntry([logObj, null]);
-            }
-            document.body.style.cursor = "default";
-            $("#logEntry").val('');
-        });
-
-        $("body").on("keypress", ".saveEntryBtn", function (event) {
-
-            $(this).addClass("active");
-            event.preventDefault();
-            document.body.style.cursor = "wait";
-
-            var entry = $("#logEntry").val().toString().replace(/\n/g, "->");
-            console.log('entry is %s', entry);
-            var id = $("#seis_id").val();
-            var nmjdob = $("#nmjdob").val();
-            if (entry.length > 0) {
-                $("html,body").css("cursor", "wait");
-                // console.log('id and entry are %s and %s', id, entry);
-                google.script.run
-                    .withSuccessHandler(updateLogEntryCache)
-                    .saveLogEntry([id, entry, nmjdob]);
-            }
-            document.body.style.cursor = "default";
-            $(this).removeClass("active");
-            $("#logEntry").val('');
-        });
-        // turn the color of the button back to green without doing anything
-        $("body").on("click", "#cancelEntryBtn", function (event) {
-            event.preventDefault();
-            $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
-        });
-
-
-        // click builds text blaze snippet from data in table 
-        $("body").on("click", "#getIEPcompForm", function (event) {
-            var flName = $("#stuName").val("");
-            var fn = flName.replace(/([A-z]+)( .*)/g, "$1");
-            var ln = flName.replace(/([A-z]+ )(.*)/g, "$2");
-            var dob = $("#dob").val("");
-
-            document.execCommand('copy');
-
-            $(this).attr("title", "");
-
-            var gId = $(this).val();
-            google.script.run
-                .withSuccessHandler(showTBsnippetGl)
-                .getGoal(gId);
-        });
-
-        // retrieves data from a seis generated csv file (seis search report)
-        $("body").on("click", "#seis_roster", function (event) {
-            event.preventDefault();
-            document.body.style.cursor = "wait";
-            var id = $("#seis_id").val();
-            google.script.run
-                .withSuccessHandler(reloadMe)
-                .updateRoster();
-            setTimeout(() => {
-                "google.script.run.updateLogForm();"
-            }, 15000);
-
-        });
-
-
-        $("body").on("mouseenter", ".logEntry", function () {
-            $(this).css("cursor", "pointer");
-        });
-
-        $("body").on("dblclick", ".logEntry", function (e) {
-            // console.log('event triggered a[name=goalList clicked');
-            // open goal for editing
-            e.preventDefault();
-            // $("#logEntry").val($(this).closest("tr").find("td:nth-child(2)").text());
-            //       console.log('log entry id is %s', logId);
-            $("#editEntry").val();
-            console.log($(this).closest("tr").find("td:nth-child(1)").text());
-            console.log($(this).closest("tr").find("td:nth-child(2)").text());
-            // console.log($(this).closest("tr").find("td:nth-child(2)").text());
-
-            $("#editEntry").val(
-                $(this).closest("tr").find("td:nth-child(2)").text()
-            );
-            $("#editDate").val(
-                $(this).closest("tr").find("td:nth-child(1)").text()
-            );
-            $("#editId").val(
-                $(this).closest("tr").find("td:nth-child(2)").data("entry_id")
-            );
-
-            var myModal = new bootstrap.Modal(document.getElementById('logEntryModal'));
-            myModal.show();
-
-            // console.log(JSON.stringify(logObj));
-        });
-        $(".logEntry").bind("taphold", function (e) {
-            // console.log('event triggered a[name=goalList clicked');
-            e.preventDefault();
-            // open goal for editing
-            var logId = $(this).data("entry_id");
-            //       console.log('log entry id is %s', logId);
-            google.script.run
-                .withSuccessHandler(editLogEntryInModal)
-                .getLogEntry(logId);
-        });
-
-        $("body").on("click", ".sendEmail", function () {
-            //       console.log('seis_id is ', $("#seis_id").val());
-            var emadr = $("#teach_email").val();
-            //       console.log('email address is: %s', emadr);
-
-        });
-        startup();
     });
+
+    $("body").on("change", ".logWindow", function () {
+        filterLogEntriesByDateWindow()
+    });
+    //save changes to spreadsheet
+    $("body").on("change", "#notes2", function (event) {
+        var id = $("#seis_id").val();
+        var field = $(this).attr("id");
+        var value = $(this).val();
+
+        console.log('id = %s, field = %s, value = %s', id, field, value);
+        google.script.run
+            .withSuccessHandler(showNotes) // works with returned values: id, index, value
+            .getNotes([id, value]);
+    });
+
+    $("body").on("click", ".saveEntryBtn", function (event) {
+        event.preventDefault();
+        document.body.style.cursor = "wait";
+        if (entry.length > 0) {
+            var logObj = new LogEntry([$("#seis_id").val(), $("#logEntry").val(), $("#nmjdob").val(), null]);
+            // console.log('id and entry are %s and %s', id, entry);
+            console.log('saving: %s', JSON.stringify(logObj));
+
+            google.script.run
+                .withSuccessHandler(updateLogEntryCache)
+                .saveLogEntry([logObj, null]);
+        }
+        document.body.style.cursor = "default";
+        $("#logEntry").val('');
+    });
+
+    $("body").on("keypress", ".saveEntryBtn", function (event) {
+
+        $(this).addClass("active");
+        event.preventDefault();
+        document.body.style.cursor = "wait";
+
+        var entry = $("#logEntry").val().toString().replace(/\n/g, "->");
+        console.log('entry is %s', entry);
+        var id = $("#seis_id").val();
+        var nmjdob = $("#nmjdob").val();
+        if (entry.length > 0) {
+            $("html,body").css("cursor", "wait");
+            // console.log('id and entry are %s and %s', id, entry);
+            google.script.run
+                .withSuccessHandler(updateLogEntryCache)
+                .saveLogEntry([id, entry, nmjdob]);
+        }
+        document.body.style.cursor = "default";
+        $(this).removeClass("active");
+        $("#logEntry").val('');
+    });
+    // turn the color of the button back to green without doing anything
+    $("body").on("click", "#cancelEntryBtn", function (event) {
+        event.preventDefault();
+        $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
+    });
+
+
+    // click builds text blaze snippet from data in table 
+    $("body").on("click", "#getIEPcompForm", function (event) {
+        var flName = $("#stuName").val("");
+        var fn = flName.replace(/([A-z]+)( .*)/g, "$1");
+        var ln = flName.replace(/([A-z]+ )(.*)/g, "$2");
+        var dob = $("#dob").val("");
+
+        document.execCommand('copy');
+
+        $(this).attr("title", "");
+
+        var gId = $(this).val();
+        google.script.run
+            .withSuccessHandler(showTBsnippetGl)
+            .getGoal(gId);
+    });
+
+    // retrieves data from a seis generated csv file (seis search report)
+    $("body").on("click", "#seis_roster", function (event) {
+        event.preventDefault();
+        document.body.style.cursor = "wait";
+        var id = $("#seis_id").val();
+        google.script.run
+            .withSuccessHandler(reloadMe)
+            .updateRoster();
+        setTimeout(() => {
+            "google.script.run.updateLogForm();"
+        }, 15000);
+
+    });
+
+
+    $("body").on("mouseenter", ".logEntry", function () {
+        $(this).css("cursor", "pointer");
+    });
+
+    $("body").on("dblclick", ".logEntry", function (e) {
+        // console.log('event triggered a[name=goalList clicked');
+        // open goal for editing
+        e.preventDefault();
+        // $("#logEntry").val($(this).closest("tr").find("td:nth-child(2)").text());
+        //       console.log('log entry id is %s', logId);
+        $("#editEntry").val();
+        console.log($(this).closest("tr").find("td:nth-child(1)").text());
+        console.log($(this).closest("tr").find("td:nth-child(2)").text());
+        // console.log($(this).closest("tr").find("td:nth-child(2)").text());
+
+        $("#editEntry").val(
+            $(this).closest("tr").find("td:nth-child(2)").text()
+        );
+        $("#editDate").val(
+            $(this).closest("tr").find("td:nth-child(1)").text()
+        );
+        $("#editId").val(
+            $(this).closest("tr").find("td:nth-child(2)").data("entry_id")
+        );
+
+        var myModal = new bootstrap.Modal(document.getElementById('logEntryModal'));
+        myModal.show();
+
+        // console.log(JSON.stringify(logObj));
+    });
+    $(".logEntry").bind("taphold", function (e) {
+        // console.log('event triggered a[name=goalList clicked');
+        e.preventDefault();
+        // open goal for editing
+        var logId = $(this).data("entry_id");
+        //       console.log('log entry id is %s', logId);
+        google.script.run
+            .withSuccessHandler(editLogEntryInModal)
+            .getLogEntry(logId);
+    });
+
+    $("body").on("click", ".sendEmail", function () {
+        //       console.log('seis_id is ', $("#seis_id").val());
+        var emadr = $("#teach_email").val();
+        //       console.log('email address is: %s', emadr);
+
+    });
+    startup();
 </script>

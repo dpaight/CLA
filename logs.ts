@@ -98,7 +98,7 @@ function getLogEntry(logId = '1') {
 }
 
 function getLogEntries(id = '1010101', loc = null, startDate, endDate) {
-    var [headings, ids, sheet, range, lastR, lastC] = myGet('roster', 1, true);
+    var [headings, ids, sheet, range, lastR, lastC] = myGet('Copy of roster', 0, true);
     ids.shift(); // file has an extra headings line
     var allRecords = [];
     var [logTableHeadings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
