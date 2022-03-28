@@ -11,7 +11,7 @@ function doGet(e) {
     ss.getSheetByName('Copy of roster').sort(2);
     ss.getSheetByName('logRespMerged').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v4-11";
+    t.version = "v4-devel";
     var url = ss.getUrl();
     t.url = url;
     return t.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
