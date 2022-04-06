@@ -63,13 +63,19 @@ function getRecord(id) {
         return [rangeH.getValues()[0], rangeD.getValues()[0]];
     }
     function getAllRecords() {
-        var [headings, values, sheet, range, lastR, lastC] = myGet('Copy of roster', -1, false);
-        values.shift();
+        var [headings, values, sheet, range, lastR, lastC] = myGet('roster', -1, false);
         var allRecords = [];
-        for (let i = 0; i < values.length; i++) {
+        var stuRec = {};
+        for (let i = 1; i < values.length; i++) {
             const el = values[i];
-            const rec = new StuRec(el, headings);
-            allRecords.push(rec);
+            for (let j = 0; j < el.length; j++) {
+                const col = el[j];
+                let key = values[0][j].toString();
+                let value = el[j];
+                stuRec[key]=value;
+            }
+            allRecords.push(stuRec);
+            stuRec={};
         }
         Logger.log('allRecords is %s', JSON.stringify(allRecords));
         return allRecords;
@@ -78,7 +84,7 @@ function getRecord(id) {
     // record was not cached; search for it
     if (id == undefined) { throw "no id at getRecord" };
     if (id == 'all') { return getAllRecords() };
-    var [headings, values, sheet, range, lastR, lastC] = myGet('Copy of roster', 0, true);
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster', 0, true);
     var row = values.indexOf(id);
     var [arrayH, arrayD] = getRowAndHeadings(sheet, row);
     Logger.log('arrayH is %s', JSON.stringify(arrayH));
@@ -164,14 +170,14 @@ function getById(fileId, sheetName, column = -1, flat = false) {
 }
 // from 'library.ts'
 function rosterGet() {
-    var sheetName = 'Copy of roster';
+    var sheetName = 'roster';
     var values = [];
-    var [headings, avalues, sheet, range, lastR, lastC] = myGet('Copy of roster');
+    var [headings, avalues, sheet, range, lastR, lastC] = myGet('roster');
     values.shift();
     return [headings, values, sheet, range, lastR, lastC];
 }
 function updateContactInfo(seisId, fldNm, fieldVal) {
-    var [headings, values, sheet, range, lastR, lastC] = myGet('Copy of roster', 0, true);
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster', 0, true);
     headings = headings.flat();
     Logger.log('headings is %s', JSON.stringify(headings));
 

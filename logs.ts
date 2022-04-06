@@ -22,7 +22,7 @@ function saveLogEntryServer(logObj) {
     }
     var [headings, logVals, logResp, range, last, lastC] = myGet('logRespMerged');
     logObj.logId = getNextLogEntryId();
-    var row = [[moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ'), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id]];
+    var row = [[dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZ'), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id]];
     var range = logResp.getRange(last + 1, 1, 1, row[0].length);
     range.setValues(row);
     row = row[0];
@@ -47,7 +47,7 @@ function saveEditedLogEntryServer(logObjStr) {
     Logger.log(logObjStr);
     var [headings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
     var logObj = JSON.parse(logObjStr);
-    var row = [moment(logObj.logDate, 'YYYY-MM-DD').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id];
+    var row = [dayjs(logObj.logDate, 'YYYY-MM-DD').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id];
     Logger.log('the row is %s', JSON.stringify(row));
     var lid_index = headings.indexOf('log_entry_id');
     for (let i = 0; i < values.length; i++) {
@@ -98,7 +98,7 @@ function getLogEntry(logId = '1') {
 }
 
 function getLogEntries(id = '1010101', loc = null, startDate, endDate) {
-    var [headings, ids, sheet, range, lastR, lastC] = myGet('Copy of roster', 0, true);
+    var [headings, ids, sheet, range, lastR, lastC] = myGet('roster', 0, true);
     ids.shift(); // file has an extra headings line
     var allRecords = [];
     var [logTableHeadings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');

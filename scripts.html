@@ -7,9 +7,19 @@
     // log entries
     if (sessionStorage.getItem('lastId') == null) {
       google.script.run
-        .withSuccessHandler(contactInfo)
-        .getFirstPointer();
+        .withSuccessHandler(cacheEm)
+        .getRecord('all');
 
+        function cacheEm(array) {
+          for (let i = 0; i < array.length; i++) {
+            const el = array[i];
+
+            sessionStorage.setItem('lastId', el.seis_id);
+            let nm = 'rec' + el.seis_id;
+            let val = JSON.stringify(el);
+            sessionStorage.setItem(nm, val);
+          }
+        }
     } else {
       var id = sessionStorage.getItem('lastId');
       contactInfo(id);
@@ -537,7 +547,7 @@
     record = JSON.parse(record);
 
     function shortDate(dateObj) {
-      return moment(dateObj).format("MM/DD/YYYY");
+      return dayjs(dateObj).format("MM/DD/YYYY");
     }
     console.log('record = %s', JSON.stringify(record));
     var key = "rec" + record.seis_id;
@@ -747,10 +757,10 @@
     var keepers = [];
     for (let i = 0; i < logEntries.length; i++) {
       const el = logEntries[i];
-      var start = moment($('#stDtEdit').val());
-      var end = moment($('#endDtEdit').val());
-      if (moment(el[0]).isBefore(end.add(1, 'd')) && moment(el[0]).isAfter(start)) {
-        //         console.log('%s is before %s', moment(el[0]).format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+      var start = dayjs($('#stDtEdit').val());
+      var end = dayjs($('#endDtEdit').val());
+      if (dayjs(el[0]).isBefore(end.add(1, 'd')) && dayjs(el[0]).isAfter(start)) {
+        //         console.log('%s is before %s', dayjs(el[0]).format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
         keepers.push(el);
       }
     }
@@ -815,14 +825,14 @@
       if (!seis_id) {
         alert(" has no id"); // lnCmafn + 
       } else {
-        if (moment(date_of_next_eligibility_evaluation).isValid() == false) {
-          var evalDate = moment(date_of_initial_parent_consent).add(1, 's').format('YYYY-MM-DD');
+        if (dayjs(date_of_next_eligibility_evaluation).isValid() == false) {
+          var evalDate = dayjs(date_of_initial_parent_consent).add(1, 's').format('YYYY-MM-DD');
           pending = ['#f4cccc', '#000000'];
-        } else if (moment(date_of_next_eligibility_evaluation).add(3, 'y').isBefore(moment().add(6, 'month'))) {
-          evalDate = moment(date_of_next_eligibility_evaluation).format('YYYY-MM-DD');
+        } else if (dayjs(date_of_next_eligibility_evaluation).add(3, 'y').isBefore(dayjs().add(6, 'month'))) {
+          evalDate = dayjs(date_of_next_eligibility_evaluation).format('YYYY-MM-DD');
           pending = ['#d9ead3', '#000000'];
         } else {
-          evalDate = moment(date_of_next_eligibility_evaluation).format('YYYY-MM-DD');
+          evalDate = dayjs(date_of_next_eligibility_evaluation).format('YYYY-MM-DD');
           pending = ['#FFFFFF', '#000000'];
         }
         // console.log('evalDate hello is %s for %s', evalDate, first_name);
@@ -834,11 +844,11 @@
           "</td>" +
           '<td class="tableDate setStudent col-3" data-stuId=' +
           seis_id + '>' +
-          moment(date_of_next_annual_plan_review).format('YYYY-MM-DD') +
+          dayjs(date_of_next_annual_plan_review).format('YYYY-MM-DD') +
           "</td>" +
           '<td class="tableDate setStudent col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';" data-stuId=' +
           seis_id + '>' +
-          moment(evalDate).format('YYYY-MM-DD') +
+          dayjs(evalDate).format('YYYY-MM-DD') +
           "</td>" +
           "</tr></div>"
         );
@@ -859,11 +869,11 @@
     parsedData = JSON.parse(data);
     for (let i = 0; i < parsedData.length; i++) {
       var [a, b, c, d, e, f, g, h] = parsedData[i];
-      var p = moment(c, 'YYYY-MM-DDTHH:mm');
-      var q = moment();
+      var p = dayjs(c, 'YYYY-MM-DDTHH:mm');
+      var q = dayjs();
 
       $("#loc00hd").append(
-        "<li ' class='upcomingEvent'>" + moment(c, 'YYYY-MM-DDTHH:mm').format('dd MM-DD-YY @ HH:mm') + "     " + b + "; \n" + f + '\n');
+        "<li ' class='upcomingEvent'>" + dayjs(c, 'YYYY-MM-DDTHH:mm').format('dd MM-DD-YY @ HH:mm') + "     " + b + "; \n" + f + '\n');
       document.body.style.cursor = "default";
     }
   }
@@ -1144,14 +1154,14 @@
       if (!seis_id) {
         alert(" has no id"); // lnCmafn + 
       } else {
-        if (moment(date_of_last_eligibility_evaluation).isValid() == false) {
-          var evalDate = moment(date_of_initial_parent_consent).add(1, 's').format('YYYY-MM-DD');
+        if (dayjs(date_of_last_eligibility_evaluation).isValid() == false) {
+          var evalDate = dayjs(date_of_initial_parent_consent).add(1, 's').format('YYYY-MM-DD');
           pending = ['#f4cccc', '#000000'];
-        } else if (moment(date_of_last_eligibility_evaluation).add(3, 'y').isBefore(moment().add(6, 'month'))) {
-          evalDate = moment(date_of_last_eligibility_evaluation).format('YYYY-MM-DD');
+        } else if (dayjs(date_of_last_eligibility_evaluation).add(3, 'y').isBefore(dayjs().add(6, 'month'))) {
+          evalDate = dayjs(date_of_last_eligibility_evaluation).format('YYYY-MM-DD');
           pending = ['#d9ead3', '#000000'];
         } else {
-          evalDate = moment(date_of_last_eligibility_evaluation).format('YYYY-MM-DD');
+          evalDate = dayjs(date_of_last_eligibility_evaluation).format('YYYY-MM-DD');
           pending = ['#FFFFFF', '#000000'];
         }
         // console.log('evalDate hello is %s for %s', evalDate, first_name);
@@ -1163,11 +1173,11 @@
           "</td>" +
           '<td class="tableDate setStudent col-3" data-stuId=' +
           seis_id + '>' +
-          moment(date_of_last_annual_plan_review).format('YYYY-MM-DD') +
+          dayjs(date_of_last_annual_plan_review).format('YYYY-MM-DD') +
           "</td>" +
           '<td class="tableDate setStudent col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';" data-stuId=' +
           seis_id + '>' +
-          moment(evalDate).format('YYYY-MM-DD') +
+          dayjs(evalDate).format('YYYY-MM-DD') +
           "</td>" +
           "</tr></div>"
         );
@@ -1318,8 +1328,8 @@
     $('#printedLogsth').empty();
     $('#printedLogstb').empty();
     $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
-    var start = moment().subtract(1, 'y').toDate();
-    var end = moment().toDate();
+    var start = dayjs().subtract(1, 'y').toDate();
+    var end = dayjs().toDate();
     document.getElementById("endDtEdit").valueAsDate = end;
     document.getElementById("stDtEdit").valueAsDate = start;
 
@@ -1350,7 +1360,7 @@
         '<td data-entry_id=' +
         logId + ' class="col-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
-        moment(el[0]).format("YYYY-MM-DD") +
+        dayjs(el[0]).format("YYYY-MM-DD") +
         '</td>' +
         '<td data-entry_id=' + logId + ' class="logEntry col-9">' +
         el[3] +
@@ -1443,7 +1453,7 @@
         '<td data-entry_id=' +
         logId + ' class="col-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
-        moment(el[0]).format("YYYY-MM-DD") +
+        dayjs(el[0]).format("YYYY-MM-DD") +
         '</td>' +
         '<td data-entry_id=' + logId + ' class="logEntry col-9">' +
         el[3] +

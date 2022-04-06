@@ -25,7 +25,7 @@
     ],
     "libraries": [
       {
-        "userSymbol": "Moment",
+        "userSymbol": "dayjs",
         "libraryId": "15hgNOjKHUG4UtyZl9clqBbl23sDvWMS8pfDJOyIapZk5RBqwL3i-rlCo",
         "version": "9"
       }

@@ -2,13 +2,13 @@
 // Compiled using dan-cl-retry 1.0.0 (TypeScript 4.5.4)
 // Compiled using dan-cl-retry 1.0.0 (TypeScript 4.5.4)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
-var roster = ss.getSheetByName('Copy of roster');
+var roster = ss.getSheetByName('roster');
 function allPupilsSheet() {
     var ss2 = SpreadsheetApp.openById("1HoulMp8RlpCxvN4qf10TbxW1vzxzTjbA8xKhFjRdZY8");
     return ss2;
 }
 function doGet(e) {
-    ss.getSheetByName('Copy of roster').sort(2);
+    ss.getSheetByName('roster').sort(2);
     ss.getSheetByName('logRespMerged').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
     t.version = "v4-devel";
@@ -47,9 +47,9 @@ function trimSS() {
 }
 var fname = 'arguments.callee.toString().match(/function ([^\(]+)/)[1]';
 // @ts-ignore
-var moment = Moment.load();
+var dayjs = dayjs.load();
 function getInitialId() {
-    return ss.getSheetByName('Copy of roster').getRange('A3').getValue().toString();
+    return ss.getSheetByName('roster').getRange('A3').getValue().toString();
 }
 function sndMl() {
     var teachEmail = "dpaight@hemetusd.org";
@@ -323,7 +323,7 @@ function getOneGoalForEditing(gId = 47) {
 //     // var seis_id = data[0], Parent_1_Home_Phone = data[1], Parent_1_Email = data[2], u1_phone = data[3], u3_Parent_1a_Email = data[4], teachemail = data[5];
 //     // data = data || ["145980", "(951) 305-1378", ""];
 //     var [headings, values, sheet, range, lastR, lastC] = rosterGet();
-//     // var values = getAllRecords('Copy of roster');
+//     // var values = getAllRecords('roster');
 //     var headings = headings.flat();
 //     // nmjdob	idAeries	teachemail	u1_phone	stuemail	u3_Parent_1a_Email	corrlng	langFlu	u6_teacher	seis_id	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
 //     Logger.log('seis index: ' + headings.indexOf('seis_id'));
@@ -340,7 +340,7 @@ function getOneGoalForEditing(gId = 47) {
 //             el.splice(u3_Parent_1a_Email_idx, 1, pem2);
 //             el.splice(teachemail_idx, 1, tem);
 //             el.splice(notes_idx, 1, notes);
-//             var destRng = ss.getSheetByName('Copy of roster').getRange(i + 1, 1, 1, el.length);
+//             var destRng = ss.getSheetByName('roster').getRange(i + 1, 1, 1, el.length);
 //             destRng.setValues([el]);
 //             return el;
 //         }
@@ -374,8 +374,8 @@ function makeMatchVar(data) {
     if (data === void 0) {
         data = ['Paight', 'Daniel', '1/21/2013'];
     }
-    var y2 = moment(data[2], 'MM-DD-YYYY').format('YY');
-    var doy = moment(data[2], 'MM-DD-YYYY').dayOfYear();
+    var y2 = dayjs(data[2], 'MM-DD-YYYY').format('YY');
+    var doy = dayjs(data[2], 'MM-DD-YYYY').dayOfYear();
     return (data[0] + data[1] + y2 + doy).toString().replace(/[^A-z0-9]/g, "");
 }
 /**
@@ -641,7 +641,7 @@ function printSelectedLogEntries(stuName, sDate, eDate, array) {
 // this returns table data to the success Handler on the client side
 function getTableData_roster() {
 
-    var [headings, values, sheet, range, lastR, lastC] = myGet('Copy of roster');
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster');
     values.shift();
     return JSON.stringify(values);
 }
@@ -923,7 +923,7 @@ function addStudentByIdFromRESstudentsServer(obj) {
             break;
         }
     }
-    var rosterHeadings = ss.getSheetByName('Copy of roster').getRange(1, 1, 1, 29).getValues().flat();
+    var rosterHeadings = ss.getSheetByName('roster').getRange(1, 1, 1, 29).getValues().flat();
     var newRosterRecord = [[]];
     for (let i = 0; i < rosterHeadings.length; i++) {
         const el = rosterHeadings[i].toString().toLowerCase();
@@ -931,7 +931,7 @@ function addStudentByIdFromRESstudentsServer(obj) {
         newRosterRecord[0].push(stuToAdd[index]);
     }
     Logger.log(JSON.stringify(newRosterRecord));
-    var roster = ss.getSheetByName('Copy of roster');
+    var roster = ss.getSheetByName('roster');
     var last = roster.getRange('A1:A').getValues().filter(String).length;
     var destRange = roster.getRange(last + 1, 1, 1, newRosterRecord.length);
     destRange.setValues([newRosterRecord]);
@@ -984,8 +984,8 @@ function addMatchVarColOne(array) {
     var seisDataMod = [];
     for (let i = 0; i < array.length; i++) {
         const row = array[i];
-        var y2 = moment(row[searchItems.birth], 'MM-DD-YYYY').format('YY');
-        var doy = moment(row[searchItems.birth], 'MM-DD-YYYY').dayOfYear();
+        var y2 = dayjs(row[searchItems.birth], 'MM-DD-YYYY').format('YY');
+        var doy = dayjs(row[searchItems.birth], 'MM-DD-YYYY').dayOfYear();
         var nmjdob = row[searchItems.last].toString().replace(/[- ']/g, "") + row[searchItems.first].toString().replace(/[- ']/g, "") +
             y2.toString() + doy.toString();
         row.unshift(nmjdob);
@@ -997,8 +997,8 @@ function addMatchVarColOne(array) {
 }
 function foldersFromNames() {
     var filing = DriveApp.getFolderById('0B3J9971qOaVIUUlCWXRCbTNjcUE');
-    var sheet = ss.getSheetByName('Copy of roster');
-    var last = findLastRow('Copy of roster', 1);
+    var sheet = ss.getSheetByName('roster');
+    var last = findLastRow('roster', 1);
     var range = sheet.getRange('A2:A22');
     var entries = range.getValues().flat();
     for (let i = 0; i < entries.length; i++) {
@@ -1007,8 +1007,8 @@ function foldersFromNames() {
     }
 }
 function fileInFolders() {
-    var sheet = ss.getSheetByName('Copy of roster');
-    var last = findLastRow('Copy of roster', 1);
+    var sheet = ss.getSheetByName('roster');
+    var last = findLastRow('roster', 1);
     var range = sheet.getRange('K2:K' + last);
     // these are last names -- something that will be in both the file name and its destination folder name
     var entries = range.getValues().flat();
@@ -1040,7 +1040,7 @@ function fileInFolders() {
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 function scanForTasks() {
-    // if (moment().month() < 8) { return };
+    // if (dayjs().month() < 8) { return };
     var [taskHeadings, taskNotesVals, taskSheet, taskRange, lastR, lastC] = myGet('tasks');
     var array = [];
     var [headings, values, sheet, range, lastR, lastC] = rosterGet();
@@ -1048,18 +1048,18 @@ function scanForTasks() {
     var taskList = getTaskLists();
     var taskListId = taskList[0].id;
     var tasks = getTasks(taskListId);
-    var nextYear = (moment().month() < 5) ?
-        moment((moment().year()).toString() + '-08-01', 'YYYY-MM-DD') :
-        moment((moment().year() + 1).toString() + '-08-01', 'YYYY-MM-DD');
-    Logger.log('nextYear is %s', moment(nextYear).format('YYYY-MM-DD'));
+    var nextYear = (dayjs().month() < 5) ?
+        dayjs((dayjs().year()).toString() + '-08-01', 'YYYY-MM-DD') :
+        dayjs((dayjs().year() + 1).toString() + '-08-01', 'YYYY-MM-DD');
+    Logger.log('nextYear is %s', dayjs(nextYear).format('YYYY-MM-DD'));
     for (let i = 0; i < values.length; i++) {
         var el = values[i];
-        var anl = moment(el[iObj['date_of_last_annual_iep']]);
-        var tri = moment(el[iObj['date_of_last_evaluation']]);
-        var nxtAnl = moment(anl).add(1, 'y');
-        var nxtTri = moment(tri).add(3, 'y');
-        Logger.log('Anl is %s; Tri is %s', moment(anl).format('YYYY-MM-DD'), moment(tri).format('YYYY-MM-DD'));
-        Logger.log('nxtAnl is %s; nxtTri is %s', moment(nxtAnl).format('YYYY-MM-DD'), moment(nxtTri).format('YYYY-MM-DD'));
+        var anl = dayjs(el[iObj['date_of_last_annual_iep']]);
+        var tri = dayjs(el[iObj['date_of_last_evaluation']]);
+        var nxtAnl = dayjs(anl).add(1, 'y');
+        var nxtTri = dayjs(tri).add(3, 'y');
+        Logger.log('Anl is %s; Tri is %s', dayjs(anl).format('YYYY-MM-DD'), dayjs(tri).format('YYYY-MM-DD'));
+        Logger.log('nxtAnl is %s; nxtTri is %s', dayjs(nxtAnl).format('YYYY-MM-DD'), dayjs(nxtTri).format('YYYY-MM-DD'));
         var fn = el[iObj['first_name']];
         var ln = el[iObj['last_name']];
         var id = el[iObj['seis_id']];
@@ -1070,21 +1070,21 @@ function scanForTasks() {
             // do nothing
         }
         else {
-            var title = 'sched meet: ' + fn + ' ' + ln + '; \nanl: ' + moment(nxtAnl).format('YYYY-MM-DD') + '; \ntri: ' +
-                '; ' + moment(nxtTri).format('YYYY-MM-DD') +
+            var title = 'sched meet: ' + fn + ' ' + ln + '; \nanl: ' + dayjs(nxtAnl).format('YYYY-MM-DD') + '; \ntri: ' +
+                '; ' + dayjs(nxtTri).format('YYYY-MM-DD') +
                 '\n--send Levels questionnaire' +
                 '\n--do informal assessments' + '\n[' + key + '] ';
-            if (moment(nxtAnl).isBefore(moment(nxtTri))) {
-                var due = moment(nxtAnl).subtract(40, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
+            if (dayjs(nxtAnl).isBefore(dayjs(nxtTri))) {
+                var due = dayjs(nxtAnl).subtract(40, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
                 title += 'annual review; ';
             }
-            if (moment(nxtTri).isBefore(moment(nextYear))) {
-                var due = moment(nxtTri).subtract(70, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
+            if (dayjs(nxtTri).isBefore(dayjs(nextYear))) {
+                var due = dayjs(nxtTri).subtract(70, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
                 title += 'triennial review is due; ';
             }
             if (langflu.toString().search(/3/g) !== -1) {
                 title += '\narrange for interpreter if needed; ';
-                due = moment(due).subtract(7, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
+                due = dayjs(due).subtract(7, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
                 ;
             }
             var task = {
@@ -1203,7 +1203,7 @@ function addTask0(taskListId) {
     };
 }
 function getFirstPointer() {
-    var [headings, values, sheet, range, lastR, lastC] = myGet('Copy of roster', 0, true);
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster', 0, true);
     values.shift();
     //     console.log('getting first pointer; the values array is: %s', JSON.stringify(values));
     Logger.log(values[0]);
@@ -1217,7 +1217,7 @@ function deleteEntry(entryId) {
 
 function updateLogForm() {
     var [allheadings, allvalues, allsheet, allrange, alllastR, alllastC] = rosterGet();
-    var [headings, values, sheet, range, lastR, lastC] = myGet('Copy of roster', allheadings.indexOf('nmjdob') + 1, true);
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster', allheadings.indexOf('nmjdob') + 1, true);
     values.shift();
     Logger.log('nmjdob array = %s', JSON.stringify(values));
     var form = FormApp.openById('1t9mAS03Kq5C8PkHiCoD47fVGc9c5E_5gnwk4NENJGl4');
@@ -1243,7 +1243,7 @@ function
         const el = Rvalues[i];
         if (el[Rheadings.indexOf('nmjdob')] == v.Student) {
             var nextId = getNextLogEntryId();
-            var record = [[moment(v.Timestamp, 'M/D/YYYY HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), v['Email Address'], v.Student, v.log_entry, nextId, el[Rheadings.indexOf("seis_id")]]];
+            var record = [[dayjs(v.Timestamp, 'M/D/YYYY HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), v['Email Address'], v.Student, v.log_entry, nextId, el[Rheadings.indexOf("seis_id")]]];
             var dest_range = sheet.getRange((lastR + 1), 1, 1, record[0].length);
             dest_range.setValues(record);
         }
@@ -1253,7 +1253,7 @@ function
     cacheLogEntry(JSON.stringify(record[0]));
 }
 function cacheLogEntry(recordJSN) {
-    // var record = [[moment(v.Timestamp, 'M/D/YYYY HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), v['Email Address'], v.Student, v.log_entry, nextId, el[Rheadings.indexOf("seis_id")]]];
+    // var record = [[dayjs(v.Timestamp, 'M/D/YYYY HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), v['Email Address'], v.Student, v.log_entry, nextId, el[Rheadings.indexOf("seis_id")]]];
     var sp = PropertiesService.getScriptProperties();
     if (sp.getProperty('newRecord') == null) {
         sp.setProperty('newRecord', JSON.stringify([]));
@@ -1315,7 +1315,7 @@ function deleteRecord_old(id = '1010101') {
     throw "the id was not found, which is really odd";
 }
 function deleteRecord(id) {
-    var [headings, values, sheet, range, lastR, lastC] = myGet('Copy of roster');
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster');
     for (let i = 0; i < values.length; i++) {
         const el = values[i];
         var thisId = el[0];
@@ -1425,13 +1425,13 @@ function markNoGo() {
             const grade = el[1];
             if (grade == gradeLevel) {
                 for (let t = 0; t < times.length; t++) {
-                    const time = moment(times[t][0]);
+                    const time = dayjs(times[t][0]);
                     for (let n = 2; n < 9; n += 2) {
                         // if (n == 2) {
                         //     times[t].splice(1, 1, null);
                         // }
-                        const ngb = moment(el[n]).subtract(1, 'minute');
-                        const nge = moment(el[n + 1]);
+                        const ngb = dayjs(el[n]).subtract(1, 'minute');
+                        const nge = dayjs(el[n + 1]);
                         const teacher = el[0].toString().substr(0, 3);
                         if (time.isAfter(ngb) && time.isBefore(nge)) {
                             const currentValue = times[t][gradeLevel].toString();
@@ -1640,7 +1640,7 @@ function updateRoster() {
     }
     // get current data
     // importXLS_2(); 
-    var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Copy of roster');
+    var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
     var last = roster.getRange('a1:a').getValues().filter(String).length;
     var rosterVals = roster.getRange(1, 1, last, seisHeadings.length).getDisplayValues();
     var rosterHeadings = rosterVals.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
@@ -1667,7 +1667,7 @@ function updateRoster() {
     var merged = getFromAeriesData(newDataWithHeadings);
     // Logger.log(JSON.stringify(newData));
     // var seis_aeries_merge = getFromAeriesData(newDataWithHeadings);
-    var dest = ss.getSheetByName('Copy of roster');
+    var dest = ss.getSheetByName('roster');
     var destRng = dest.getRange(1, 1, merged.length, merged[0].length);
     destRng.setValues(merged);
     SpreadsheetApp.flush();
@@ -1720,7 +1720,7 @@ function getAllPupilsList() {
     return values;
 }
 function getAeriesData() {
-    var data = myGet('Copy of roster');
+    var data = myGet('roster');
     var [headings, values, sheet, range, lastR, lastC] = data;
     var aeriesData = getAllPupilsList();
     var aerHeadings = aeriesData.shift();
@@ -1749,7 +1749,7 @@ function getAeriesData() {
             }
         }
     }
-    var destR = ss.getSheetByName('Copy of roster')
+    var destR = ss.getSheetByName('roster')
         .getRange(2, 1, values.length, values[0].length);
     destR.setValues(values);
 }
@@ -1759,7 +1759,7 @@ function lookForTeachers(id, refresh) {
         parseClassListReport();
     }
     var [c_headings, c_values, sheet, range, lastR, lastC] = myGet('coursesTeachers');
-    var [rost_headings, rost_values, rost_sheet, rost_range, rost_lastR, rost_lastC] = myGet('Copy of roster');
+    var [rost_headings, rost_values, rost_sheet, rost_range, rost_lastR, rost_lastC] = myGet('roster');
     var ctStuIdIdx = c_headings.indexOf('Student ID');
     var seisIdIdx = rost_headings.indexOf('seis_id');
     var husdIdIdx = rost_headings.indexOf('student_id');
@@ -1846,8 +1846,8 @@ function getFromAeriesData(newDataWithHeadings) {
         var nmjdob, student_id, tchr_num, teachname, total_minutes___frequency, frequency, location, firstname_lastname, langflu, corrlng, teachemail, stuemail, firslinit, allServices;
         nmjdob = makenmjdob(first_name, last_name, date_of_birth);
         function makenmjdob(fn, ln, dob) {
-            var y2 = moment(dob).format('YY');
-            var doy = moment(dob).dayOfYear();
+            var y2 = dayjs(dob).format('YY');
+            var doy = dayjs(dob).dayOfYear();
             var nmjdob = ln.replace(/[- ']/g, "") + fn.replace(/[- ']/g, "") + y2.toString() + doy.toString();
             return nmjdob;
         }
@@ -1944,7 +1944,7 @@ function getFromAeriesData(newDataWithHeadings) {
 // 
 // from 'makeDocsForNotes.ts
 function makeNewNotesDocs() {
-    var [headings, values, sheet, range, lastR, lastC] = myGet('Copy of roster');
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster');
     var doc, fn, ln, folder, files, file, fileName, folderId;
     values.shift();
     var root = DriveApp.getRootFolder();
@@ -1993,7 +1993,7 @@ function getLinks() {
 }
 function cleanOldLogEntries() {
     var [headings, logids, sheetLogs, range, lastR, lastC] = myGet("logRespMerged");
-    var [rheads, rostids, sheet, range, lastR, lastC] = myGet("Copy of roster", 1, true);
+    var [rheads, rostids, sheet, range, lastR, lastC] = myGet("roster", 1, true);
     var keepers = logids;
     var toss = [];
     var found = [];
@@ -2020,7 +2020,7 @@ function FILLMLIST(rosterRow) {
     var sheet, range, values, row, columns;
     columns = [0, 1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 25, 26];
     // columns are adjusted to be zero indexed
-    sheet = ss.getSheetByName('Copy of roster');
+    sheet = ss.getSheetByName('roster');
     range = sheet.getRange(rosterRow, 1, 1, 30);
     values = range.getValues();
     row = [];

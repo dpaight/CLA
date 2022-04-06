@@ -145,25 +145,25 @@ function getTestScores(id = "155051") {
             row.push(student_id);
             if (testid == "MAP") {
                 if (part == 1) {
-                    if (scores.mapRpt1[1][4] == "" || moment(date_taken, "MM/DD/YYYY").isAfter(moment(scores.mapRpt1[1][4], "MM/DD/YYYY"))) {
+                    if (scores.mapRpt1[1][4] == "" || dayjs(date_taken, "MM/DD/YYYY").isAfter(dayjs(scores.mapRpt1[1][4], "MM/DD/YYYY"))) {
                         scores.mapRpt0[1] = scores.mapRpt1[1];
                         scores.mapRpt1[1] = [testid, m[1], s_s, pct, date_taken];
                     }
                 }
                 else if (part == 20) {
-                    if (scores.mapRpt1[20][4] == "" || moment(date_taken, "MM/DD/YYYY").isAfter(moment(scores.mapRpt1[20][4], "MM/DD/YYYY"))) {
+                    if (scores.mapRpt1[20][4] == "" || dayjs(date_taken, "MM/DD/YYYY").isAfter(dayjs(scores.mapRpt1[20][4], "MM/DD/YYYY"))) {
                         scores.mapRpt0[20] = scores.mapRpt1[20];
                         scores.mapRpt1[20] = [testid, m[20], s_s, pct, date_taken];
                     }
                 }
             }
             else if (testid == "ELPAC") {
-                if (scores.elpacRpt[part] == undefined || moment(date_taken, "MM/DD/YYYY").isAfter(moment(scores.elpacRpt[part], "MM/DD/YYYY"))) {
+                if (scores.elpacRpt[part] == undefined || dayjs(date_taken, "MM/DD/YYYY").isAfter(dayjs(scores.elpacRpt[part], "MM/DD/YYYY"))) {
                     scores.elpacRpt[part] = [date_taken, e[part], performlvl];
                 }
             }
             else if (testid == "SRI") {
-                if (scores.sri[4] == undefined || moment(date_taken, "MM/DD/YYYY").isAfter(moment(scores.sri[4], "MM/DD/YYYY"))) {
+                if (scores.sri[4] == undefined || dayjs(date_taken, "MM/DD/YYYY").isAfter(dayjs(scores.sri[4], "MM/DD/YYYY"))) {
                     scores.sri = [date_taken, s_s, pct];
                 }
             }
