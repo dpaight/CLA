@@ -22,7 +22,7 @@ function saveLogEntryServer(logObj) {
     }
     var [headings, logVals, logResp, range, last, lastC] = myGet('logRespMerged');
     logObj.logId = getNextLogEntryId();
-    var row = [[dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZ'), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id]];
+    var row = [[new Date(), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id]];
     var range = logResp.getRange(last + 1, 1, 1, row[0].length);
     range.setValues(row);
     row = row[0];
@@ -47,7 +47,7 @@ function saveEditedLogEntryServer(logObjStr) {
     Logger.log(logObjStr);
     var [headings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
     var logObj = JSON.parse(logObjStr);
-    var row = [dayjs(logObj.logDate, 'YYYY-MM-DD').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id];
+    var row = [logObj.logDate, Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id];
     Logger.log('the row is %s', JSON.stringify(row));
     var lid_index = headings.indexOf('log_entry_id');
     for (let i = 0; i < values.length; i++) {

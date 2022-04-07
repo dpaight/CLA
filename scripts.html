@@ -5,31 +5,31 @@
   $(document).ready(function () {
     // click student name in roster table switches to that student for both contact info and
     // log entries
-    if (sessionStorage.getItem('lastId') == null) {
-      google.script.run
-        .withSuccessHandler(cacheEm)
-        .getRecord('all');
+    if (sessionStorage.getItem("lastId") == null) {
+      google.script.run.withSuccessHandler(cacheEm).getRecord("all");
 
-        function cacheEm(array) {
-          for (let i = 0; i < array.length; i++) {
-            const el = array[i];
+      function cacheEm(array) {
+        for (let i = 0; i < array.length; i++) {
+          const el = array[i];
 
-            sessionStorage.setItem('lastId', el.seis_id);
-            let nm = 'rec' + el.seis_id;
-            let val = JSON.stringify(el);
-            sessionStorage.setItem(nm, val);
-          }
+          sessionStorage.setItem("lastId", el.seis_id);
+          let nm = "rec" + el.seis_id;
+          let val = JSON.stringify(el);
+          sessionStorage.setItem(nm, val);
         }
+      }
     } else {
-      var id = sessionStorage.getItem('lastId');
+      var id = sessionStorage.getItem("lastId");
       contactInfo(id);
     }
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 
-    $("body").on("click tap", ".setStudent", function (event) {
+    $("table").on("click tap", ".setStudent", function (event) {
       event.preventDefault();
       var id = $(this).attr("data-stuId");
       //       console.log('id = %s', id);
@@ -47,10 +47,8 @@
       // console.log('this is %s', JSON.stringify($(this).text()));
       var thisGoal = JSON.parse($(this).text());
       var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
-      console.log('gId = %s', gId);
-      google.script.run
-        .withSuccessHandler(editGoalInModal)
-        .getGoal(gId);
+      console.log("gId = %s", gId);
+      google.script.run.withSuccessHandler(editGoalInModal).getGoal(gId);
     });
     // console.log('sent to goal edit: %s', $(this).text());
     $("body").on("click", ".goalList", function (e) {
@@ -58,7 +56,7 @@
       if (e.ctrlKey) {
         e.preventDefault();
         var item = JSON.parse($(this).text());
-        var gId = item[item.length - 1]
+        var gId = item[item.length - 1];
         // item = item.toString().match(/\d+$/);
 
         $(".gls").each(function (i, el) {
@@ -80,7 +78,7 @@
         $(this).val("");
         $(this).attr("title", "");
       } else {
-        var id = $('#seis_id').val();
+        var id = $("#seis_id").val();
         var gId = $(this).val();
         google.script.run
           .withSuccessHandler(showTBsnippetGl)
@@ -91,11 +89,13 @@
     // $("body").on("click", "#emParentsMenuItem", emParents());
 
     $(function () {
-      $('[data-toggle="tooltip"]').tooltip()
+      $('[data-toggle="tooltip"]').tooltip();
     });
     // console.log('gSmL is %s', gSmL);
 
-    $("body").on("click", "#gVoiceMenuItem", function () { firstSnipThenGvoice() });
+    $("body").on("click", "#gVoiceMenuItem", function () {
+      firstSnipThenGvoice();
+    });
     $(".alert").alert();
 
     //set cursor to pointer when entering a nav item
@@ -118,15 +118,18 @@
       $(".setStudent").css("cursor", "default");
     });
 
-
     // modals
-    $("body").on("show.srchModal.modal", function () {
-
-    });
+    $("body").on("show.srchModal.modal", function () {});
 
     $("body").on("show.bs.modal", function () {
       // alert('event');
-      var addresses = ($("#teachemail").val() + ',' + $("#Parent_1_Email").val() + ',' + $("#u3_Parent_1a_Email").val()).replace(/,$/, "");
+      var addresses = (
+        $("#teachemail").val() +
+        "," +
+        $("#Parent_1_Email").val() +
+        "," +
+        $("#u3_Parent_1a_Email").val()
+      ).replace(/,$/, "");
       var subject = $("#stuName").val();
       // console.log(addresses);
       $("#emailRecipients").val(addresses);
@@ -141,7 +144,10 @@
     $("body").on("mousemove", ".gls", function () {
       if (event.shiftKey) {
         e.preventDefault();
-        $(".gls").css("cursor", "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto");
+        $(".gls").css(
+          "cursor",
+          "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto"
+        );
       } else {
         $(".gls").css("cursor", "pointer");
       }
@@ -157,7 +163,7 @@
     // copy a text blaze snippet to clipboard when clicking on the item
     $("body").on("click", '[name$="Copy"]', function () {
       $(this).select();
-      document.execCommand('copy');
+      document.execCommand("copy");
     });
     $(".btn-success").click(function () {
       $(this).toggleClass("btn-active").siblings().removeClass("btn-active");
@@ -177,11 +183,11 @@
       // console.log('mouse up');
     });
 
-    // record edited fields 
+    // record edited fields
     $("body").on("change", ".stuEdit", function () {
       var seisId = $("#seis_id").val();
       var fieldVal = $(this).val();
-      var fldNm = $(this).attr("data-fldNm");
+      var fldNm = $(this).attr("id");
 
       if (!seisId || !fieldVal || !fldNm) {
         alert("missing data in html");
@@ -193,8 +199,12 @@
         fieldVal = fieldVal.toString().replace(/-/g, "/");
         $(this).val(fieldVal);
       }
+      var cacheRec = JSON.parse(sessionStorage.getItem("rec" + seisId));
+      cacheRec[fldNm] = fieldVal;
+      sessionStorage.setItem("rec" + seisId, JSON.stringify(cacheRec));
+
       google.script.run
-        .withSuccessHandler(updateSessionStorage)
+        .withSuccessHandler()
         .updateContactInfo(seisId, fldNm, fieldVal);
 
       setTimeout(() => {
@@ -203,11 +213,10 @@
           .getTableData_roster();
       }, 3000);
     });
-
   });
 
   $("body").on("change", ".logWindow", function () {
-    filterLogEntriesByDateWindow()
+    filterLogEntriesByDateWindow();
   });
   //save changes to spreadsheet
   $("body").on("change", "#notes2", function (event) {
@@ -215,7 +224,7 @@
     var field = $(this).attr("id");
     var value = $(this).val();
 
-    console.log('id = %s, field = %s, value = %s', id, field, value);
+    console.log("id = %s, field = %s, value = %s", id, field, value);
     google.script.run
       .withSuccessHandler(showNotes) // works with returned values: id, index, value
       .getNotes([id, value]);
@@ -225,26 +234,30 @@
     event.preventDefault();
     document.body.style.cursor = "wait";
     if (entry.length > 0) {
-      var logObj = new LogEntry([$("#seis_id").val(), $("#logEntry").val(), $("#nmjdob").val(), null]);
+      var logObj = LogEntry([
+        $("#seis_id").val(),
+        $("#logEntry").val(),
+        $("#nmjdob").val(),
+        null,
+      ]);
       // console.log('id and entry are %s and %s', id, entry);
-      console.log('saving: %s', JSON.stringify(logObj));
+      console.log("saving: %s", JSON.stringify(logObj));
 
       google.script.run
         .withSuccessHandler(updateLogEntryCache)
         .saveLogEntry([logObj, null]);
     }
     document.body.style.cursor = "default";
-    $("#logEntry").val('');
+    $("#logEntry").val("");
   });
 
   $("body").on("keypress", ".saveEntryBtn", function (event) {
-
     $(this).addClass("active");
     event.preventDefault();
     document.body.style.cursor = "wait";
 
     var entry = $("#logEntry").val().toString().replace(/\n/g, "->");
-    console.log('entry is %s', entry);
+    console.log("entry is %s", entry);
     var id = $("#seis_id").val();
     var nmjdob = $("#nmjdob").val();
     if (entry.length > 0) {
@@ -256,7 +269,7 @@
     }
     document.body.style.cursor = "default";
     $(this).removeClass("active");
-    $("#logEntry").val('');
+    $("#logEntry").val("");
   });
   // turn the color of the button back to green without doing anything
   $("body").on("click", "#cancelEntryBtn", function (event) {
@@ -264,22 +277,19 @@
     $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
   });
 
-
-  // click builds text blaze snippet from data in table 
+  // click builds text blaze snippet from data in table
   $("body").on("click", "#getIEPcompForm", function (event) {
     var flName = $("#stuName").val("");
     var fn = flName.replace(/([A-z]+)( .*)/g, "$1");
     var ln = flName.replace(/([A-z]+ )(.*)/g, "$2");
     var dob = $("#dob").val("");
 
-    document.execCommand('copy');
+    document.execCommand("copy");
 
     $(this).attr("title", "");
 
     var gId = $(this).val();
-    google.script.run
-      .withSuccessHandler(showTBsnippetGl)
-      .getGoal(gId);
+    google.script.run.withSuccessHandler(showTBsnippetGl).getGoal(gId);
   });
 
   // retrieves data from a seis generated csv file (seis search report)
@@ -287,15 +297,11 @@
     event.preventDefault();
     document.body.style.cursor = "wait";
     var id = $("#seis_id").val();
-    google.script.run
-      .withSuccessHandler(reloadMe)
-      .updateRoster();
+    google.script.run.withSuccessHandler(reloadMe).updateRoster();
     setTimeout(() => {
-      "google.script.run.updateLogForm();"
+      "google.script.run.updateLogForm();";
     }, 15000);
-
   });
-
 
   $("body").on("mouseenter", ".logEntry", function () {
     $(this).css("cursor", "pointer");
@@ -312,17 +318,13 @@
     console.log($(this).closest("tr").find("td:nth-child(2)").text());
     // console.log($(this).closest("tr").find("td:nth-child(2)").text());
 
-    $("#editEntry").val(
-      $(this).closest("tr").find("td:nth-child(2)").text()
-    );
-    $("#editDate").val(
-      $(this).closest("tr").find("td:nth-child(1)").text()
-    );
+    $("#editEntry").val($(this).closest("tr").find("td:nth-child(2)").text());
+    $("#editDate").val($(this).closest("tr").find("td:nth-child(1)").text());
     $("#editId").val(
       $(this).closest("tr").find("td:nth-child(2)").data("entry_id")
     );
 
-    var myModal = new bootstrap.Modal(document.getElementById('logEntryModal'));
+    var myModal = new bootstrap.Modal(document.getElementById("logEntryModal"));
     myModal.show();
 
     // console.log(JSON.stringify(logObj));
@@ -342,14 +344,12 @@
     //       console.log('seis_id is ', $("#seis_id").val());
     var emadr = $("#teach_email").val();
     //       console.log('email address is: %s', emadr);
-
   });
   startup();
 
-
   // calls function on server side to return data for this student
   function startup(id = sessionStorage.getItem("lastId")) {
-    $('#spinner01').show();
+    $("#spinner01").show();
     // id = getPointer();
     if (id == undefined || id == null) {
       google.script.run
@@ -377,9 +377,7 @@
       .withSuccessHandler(showRosterTable)
       .getTableData_roster(id);
 
-    google.script.run
-      .withSuccessHandler(showLog)
-      .getLogEntries(id);
+    google.script.run.withSuccessHandler(showLog).getLogEntries(id);
 
     focus(id);
   }
@@ -391,27 +389,28 @@
 
     if (sessionStorage.getItem("reclog" + id) != null) {
       var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
-      showLog(logs, 'loc01');
-      $('#spinner01').hide();
+      showLog(logs, "loc01");
+      $("#spinner01").hide();
     } else {
       google.script.run
         .withSuccessHandler(logsToCache)
-        .getLogEntries(id, 'loc01');
+        .getLogEntries(id, "loc01");
     }
   }
   function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-
-  function contactInfo(id = sessionStorage.getItem('lastId')) {
-    if (id == undefined || id == null || id == "") { alert('no id at contactInfo()') };
+  function contactInfo(id = sessionStorage.getItem("lastId")) {
+    if (id == undefined || id == null || id == "") {
+      alert("no id at contactInfo()");
+    }
 
     if (sessionStorage.getItem("rec" + id.toString()) != null) {
-      console.log('rec + id key was not null');
+      console.log("rec + id key was not null");
       showContactInfo(sessionStorage.getItem("rec" + id.toString()));
     } else {
-      console.log('rec + id key was null');
+      console.log("rec + id key was null");
       google.script.run
         .withSuccessHandler(showContactInfo)
         .getRecord(id.toString());
@@ -424,23 +423,31 @@
   //   $("#notes2").val(notes);
   // }
   function showTBsnippetGl(goalObj) {
-    var snippet = '[' +
-      '"area" = "' + goalObj.area + '",' +
-      '"strand" = "' + goalObj.strand + '",' +
-      '"stnd" = "' + goalObj.standard + '",' +
-      '"gl" = "' + goalObj.annual + '"' +
-      ']'
+    var snippet =
+      "[" +
+      '"area" = "' +
+      goalObj.area +
+      '",' +
+      '"strand" = "' +
+      goalObj.strand +
+      '",' +
+      '"stnd" = "' +
+      goalObj.standard +
+      '",' +
+      '"gl" = "' +
+      goalObj.annual +
+      '"' +
+      "]";
     $("#tbSnippetCopy").text(snippet);
     $("#tbSnippetCopy").select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     showToast('goal copied; type "/gl" starting in date field');
 
     document.body.style.cursor = "default";
   }
 
-
   function store(records) {
-    if ($('#seis_id').val() == null) {
+    if ($("#seis_id").val() == null) {
       // setTimeout(
       //   function () {
       //     store(records);
@@ -470,22 +477,21 @@
   // search the goal bank for goals of a given level and area
   function findGoals() {
     var glLvl = $("#glLvl").children("option:selected").val();
-    var glLvlElid = $("#glLvl").children("option:selected").attr('id');
+    var glLvlElid = $("#glLvl").children("option:selected").attr("id");
 
     var glArea = $("#glArea").children("option:selected").val();
-    var glAreaElid = $("#glArea").children("option:selected").attr('id');
+    var glAreaElid = $("#glArea").children("option:selected").attr("id");
 
     var id = $("#seis_id").val();
     // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
 
-    sessionStorage.setItem('glLvl', glLvl);
-    sessionStorage.setItem('glArea', glArea);
-    var search = glLvl + '_' + glArea;
+    sessionStorage.setItem("glLvl", glLvl);
+    sessionStorage.setItem("glArea", glArea);
+    var search = glLvl + "_" + glArea;
 
-
-    if (sessionStorage.getItem('goals' + search)) {
+    if (sessionStorage.getItem("goals" + search)) {
       // console.log('getting items from cache for ' + search);
-      showGoals(sessionStorage.getItem('goals' + search));
+      showGoals(sessionStorage.getItem("goals" + search));
     } else {
       google.script.run
         .withSuccessHandler(showGoals)
@@ -496,22 +502,21 @@
 
   function findGoals_m() {
     var glLvl = $("#m-glLvl").children("option:selected").val();
-    var glLvlElid = $("#m-glLvl").children("option:selected").attr('id');
+    var glLvlElid = $("#m-glLvl").children("option:selected").attr("id");
 
     var glArea = $("#m-glArea").children("option:selected").val();
-    var glAreaElid = $("#m-glArea").children("option:selected").attr('id');
+    var glAreaElid = $("#m-glArea").children("option:selected").attr("id");
 
     var id = $("#seis_id").val();
     // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
 
-    sessionStorage.setItem('glLvl', glLvl);
-    sessionStorage.setItem('glArea', glArea);
-    var search = glLvl + '_' + glArea;
+    sessionStorage.setItem("glLvl", glLvl);
+    sessionStorage.setItem("glArea", glArea);
+    var search = glLvl + "_" + glArea;
 
-
-    if (sessionStorage.getItem('goals' + search)) {
+    if (sessionStorage.getItem("goals" + search)) {
       // console.log('getting items from cache for ' + search);
-      showGoals(sessionStorage.getItem('goals' + search));
+      showGoals(sessionStorage.getItem("goals" + search));
     } else {
       google.script.run
         .withSuccessHandler(showGoals_m)
@@ -521,8 +526,8 @@
   }
   function getAllLevSnipForTB() {
     var id = $("#seis_id").val();
-    if (sessionStorage['lSnp' + $('#seis_id').val()] != null) {
-      showTBsnippet(sessionStorage['lvlsSnp' + $('#seis_id').val()]);
+    if (sessionStorage["lSnp" + $("#seis_id").val()] != null) {
+      showTBsnippet(sessionStorage["lvlsSnp" + $("#seis_id").val()]);
     } else {
       google.script.run
         .withSuccessHandler(showTBsnippet)
@@ -531,8 +536,8 @@
   }
   function getAllLevSnipForGoal() {
     var id = $("#seis_id").val();
-    if (sessionStorage['lSnp' + $('#seis_id').val()] != null) {
-      makeGoalSnip(sessionStorage['lvlsSnp' + $('#seis_id').val()]);
+    if (sessionStorage["lSnp" + $("#seis_id").val()] != null) {
+      makeGoalSnip(sessionStorage["lvlsSnp" + $("#seis_id").val()]);
     } else {
       google.script.run
         .withSuccessHandler(makeGoalSnip)
@@ -540,7 +545,7 @@
     }
   }
 
-  // show functions ; functions named show... should be call backs success handlers 
+  // show functions ; functions named show... should be call backs success handlers
   // that display data retrieved from a script run on the server
   function showContactInfo(record) {
     console.log(record);
@@ -549,26 +554,32 @@
     function shortDate(dateObj) {
       return dayjs(dateObj).format("MM/DD/YYYY");
     }
-    console.log('record = %s', JSON.stringify(record));
+    console.log("record = %s", JSON.stringify(record));
     var key = "rec" + record.seis_id;
     sessionStorage.setItem(key, JSON.stringify(record));
 
     $("#disability_1_code").val(record.disability_1_code);
     $("#disability_2_code").val(record.disability_2_code);
-    $("#date_of_last_eligibility_evaluation").val(shortDate(record.date_of_last_eligibility_evaluation));
-    $("#date_of_last_annual_plan_review").val(shortDate(record.date_of_last_annual_plan_review));
+    $("#date_of_last_eligibility_evaluation").val(
+      shortDate(record.date_of_last_eligibility_evaluation)
+    );
+    $("#date_of_last_annual_plan_review").val(
+      shortDate(record.date_of_last_annual_plan_review)
+    );
     $("#husd_id").val(record.student_id);
     $("#first_name").val(record.first_name);
     $("#last_name").val(record.last_name);
     $("#langflu").val(record.langflu);
     $("#corrlng").val(record.corrlng);
     $("#gradeCode").val(record.grade_code);
-    $("#stuName").val(record.first_name + ' ' + record.last_name);
-    $("#namenav").text(record.first_name + ' ' + last_name);
+    $("#stuName").val(record.first_name + " " + record.last_name);
+    $("#namenav").text(record.first_name + " " + last_name);
     $("#dob").val(shortDate(record.date_of_birth));
     $("#parent_guardian_1_name").val(record.parent_guardian_1_name);
     $("#parent_1_home_phone").attr("title", "cell/home");
-    $("#parent_1_home_phone").val(record.parent_1_cell_phone + "; " + record.parent_1_home_phone);
+    $("#parent_1_home_phone").val(
+      record.parent_1_cell_phone + "; " + record.parent_1_home_phone
+    );
     $("#u1_phone").attr("title", "work/other");
     $("#parent_1_email").val(record.parent_1_email);
     $("#sex").val(record.gender.toString());
@@ -578,47 +589,55 @@
     $("#addCity").val(record.parent_1_mail_city);
     $("#addZip").val(record.parent_1_mail_zip);
     $("#seis_id").val(record.seis_id);
-    $("#stuemail").val((record.first_name.toString()[0] + record.last_name.toString()[0] + record.student_id + "@stu.hemetusd.org").toLowerCase());
+    $("#stuemail").val(
+      (
+        record.first_name.toString()[0] +
+        record.last_name.toString()[0] +
+        record.student_id +
+        "@stu.hemetusd.org"
+      ).toLowerCase()
+    );
     $("#nmjdob").val(record.nmjdob);
     $("#teachemail").val(record.teachemail);
     $("#notes2").val(record.notes2);
 
-    console.log('nmjdob = %s', nmjdob);
+    console.log("nmjdob = %s", nmjdob);
     // console.log('nmjdob = %s', $("#nmjdob").val());
 
     if ($("#corrlng").val() == 1) {
       $("#corrlng").css("background-color", "#FF0000");
       $("#corrlng").css("color", "#FFFFFF");
-
     } else {
       $("#corrlng").css("color", "#000000");
     }
-
   }
   function phoneFmt(phone) {
     if (phone == null || phone == undefined || phone == "") {
       return "";
     }
 
-    phone = phone.toString().replace(/[^0-9]/g, '');
-    return phone.substr(0, 3) +
+    phone = phone.toString().replace(/[^0-9]/g, "");
+    return (
+      phone.substr(0, 3) +
       "-" +
       phone.substr(3, 3) +
       "-" +
-      phone.substr(6,) + " ; ";
+      phone.substr(6) +
+      " ; "
+    );
   }
 
   function sndEm(buttonVal) {
     var params = {};
-    var corrLang = $('#corrlng').val().toString();
-    if (corrLang == '1' || corrLang == '01') {
-      params['translate'] = true;
+    var corrLang = $("#corrlng").val().toString();
+    if (corrLang == "1" || corrLang == "01") {
+      params["translate"] = true;
     } else {
-      params['translate'] = false;
+      params["translate"] = false;
     }
-    params['to'] = $('#emailRecipients').val();
-    params['subj'] = $('#emailSubject').val();
-    params['body'] = $('#emailBody').val();
+    params["to"] = $("#emailRecipients").val();
+    params["subj"] = $("#emailSubject").val();
+    params["document"] = $("#emailBody").val();
 
     google.script.run
       .withSuccessHandler(copyToClipboard)
@@ -626,26 +645,26 @@
   }
   function sndMassEm(buttonVal) {
     var params = {};
-    var corrLang = $('#corrlng').val().toString();
-    if (corrLang == '1' || corrLang == '01') {
-      params['translate'] = true;
+    var corrLang = $("#corrlng").val().toString();
+    if (corrLang == "1" || corrLang == "01") {
+      params["translate"] = true;
     } else {
-      params['translate'] = false;
+      params["translate"] = false;
     }
 
-    var toAsStr = '';
-    $.each($('#emSelect').val(), function (i, val) {
-      toAsStr += val + ',';
+    var toAsStr = "";
+    $.each($("#emSelect").val(), function (i, val) {
+      toAsStr += val + ",";
     });
-    $.each($('#teacherSelect').val(), function (i, val) {
-      toAsStr += val + ',';
+    $.each($("#teacherSelect").val(), function (i, val) {
+      toAsStr += val + ",";
     });
 
     // console.log('asStr = %s', toAsStr);
 
-    params['to'] = toAsStr;
-    params['subj'] = $('#emailSubject').val();
-    params['body'] = $('#emailBody').val();
+    params["to"] = toAsStr;
+    params["subj"] = $("#emailSubject").val();
+    params["document"] = $("#emailBody").val();
 
     // console.log('params = %s', JSON.stringify(params));
     // return;
@@ -654,22 +673,23 @@
       .createDraftEmail(buttonVal, JSON.stringify(params));
   }
   function editGoalInModal(goal) {
-
-    $('#spinner01').show();
-    var myModal = new bootstrap.Modal(document.getElementById('goalModal'), { focus: true });
-    $('#glEditId').val(goal.id);
-    $('#glEditLvl').val(goal.lvl);
-    $('#glEditStrand').val(goal.strand);
-    $('#glEditAnnual').val(goal.annual);
-    $('#glEditArea').val(goal.area);
-    $('#glEditStandard').val(goal.standard);
-    $('#glEditobj1').val(goal.objective1);
-    $('#glEditobj2').val(goal.objective2);
-    $('#glEditobj3').val(goal.objective3);
-    $('#timestamp').val(goal.timestamp);
+    $("#spinner01").show();
+    var myModal = new bootstrap.Modal(document.getElementById("goalModal"), {
+      focus: true,
+    });
+    $("#glEditId").val(goal.id);
+    $("#glEditLvl").val(goal.lvl);
+    $("#glEditStrand").val(goal.strand);
+    $("#glEditAnnual").val(goal.annual);
+    $("#glEditArea").val(goal.area);
+    $("#glEditStandard").val(goal.standard);
+    $("#glEditobj1").val(goal.objective1);
+    $("#glEditobj2").val(goal.objective2);
+    $("#glEditobj3").val(goal.objective3);
+    $("#timestamp").val(goal.timestamp);
 
     myModal.show();
-    $('#spinner01').hide();
+    $("#spinner01").hide();
 
     // goal is a goal object from 'getGoal'
     // this.id = id;
@@ -682,21 +702,26 @@
     // this.objective2 = objctv2;
     // this.objective3 = objctv3;
 
-
-
     // $('#goalModal').modal({
     //   focus: true
     // });
-
   }
   function clearEmailFields() {
     $("textarea.email").val("");
   }
-  // this is a bit of code I stole from w3 schools; works great!; 
+  // this is a bit of code I stole from w3 schools; works great!;
   // together with the code in the HTML file, this allows sorting by columns when the headings are clicked
   function sortTable(t_id, n) {
     //     console.log('sortTable args = %s, %s', t_id, n);
-    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    var table,
+      rows,
+      switching,
+      i,
+      x,
+      y,
+      shouldSwitch,
+      dir,
+      switchcount = 0;
     table = document.getElementById("rosterList");
     switching = true;
     // Set the sorting direction to ascending:
@@ -709,7 +734,7 @@
       rows = table.rows;
       /* Loop through all table rows (except the
       first, which contains table headers): */
-      for (i = 1; i < (rows.length - 1); i++) {
+      for (i = 1; i < rows.length - 1; i++) {
         // Start by saying there should be no switching:
         shouldSwitch = false;
         /* Get the two elements you want to compare,
@@ -753,30 +778,34 @@
   function filterLogEntriesByDateWindow() {
     //     console.log('fired');
     //     console.log('current start date: %s; end date: %s', $('#stDtEdit').val(), $('#endDtEdit').val());
-    var logEntries = JSON.parse(sessionStorage.getItem('reclog' + $('#seis_id').val()));
+    var logEntries = JSON.parse(
+      sessionStorage.getItem("reclog" + $("#seis_id").val())
+    );
     var keepers = [];
     for (let i = 0; i < logEntries.length; i++) {
       const el = logEntries[i];
-      var start = dayjs($('#stDtEdit').val());
-      var end = dayjs($('#endDtEdit').val());
-      if (dayjs(el[0]).isBefore(end.add(1, 'd')) && dayjs(el[0]).isAfter(start)) {
+      var start = dayjs($("#stDtEdit").val());
+      var end = dayjs($("#endDtEdit").val());
+      if (
+        dayjs(el[0]).isBefore(end.add(1, "d")) &&
+        dayjs(el[0]).isAfter(start)
+      ) {
         //         console.log('%s is before %s', dayjs(el[0]).format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
         keepers.push(el);
       }
     }
-    sessionStorage.setItem('logPrintItems', JSON.stringify(keepers));
-    showLog(keepers, 'loc04');
+    sessionStorage.setItem("logPrintItems", JSON.stringify(keepers));
+    showLog(keepers, "loc04");
   }
-
 
   function printSelectedLogEntries() {
     // $('#spinner02').show();
     document.body.style.cursor = "wait";
 
-    var stuName = $('#stuName').val();
-    var array = sessionStorage.getItem('logPrintItems');
-    var sDate = $('#stDtEdit').val().toString();
-    var eDate = $('#endDtEdit').val().toString();
+    var stuName = $("#stuName").val();
+    var array = sessionStorage.getItem("logPrintItems");
+    var sDate = $("#stDtEdit").val().toString();
+    var eDate = $("#endDtEdit").val().toString();
 
     google.script.run
       .withSuccessHandler(showUrl)
@@ -787,19 +816,27 @@
     var msg = obj.msg;
     var filename = obj.filename;
     var url = obj.url;
-    $('#pdfUrl').html('<p>' + msg + '</p>' + '\n'
-      + '<a href="' + url + '" target="_blank">' + filename + '</a>');
+    $("#pdfUrl").html(
+      "<p>" +
+        msg +
+        "</p>" +
+        "\n" +
+        '<a href="' +
+        url +
+        '" target="_blank">' +
+        filename +
+        "</a>"
+    );
     document.body.style.cursor = "default";
     sleep(1000);
 
     // $('#spinner02').hide();
-
   }
 
   // clears new log entry field and resets button colors
   function showLogUpdates(record) {
     //update the browser cache with saved data
-    var key = 'rec' + record[0];
+    var key = "rec" + record[0];
     sessionStorage[key] = JSON.stringify(record);
     // console.log(sessionStorage[key]);
     // get contact logs
@@ -812,54 +849,108 @@
   function showRosterTable(dataStr) {
     // console.log('data is %s', dataStr);
     var data = JSON.parse(dataStr);
-    var loc = 'loc00';
-    var pending = ['#ffffff', '#000000'];
+    var loc = "loc00";
+    var pending = ["#ffffff", "#000000"];
     for (let i = 0; i < data.length; i++) {
       const el = data[i];
       var [
-        seis_id, last_name, first_name, date_of_birth, case_manager, gender, grade_code, date_of_last_annual_plan_review, date_of_next_annual_plan_review, date_of_last_eligibility_evaluation, date_of_next_eligibility_evaluation, date_of_initial_parent_consent, parent_guardian_1_name, parent_1_email, parent_1_cell_phone, parent_1_home_phone, parent_1_work_phone_h1, parent_1_other_phone, parent_1_mail_address, parent_1_mail_city, parent_1_mail_zip, disability_1_code, disability_2_code, nmjdob, student_id, tchr_num, teachname, total_minutes___frequency, frequency, location, firstname_lastname, langflu, corrlng, teachemail, stuemail, firslinit, allServices, notes2
+        seis_id,
+        last_name,
+        first_name,
+        date_of_birth,
+        case_manager,
+        gender,
+        grade_code,
+        date_of_last_annual_plan_review,
+        date_of_next_annual_plan_review,
+        date_of_last_eligibility_evaluation,
+        date_of_next_eligibility_evaluation,
+        date_of_initial_parent_consent,
+        parent_guardian_1_name,
+        parent_1_email,
+        parent_1_cell_phone,
+        parent_1_home_phone,
+        parent_1_work_phone_h1,
+        parent_1_other_phone,
+        parent_1_mail_address,
+        parent_1_mail_city,
+        parent_1_mail_zip,
+        disability_1_code,
+        disability_2_code,
+        nmjdob,
+        student_id,
+        tchr_num,
+        teachname,
+        total_minutes___frequency,
+        frequency,
+        location,
+        firstname_lastname,
+        langflu,
+        corrlng,
+        teachemail,
+        stuemail,
+        firslinit,
+        allServices,
+        notes2,
       ] = el;
       //       console.log(JSON.stringify(el));
       list = $("#" + loc + "tb");
 
       if (!seis_id) {
-        alert(" has no id"); // lnCmafn + 
+        alert(" has no id"); // lnCmafn +
       } else {
         if (dayjs(date_of_next_eligibility_evaluation).isValid() == false) {
-          var evalDate = dayjs(date_of_initial_parent_consent).add(1, 's').format('YYYY-MM-DD');
-          pending = ['#f4cccc', '#000000'];
-        } else if (dayjs(date_of_next_eligibility_evaluation).add(3, 'y').isBefore(dayjs().add(6, 'month'))) {
-          evalDate = dayjs(date_of_next_eligibility_evaluation).format('YYYY-MM-DD');
-          pending = ['#d9ead3', '#000000'];
+          var evalDate = dayjs(date_of_initial_parent_consent)
+            .add(1, "s")
+            .format("YYYY-MM-DD");
+          pending = ["#f4cccc", "#000000"];
+        } else if (
+          dayjs(date_of_next_eligibility_evaluation)
+            .add(3, "y")
+            .isBefore(dayjs().add(6, "month"))
+        ) {
+          evalDate = dayjs(date_of_next_eligibility_evaluation).format(
+            "YYYY-MM-DD"
+          );
+          pending = ["#d9ead3", "#000000"];
         } else {
-          evalDate = dayjs(date_of_next_eligibility_evaluation).format('YYYY-MM-DD');
-          pending = ['#FFFFFF', '#000000'];
+          evalDate = dayjs(date_of_next_eligibility_evaluation).format(
+            "YYYY-MM-DD"
+          );
+          pending = ["#FFFFFF", "#000000"];
         }
         // console.log('evalDate hello is %s for %s', evalDate, first_name);
         list.append(
           '<tr class="d-flex"><td class="setStudent  col-6" data-stuId=' +
-          seis_id +
-          "> " +
-          last_name + ', ' + first_name +
-          "</td>" +
-          '<td class="tableDate setStudent col-3" data-stuId=' +
-          seis_id + '>' +
-          dayjs(date_of_next_annual_plan_review).format('YYYY-MM-DD') +
-          "</td>" +
-          '<td class="tableDate setStudent col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';" data-stuId=' +
-          seis_id + '>' +
-          dayjs(evalDate).format('YYYY-MM-DD') +
-          "</td>" +
-          "</tr></div>"
+            seis_id +
+            "> " +
+            last_name +
+            ", " +
+            first_name +
+            "</td>" +
+            '<td class="tableDate setStudent col-3" data-stuId=' +
+            seis_id +
+            ">" +
+            dayjs(date_of_next_annual_plan_review).format("YYYY-MM-DD") +
+            "</td>" +
+            '<td class="tableDate setStudent col-3" style="background-color:' +
+            pending[0] +
+            "; color:" +
+            pending[1] +
+            ';" data-stuId=' +
+            seis_id +
+            ">" +
+            dayjs(evalDate).format("YYYY-MM-DD") +
+            "</td>" +
+            "</tr></div>"
         );
       }
     }
     store(data);
-    $('#spinner01').hide();
+    $("#spinner01").hide();
 
-    return 'rosterList', 0;
+    return "rosterList", 0;
   }
-
 
   // bindSetStudentClick();
   // show upcoming iep meetings on the calendar
@@ -869,18 +960,25 @@
     parsedData = JSON.parse(data);
     for (let i = 0; i < parsedData.length; i++) {
       var [a, b, c, d, e, f, g, h] = parsedData[i];
-      var p = dayjs(c, 'YYYY-MM-DDTHH:mm');
+      var p = dayjs(c, "YYYY-MM-DDTHH:mm");
       var q = dayjs();
 
       $("#loc00hd").append(
-        "<li ' class='upcomingEvent'>" + dayjs(c, 'YYYY-MM-DDTHH:mm').format('dd MM-DD-YY @ HH:mm') + "     " + b + "; \n" + f + '\n');
+        "<li ' class='upcomingEvent'>" +
+          dayjs(c, "YYYY-MM-DDTHH:mm").format("dd MM-DD-YY @ HH:mm") +
+          "     " +
+          b +
+          "; \n" +
+          f +
+          "\n"
+      );
       document.body.style.cursor = "default";
     }
   }
   /**
    *
-   * @param searchAndItems [search term in form 'gradeLevel_area' , last search result] 
-   * 
+   * @param searchAndItems [search term in form 'gradeLevel_area' , last search result]
+   *
    */
   function showGoals(goalListItemsArray) {
     // console.log(goalListItemsArray);
@@ -909,10 +1007,9 @@
 
     $("#tbSnippetCopy").text(snippet);
     $("#tbSnippetCopy").select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.style.cursor = "default";
   }
-
 
   function snipInfo() {
     var id = $("#seis_id").val();
@@ -925,8 +1022,20 @@
     var snip = "[";
     snip += '"corrlng"="' + $("#corrlng").val() + '"';
     snip += ',"nm"="' + $("#stuName").val() + '"';
-    snip += ',"fn"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1") + '"';
-    snip += ',"ln"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2") + '"';
+    snip +=
+      ',"fn"="' +
+      $("#stuName")
+        .val()
+        .toString()
+        .replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1") +
+      '"';
+    snip +=
+      ',"ln"="' +
+      $("#stuName")
+        .val()
+        .toString()
+        .replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2") +
+      '"';
     snip += ',"dob"="' + $("#dob").val() + '"';
     snip += ',"sex"="' + $("#sex").val() + '"';
     snip += ',"par"="' + $("#parent_guardian_1_name").val() + '"';
@@ -941,13 +1050,19 @@
     snip += ',"lst1"="' + $("#date_of_last_annual_plan_review").val() + '"';
     snip += ',"lst3"="' + $("#date_of_last_eligibility_evaluation").val() + '"';
 
-    // snip += ',"id"="' + 
-    snip += ',"sem"="' + $("#stuemail").val().toString().replace(/[A-z]{2}(\d{6}).*/, "$1") + '"';
+    // snip += ',"id"="' +
+    snip +=
+      ',"sem"="' +
+      $("#stuemail")
+        .val()
+        .toString()
+        .replace(/[A-z]{2}(\d{6}).*/, "$1") +
+      '"';
     snip += "]";
     // console.log(snip);
 
     if (levelsSnip == "not found") {
-      levelsSnip = "[\"not found\"=\"not found\"]"
+      levelsSnip = '["not found"="not found"]';
       // do nothing
     } else {
       // combine snips
@@ -960,29 +1075,29 @@
     // copy the whole thing to the clipboard
     //     console.log('snip is: %s', JSON.stringify(snip));
     copyToClipboard(snip);
-  };
+  }
   function copyToClipboard(content) {
-    var container = document.createElement('div');
+    var container = document.createElement("div");
     container.textContent = content;
-    container.style.position = 'fixed';
-    container.style.pointerEvents = 'none';
+    container.style.position = "fixed";
+    container.style.pointerEvents = "none";
     container.style.opacity = 0;
     document.body.appendChild(container);
     window.getSelection().removeAllRanges();
     var range = document.createRange();
     range.selectNode(container);
     window.getSelection().addRange(range);
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.removeChild(container);
-    showToast('data copied to clipboard');
+    showToast("data copied to clipboard");
 
     // alert("The data has been copied as a TextBlaze key-value list to the clipboard.");
   }
 
   function showToast(msg) {
-    $('#toastBody').html('<p>' + msg + '</p>')
-    $('.toast').toast({ delay: 5000 });
-    $('.toast').toast('show');
+    $("#toastBody").html("<p>" + msg + "</p>");
+    $(".toast").toast({ delay: 5000 });
+    $(".toast").toast("show");
     document.body.style.cursor = "default";
   }
 
@@ -990,36 +1105,46 @@
     if (newReplace === -1) {
       var glEditId = -1;
     } else {
-      var glEditId = parseInt($('#glEditId').val(), 10);
+      var glEditId = parseInt($("#glEditId").val(), 10);
     }
 
     var obj = {};
 
     obj.glEditId = glEditId;
-    obj.glEditLevel = parseInt($('#glEditLvl').val(), 10);
-    obj.glEditArea = $('#glEditArea').val().toString().replace(/\n/g, " ");
-    obj.glEditStrand = $('#glEditStrand').val().toString().replace(/\n/g, " ");
-    obj.glEditStandard = $('#glEditStandard').val().toString().replace(/\n/g, " ");
-    obj.glEditAnnual = $('#glEditAnnual').val().toString().replace(/\n/g, " ");
-    obj.glEditObj1 = $('#glEditobj1').val().toString().replace(/\n/g, " ");
-    obj.glEditObj2 = $('#glEditobj2').val().toString().replace(/\n/g, " ");
-    obj.glEditObj3 = $('#glEditobj3').val().toString().replace(/\n/g, " ");
+    obj.glEditLevel = parseInt($("#glEditLvl").val(), 10);
+    obj.glEditArea = $("#glEditArea").val().toString().replace(/\n/g, " ");
+    obj.glEditStrand = $("#glEditStrand").val().toString().replace(/\n/g, " ");
+    obj.glEditStandard = $("#glEditStandard")
+      .val()
+      .toString()
+      .replace(/\n/g, " ");
+    obj.glEditAnnual = $("#glEditAnnual").val().toString().replace(/\n/g, " ");
+    obj.glEditObj1 = $("#glEditobj1").val().toString().replace(/\n/g, " ");
+    obj.glEditObj2 = $("#glEditobj2").val().toString().replace(/\n/g, " ");
+    obj.glEditObj3 = $("#glEditobj3").val().toString().replace(/\n/g, " ");
     obj.timestamp = new Date().toLocaleDateString().replace(/\n/g, " ");
 
     // console.log('data = %s', JSON.stringify(data));
     // console.log('data is %s', JSON.stringify(obj));
-    google.script.run
-      .withSuccessHandler(saveGoalSuccess)
-      .saveGoalSS(obj);
-
+    google.script.run.withSuccessHandler(saveGoalSuccess).saveGoalSS(obj);
   }
   function saveGoalSuccess(value) {
     // console.log('returned: %s', value);
     findGoals();
   }
 
-
-  function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, timestamp) {
+  function Goal(
+    id,
+    grdLvl,
+    area,
+    strand,
+    annual,
+    standard,
+    objctv1,
+    objctv2,
+    objctv3,
+    timestamp
+  ) {
     this.id = id;
     this.lvl = grdLvl;
     this.area = area;
@@ -1032,26 +1157,54 @@
     this.timestamp = timestamp;
 
     this.snip = function () {
-      return '[' +
-        '"area" = "' + this.area + '",' +
-        '"strand" = "' + this.strand + '",' +
-        '"stnd" = "' + this.standard + '",' +
-        '"gl" = "' + this.annual + '"' +
-        ']';
-    }
+      return (
+        "[" +
+        '"area" = "' +
+        this.area +
+        '",' +
+        '"strand" = "' +
+        this.strand +
+        '",' +
+        '"stnd" = "' +
+        this.standard +
+        '",' +
+        '"gl" = "' +
+        this.annual +
+        '"' +
+        "]"
+      );
+    };
     this.list = function () {
-      return '<li class="goalList" glId="' + this.id
-        + '["' + this.lvl + '"' + ', '
-        + '"' + this.strand + '"' + ', '
-        + '"' + this.annual + '"' + ', '
-        + '"' + this.id + '"]</li>';
-    }
-
+      return (
+        '<li class="goalList" glId="' +
+        this.id +
+        '["' +
+        this.lvl +
+        '"' +
+        ", " +
+        '"' +
+        this.strand +
+        '"' +
+        ", " +
+        '"' +
+        this.annual +
+        '"' +
+        ", " +
+        '"' +
+        this.id +
+        '"]</li>'
+      );
+    };
   }
 
   function firstSnipThenGvoice() {
     snipInfo();
-    setTimeout(function () { window.open("https://voice.google.com/u/0/messages/", target = "_blank"); }, 2000);
+    setTimeout(function () {
+      window.open(
+        "https://voice.google.com/u/0/messages/",
+        (target = "_blank")
+      );
+    }, 2000);
   }
   function successMsg(msgAndUrlJSON) {
     var object = JSON.parse(msgAndUrlJSON);
@@ -1063,29 +1216,23 @@
 
   function NORMSDIST(z) {
     // Uses https://cdn.jsdelivr.net/jstat/latest/jstat.min.js
-    if (isNaN(z)) return '#VALUE!';
-    var mean = 0, sd = 1;
+    if (isNaN(z)) return "#VALUE!";
+    var mean = 0,
+      sd = 1;
     return jStat.normal.cdf(z, mean, sd);
   }
 
-
   function getPointer() {
-    if (sessionStorage.getItem('lastId') == null) {
-      google.script.run
-        .withSuccessHandler(getPointer)
-        .getFirstPointer()
-    };
-    return sessionStorage.getItem('lastId');
-
+    if (sessionStorage.getItem("lastId") == null) {
+      google.script.run.withSuccessHandler(getPointer).getFirstPointer();
+    }
+    return sessionStorage.getItem("lastId");
   }
   function setPointer(id) {
     try {
-      sessionStorage.setItem('lastId', id.toString());
-
+      sessionStorage.setItem("lastId", id.toString());
     } catch (error) {
-      google.script.run
-        .withSuccessHandler(setPointer)
-        .getFirstPointer()
+      google.script.run.withSuccessHandler(setPointer).getFirstPointer();
     }
   }
 
@@ -1093,7 +1240,7 @@
     if (confirm("Are you sure you want to remove this record?") == true) {
       var id = $("#seis_id").val();
       //     console.log('the id to delete is %s', id);
-      sessionStorage.removeItem('rec' + id);
+      sessionStorage.removeItem("rec" + id);
       google.script.run
         .withSuccessHandler() // reload
         .withFailureHandler()
@@ -1109,16 +1256,16 @@
   //     .deleteRecord(id);
   // }
   function openAddStudentModal() {
-    $('#addStuModal').modal({
-      focus: true
+    $("#addStuModal").modal({
+      focus: true,
     });
   }
   function openRosterChecklistModal() {
     google.script.run
       .withSuccessHandler(showRosterChecklist)
       .getTableData_roster();
-    $('#checklist').modal({
-      focus: true
+    $("#checklist").modal({
+      focus: true,
     });
   }
 
@@ -1140,53 +1287,108 @@
 
   // display table of names sorted by due dates
   function showRosterChecklist(data) {
-    var loc = 'modal00';
+    var loc = "modal00";
 
-    var pending = ['#ffffff', '#000000'];
+    var pending = ["#ffffff", "#000000"];
     for (let i = 0; i < data.length; i++) {
       const el = data[i];
       var [
-        seis_id, last_name, first_name, date_of_birth, case_manager, gender, grade_code, date_of_last_annual_plan_review, date_of_next_annual_plan_review, date_of_last_eligibility_evaluation, date_of_next_eligibility_evaluation, date_of_initial_parent_consent, parent_guardian_1_name, parent_1_email, parent_1_cell_phone, parent_1_home_phone, parent_1_work_phone_h1, parent_1_other_phone, parent_1_mail_address, parent_1_mail_city, parent_1_mail_zip, disability_1_code, disability_2_code, nmjdob, student_id, tchr_num, teachname, total_minutes___frequency, frequency, location, firstname_lastname, langflu, corrlng, teachemail, stuemail, firslinit, allServices, notes
+        seis_id,
+        last_name,
+        first_name,
+        date_of_birth,
+        case_manager,
+        gender,
+        grade_code,
+        date_of_last_annual_plan_review,
+        date_of_next_annual_plan_review,
+        date_of_last_eligibility_evaluation,
+        date_of_next_eligibility_evaluation,
+        date_of_initial_parent_consent,
+        parent_guardian_1_name,
+        parent_1_email,
+        parent_1_cell_phone,
+        parent_1_home_phone,
+        parent_1_work_phone_h1,
+        parent_1_other_phone,
+        parent_1_mail_address,
+        parent_1_mail_city,
+        parent_1_mail_zip,
+        disability_1_code,
+        disability_2_code,
+        nmjdob,
+        student_id,
+        tchr_num,
+        teachname,
+        total_minutes___frequency,
+        frequency,
+        location,
+        firstname_lastname,
+        langflu,
+        corrlng,
+        teachemail,
+        stuemail,
+        firslinit,
+        allServices,
+        notes,
       ] = el;
       //       console.log(JSON.stringify(el));
       list = $("#" + loc + "tb");
 
       if (!seis_id) {
-        alert(" has no id"); // lnCmafn + 
+        alert(" has no id"); // lnCmafn +
       } else {
         if (dayjs(date_of_last_eligibility_evaluation).isValid() == false) {
-          var evalDate = dayjs(date_of_initial_parent_consent).add(1, 's').format('YYYY-MM-DD');
-          pending = ['#f4cccc', '#000000'];
-        } else if (dayjs(date_of_last_eligibility_evaluation).add(3, 'y').isBefore(dayjs().add(6, 'month'))) {
-          evalDate = dayjs(date_of_last_eligibility_evaluation).format('YYYY-MM-DD');
-          pending = ['#d9ead3', '#000000'];
+          var evalDate = dayjs(date_of_initial_parent_consent)
+            .add(1, "s")
+            .format("YYYY-MM-DD");
+          pending = ["#f4cccc", "#000000"];
+        } else if (
+          dayjs(date_of_last_eligibility_evaluation)
+            .add(3, "y")
+            .isBefore(dayjs().add(6, "month"))
+        ) {
+          evalDate = dayjs(date_of_last_eligibility_evaluation).format(
+            "YYYY-MM-DD"
+          );
+          pending = ["#d9ead3", "#000000"];
         } else {
-          evalDate = dayjs(date_of_last_eligibility_evaluation).format('YYYY-MM-DD');
-          pending = ['#FFFFFF', '#000000'];
+          evalDate = dayjs(date_of_last_eligibility_evaluation).format(
+            "YYYY-MM-DD"
+          );
+          pending = ["#FFFFFF", "#000000"];
         }
         // console.log('evalDate hello is %s for %s', evalDate, first_name);
         list.append(
           '<tr class="d-flex"><td class="setStudent  col-6" data-stuId=' +
-          seis_id +
-          "> " +
-          last_name + ', ' + first_name +
-          "</td>" +
-          '<td class="tableDate setStudent col-3" data-stuId=' +
-          seis_id + '>' +
-          dayjs(date_of_last_annual_plan_review).format('YYYY-MM-DD') +
-          "</td>" +
-          '<td class="tableDate setStudent col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';" data-stuId=' +
-          seis_id + '>' +
-          dayjs(evalDate).format('YYYY-MM-DD') +
-          "</td>" +
-          "</tr></div>"
+            seis_id +
+            "> " +
+            last_name +
+            ", " +
+            first_name +
+            "</td>" +
+            '<td class="tableDate setStudent col-3" data-stuId=' +
+            seis_id +
+            ">" +
+            dayjs(date_of_last_annual_plan_review).format("YYYY-MM-DD") +
+            "</td>" +
+            '<td class="tableDate setStudent col-3" style="background-color:' +
+            pending[0] +
+            "; color:" +
+            pending[1] +
+            ';" data-stuId=' +
+            seis_id +
+            ">" +
+            dayjs(evalDate).format("YYYY-MM-DD") +
+            "</td>" +
+            "</tr></div>"
         );
       }
     }
     store(data);
-    $('#spinner01').hide();
+    $("#spinner01").hide();
 
-    return 'rosterList', 0;
+    return "rosterList", 0;
   }
   function lookForTemails(event) {
     var id = $("#seis_id").val();
@@ -1209,7 +1411,7 @@
   function reloadMe(url) {
     // return ScriptApp.getService().getUrl().toString();
     alert("reload this page to complete the update");
-    // $('body').html('<a style="font-size: 3rem;  position: fixed; top:20%; left:20%;" href=' + url + '>Click to reload.</a>');
+    // $("body").html('<a style="font-size: 3rem;  position: fixed; top:20%; left:20%;" href=' + url + '>Click to reload.</a>');
   }
   function findStuFolder() {
     var id, fname, lname;
@@ -1217,15 +1419,12 @@
     fname = $("#first_name").val();
     lname = $("#last_name").val();
 
-    google.script.run
-      .withSuccessHandler(openUrl)
-      .getStuFolder(fname, lname);
+    google.script.run.withSuccessHandler(openUrl).getStuFolder(fname, lname);
   }
   function openUrl(url) {
-    window.open(url, target = "_blank");
+    window.open(url, (target = "_blank"));
   }
   function getPrefilledLevels() {
-
     var id = $("#seis_id").val();
     var stuName = $("#stuName").val();
     var teachemail = $("#teachemail").val();
@@ -1238,16 +1437,15 @@
   function openDoc(url) {
     copyToClipboard(url);
     // window.open(url, "_blank");
-  };
+  }
   function goToSeisIep() {
     var url = "https://seis.org/iep/";
     url += $("#seis_id").val();
     url += "/29368995/forms";
     window.open(url, "_blank");
-
   }
   function sendLevelsQues() {
-    console.log('send levels button clicked');
+    console.log("send levels button clicked");
     var id = $("#seis_id").val();
     var stuName = $("#stuName").val();
     var teachemail = $("#teachemail").val();
@@ -1255,17 +1453,15 @@
     var mLvlAry = [
       $("#stuName").val(),
       $("#seis_id").val(),
-      $("#teachemail").val()
-    ]
-    google.script.run
-      .withSuccessHandler()
-      .sendLevelsForm(mLvlAry);
+      $("#teachemail").val(),
+    ];
+    google.script.run.withSuccessHandler().sendLevelsForm(mLvlAry);
   }
   // function openMailModal(objStr) {
   //   // emailData = {
   //   //     "recipients": <string>,
   //   //     "subject": "levels of performance for " + stuName,
-  //   //     "body": "Here is the url: " + levelsUrl
+  //   //     "document": "Here is the url: " + levelsUrl
   //   // };
 
   //   var obj = JSON.parse(objStr);
@@ -1276,9 +1472,7 @@
   //   $("#emailSubject").val(obj.subject);
   //   $("#emailBody").html('&lt;a href=' + obj.levelsUrl + '&gt;Here is the url: &lt;/a&gt;');
 
-
   // }
-
 
   function logServices(string) {
     $("#logEntry").val(string);
@@ -1298,7 +1492,7 @@
       var logObj = new LogEntry();
       // console.log($('entry is gt 0: %s', $("#logEntry").val().toString()));
       // console.log('id and entry are %s and %s', id, entry);
-      console.log('saving: %s', JSON.stringify(logObj));
+      console.log("saving: %s", JSON.stringify(logObj));
 
       google.script.run
         .withSuccessHandler(updateLogEntryCache) // server returns the same object
@@ -1313,22 +1507,22 @@
     allRecords = JSON.parse(allRecords);
     for (let i = 0; i < allRecords.length; i++) {
       const elAll = allRecords[i];
-      // these records have id numbers at 0; within each id number item lies a 2-d array with contact log entries      
-      var key = 'reclog' + elAll[0];
+      // these records have id numbers at 0; within each id number item lies a 2-d array with contact log entries
+      var key = "reclog" + elAll[0];
       var val = JSON.stringify(elAll[1]);
       sessionStorage.setItem(key, val);
     }
     focus(sessionStorage.getItem("lastId"));
   }
   function openLogPrintDialog() {
-    $('#logModal').modal({
-      focus: true
+    $("#logModal").modal({
+      focus: true,
     });
-    $('#pdfUrl').empty();
-    $('#printedLogsth').empty();
-    $('#printedLogstb').empty();
-    $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
-    var start = dayjs().subtract(1, 'y').toDate();
+    $("#pdfUrl").empty();
+    $("#printedLogsth").empty();
+    $("#printedLogstb").empty();
+    $("#printLogStuName").html("<h4>" + $("#stuName").val() + "</h4>");
+    var start = dayjs().subtract(1, "y").toDate();
     var end = dayjs().toDate();
     document.getElementById("endDtEdit").valueAsDate = end;
     document.getElementById("stDtEdit").valueAsDate = start;
@@ -1338,51 +1532,64 @@
     filterLogEntriesByDateWindow();
     // $('#spinner02').hide();
   }
-  function showLog(logEntries, loc) { // [entries, id]
+  function showLog(logEntries, loc) {
+    // [entries, id]
     // input is an array containing one arrays and one string ('loc'): array contains all the log entries that correspond to that record
     //     console.log('in "showLog" the first log entry is: %s; the loc is %s', JSON.stringify(logEntries[0]), loc);
     //     console.log('logEntries is a type of %s', typeof logEntries);
-    if (typeof logEntries == 'string') {
+    if (typeof logEntries == "string") {
       logEntries = JSON.parse(logEntries);
     }
 
     var list = $("#" + loc);
     list.empty();
 
-    var stuName = First_Name + ' ' + Last_Name;
+    var stuName = First_Name + " " + Last_Name;
     for (var i = 0; i < logEntries.length; i++) {
       var el = logEntries[i];
       var [
-        Timestamp, email, studentMC, log_entry, logId, seis_id, Last_Name, First_Name, First_Name, Student_ID
+        Timestamp,
+        email,
+        studentMC,
+        log_entry,
+        logId,
+        seis_id,
+        Last_Name,
+        First_Name,
+        First_Name,
+        Student_ID,
       ] = el;
       list.append(
         '<tr class="d-flex">' +
-        '<td data-entry_id=' +
-        logId + ' class="col-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
-        'title= "double-click to edit">' +
-        dayjs(el[0]).format("YYYY-MM-DD") +
-        '</td>' +
-        '<td data-entry_id=' + logId + ' class="logEntry col-9">' +
-        el[3] +
-        '</td>' +
-        '</tr>'
+          "<td data-entry_id=" +
+          logId +
+          ' class="col-3 logEntry"' +
+          'data-toggle="tooltip" data-placement="right" ' +
+          'title= "double-click to edit">' +
+          dayjs(el[0]).format("YYYY-MM-DD") +
+          "</td>" +
+          "<td data-entry_id=" +
+          logId +
+          ' class="logEntry col-9">' +
+          el[3] +
+          "</td>" +
+          "</tr>"
       );
     }
     $("#corrlng[value='01']", function () {
-      $(this).css("background-color", "#ff0000")
+      $(this).css("background-color", "#ff0000");
     });
 
-    $("#" + 'loc01' + "tb").show();
+    $("#" + "loc01" + "tb").show();
 
     document.body.style.cursor = "default";
-
   }
 
   function saveEditedLogEntryClient(remove) {
     if (remove == true) {
       if (confirm("Are you sure you want to remove this log entry?") == false) {
         return;
-      };
+      }
     }
     var entry = $("#editEntry").val();
     var date = $("#editDate").val();
@@ -1390,37 +1597,36 @@
     var nmjdob = $("#nmjdob").val();
     var seis_id = $("#seis_id").val();
 
-    console.log('vars %s; %s; %s; %s; %s; ', entry, date, id, nmjdob, seis_id);
+    console.log("vars %s; %s; %s; %s; %s; ", entry, date, id, nmjdob, seis_id);
     var logObj = {
-      "logEntry": entry,
-      "logDate": date,
-      "logId": id,
-      "nmjdob": nmjdob,
-      "seis_id": seis_id,
-      "remove": remove
-    }
-    console.log('logObj: %s', JSON.stringify(logObj));
+      logEntry: entry,
+      logDate: date,
+      logId: id,
+      nmjdob: nmjdob,
+      seis_id: seis_id,
+      remove: remove,
+    };
+    console.log("logObj: %s", JSON.stringify(logObj));
 
     google.script.run
       .withSuccessHandler(saveLogEntrySuccess)
       .saveEditedLogEntryServer(JSON.stringify(logObj));
-
   }
   function saveLogEntrySuccess(logObjStr) {
     var logObj = JSON.parse(logObjStr);
-    console.log('returned at saveLogEntrySuccess: %s', logObjStr);
-    sessionStorage.removeItem('reclog' + logObj.seis_id.toString());
-    focus(logObj.seis_id.toString(), 'loc01');
+    console.log("returned at saveLogEntrySuccess: %s", logObjStr);
+    sessionStorage.removeItem("reclog" + logObj.seis_id.toString());
+    focus(logObj.seis_id.toString(), "loc01");
   }
 
   function LogEntry() {
     // as passed from jquery function or from log entry editor (in the former case, there will be no logId value)
-    //  log-entry-obj = 
+    //  log-entry-obj =
     //  {
     //     "seis_id": id,
     //     "logEntry": entry,
     //     "nmjdob": nmjdob,
-    //     "logId": 
+    //     "logId":
     //  }
     this.logEntry = $("#logEntry").val().toString();
     this.logId = null;
@@ -1431,57 +1637,81 @@
   function updateLogEntryCache(array) {
     var [logObjStr, cacheRow] = array;
     var logObj = JSON.parse(logObjStr);
-    console.log('caching...logObj is %s', JSON.stringify(logObj));
+    console.log("caching...logObj is %s", JSON.stringify(logObj));
 
-    var logCache = JSON.parse(sessionStorage.getItem('reclog' + logObj.seis_id));
+    var logCache = JSON.parse(
+      sessionStorage.getItem("reclog" + logObj.seis_id)
+    );
     logCache.unshift(JSON.parse(cacheRow));
-    sessionStorage.setItem('reclog' + logObj.seis_id, JSON.stringify(logCache));
+    sessionStorage.setItem("reclog" + logObj.seis_id, JSON.stringify(logCache));
 
-    refreshLogDisplay(logCache, 'loc01');
+    refreshLogDisplay(logCache, "loc01");
   }
-  function refreshLogDisplay(logCache, loc) { // [entries, id]
+  function refreshLogDisplay(logCache, loc) {
+    // [entries, id]
     var list = $("#" + loc);
     list.empty();
 
     for (var i = 0; i < logCache.length; i++) {
       var el = logCache[i];
       var [
-        Timestamp, email, studentMC, log_entry, logId, seis_id, Last_Name, First_Name, First_Name, Student_ID
+        Timestamp,
+        email,
+        studentMC,
+        log_entry,
+        logId,
+        seis_id,
+        Last_Name,
+        First_Name,
+        First_Name,
+        Student_ID,
       ] = el;
       list.append(
         '<tr class="d-flex">' +
-        '<td data-entry_id=' +
-        logId + ' class="col-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
-        'title= "double-click to edit">' +
-        dayjs(el[0]).format("YYYY-MM-DD") +
-        '</td>' +
-        '<td data-entry_id=' + logId + ' class="logEntry col-9">' +
-        el[3] +
-        '</td>' +
-        '</tr>'
+          "<td data-entry_id=" +
+          logId +
+          ' class="col-3 logEntry"' +
+          'data-toggle="tooltip" data-placement="right" ' +
+          'title= "double-click to edit">' +
+          dayjs(el[0]).format("YYYY-MM-DD") +
+          "</td>" +
+          "<td data-entry_id=" +
+          logId +
+          ' class="logEntry col-9">' +
+          el[3] +
+          "</td>" +
+          "</tr>"
       );
     }
     $("#corrlng[value='01']", function () {
-      $(this).css("background-color", "#ff0000")
+      $(this).css("background-color", "#ff0000");
     });
 
-    $("#" + 'loc01' + "tb").show();
+    $("#" + "loc01" + "tb").show();
 
     document.body.style.cursor = "default";
-
   }
-// function editLogEntryInModal(logObjStr){
-//     logObj = JSON.stringify(logObjStr);
-//     var myModal = new bootstrap.Modal(document.getElementById('logModal'), { focus: true });
-// "seis_id": seis_id,
-// "logEntry": logEntry,
-// "nmjdob": nmjdob,
-// "logId": logId
 
-//     $('#seis_id').val(logObj.seis_id);
-//     $('#glEditLvl').val();
-//     $('#glEditStrand').val(goal.strand);
-//     myModal.show();
+  function updateSessionStorage(array) {
+    var [seisId, fldNm, fieldVal] = array;
+    var key = sessionStorage.getItem("rec" + seisId);
+    var cachedRecord = JSON.parse(sessionStorage.getItem(key));
+    cachedRecord[fldNm] = fieldVal;
+    sessionStorage.setItem(key, JSON.stringify(cachedRecord));
+  }
 
-// }
+  // function editLogEntryInModal(logObjStr){
+  //     logObj = JSON.stringify(logObjStr);
+  //     var myModal = new bootstrap.Modal(document.getElementById('logModal'), { focus: true });
+  // "seis_id": seis_id,
+  // "logEntry": logEntry,
+  // "nmjdob": nmjdob,
+  // "logId": logId
+
+  //     $('#seis_id').val(logObj.seis_id);
+  //     $('#glEditLvl').val();
+  //     $('#glEditStrand').val(goal.strand);
+  //     myModal.show();
+
+  // }
 </script>

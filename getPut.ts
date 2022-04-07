@@ -187,13 +187,6 @@ function updateContactInfo(seisId, fldNm, fieldVal) {
     el_range.setValue(fieldVal);
     return [seisId, fldNm, fieldVal];
 }
-function updateSessionStorage(array) {
-    var [seisId, fldNm, fieldVal] = array;
-    var key = sessionStorage.getItem('rec' + seisId);
-    var cachedRecord = JSON.parse(sessionStorage.getItem(key));
-    cachedRecord[fldNm] = fieldVal;
-    sessionStorage.setItem(key, JSON.stringify(cachedRecord));
-}
 // $("#loc00tb").empty();
 // google.script.run
 //     .withSuccessHandler(showRosterTable)
