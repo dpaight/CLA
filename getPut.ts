@@ -90,7 +90,6 @@ function getRecord(id) {
     Logger.log('arrayH is %s', JSON.stringify(arrayH));
     Logger.log('arrayD is %s', JSON.stringify(arrayD));
 
-
     var record = new StuRec(arrayD, arrayH);
     Logger.log('record is %s', JSON.stringify(record));
 
@@ -146,7 +145,6 @@ function myGet(sheetName, column = -1, flat = false) {
         sheet.getRange(1, 1, 1, lastC).getValues();
     return [headings, values, sheet, range, lastR, lastC];
 }
-
 function getById(fileId, sheetName, column = -1, flat = false) {
     var ss = SpreadsheetApp.openById(fileId);
     if (!sheetName) {

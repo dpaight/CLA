@@ -10,6 +10,8 @@ function allPupilsSheet() {
   );
   return ss2;
 }
+// from updateRoster.ts
+
 /**
  *
  * @param e
@@ -27,7 +29,7 @@ function doGet(e) {
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
-function findWinningSeries() {}
+function findWinningSeries() { }
 function trimSS() {
   var sheets, sheet, last;
   sheets = ss.getSheets();
@@ -77,16 +79,16 @@ function sndMl() {
     teachEmail,
     stuName + "'s levels of performance",
     "The IEP for " +
-      stuName +
-      " is coming up, and I need some information, please. " +
-      "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
-      "information you provide as data for the IEP. Thank you for your time.<br><br>" +
-      "NB: This email was sent automatically. If you have already responded, please ignore this request." +
-      "<h2><a href=" +
-      "levelsUrl" +
-      ">Levels of Performance for " +
-      stuName +
-      "</a></h2>"
+    stuName +
+    " is coming up, and I need some information, please. " +
+    "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
+    "information you provide as data for the IEP. Thank you for your time.<br><br>" +
+    "NB: This email was sent automatically. If you have already responded, please ignore this request." +
+    "<h2><a href=" +
+    "levelsUrl" +
+    ">Levels of Performance for " +
+    stuName +
+    "</a></h2>"
   );
 }
 
@@ -512,8 +514,20 @@ function makeMatchVar(data) {
   if (data === void 0) {
     data = ["Paight", "Daniel", "1/21/2013"];
   }
-  var y2 = data[2].getFullYear().toString().slice(2);
-  var doy = data[2].dayOfYear();
+
+  function daysIntoYear(date) {
+    return (
+      (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
+        Date.UTC(date.getFullYear(), 0, 0)) /
+      24 /
+      60 /
+      60 /
+      1000
+    );
+  }
+
+  var y2 = new Date(data[2]).getFullYear().toString().slice(2);
+  var doy = daysIntoYear(new Date(data[2]));
   return (data[0] + data[1] + y2 + doy).toString().replace(/[^A-z0-9]/g, "");
 }
 /**
@@ -969,8 +983,8 @@ function LevelsPerformance(el) {
   this["lvls"].wrkH2bts =
     el[21].length > 0
       ? "able to attend to a classwork task at instructional level for " +
-        el[21].toString().replace(/"/g, "'") +
-        " minutes"
+      el[21].toString().replace(/"/g, "'") +
+      " minutes"
       : "";
   this["lvls"].writ1eOverall =
     el[12].length > 0
@@ -1061,7 +1075,7 @@ function LevelsPerformance(el) {
             wholeSnip =
               wholeSnip == "["
                 ? // if this is the firs addition to wholeSnip, omit the comma
-                  wholeSnip + partSnip
+                wholeSnip + partSnip
                 : wholeSnip + "," + partSnip;
             partSnip = "";
           }
@@ -1125,14 +1139,14 @@ function addStudentByIdFromRESstudentsServer(obj) {
       break;
     }
   }
-  var rosterHeadings = ss
+  var rHeads = ss
     .getSheetByName("roster")
     .getRange(1, 1, 1, 29)
     .getValues()
     .flat();
   var newRosterRecord = [[]];
-  for (let i = 0; i < rosterHeadings.length; i++) {
-    const el = rosterHeadings[i].toString().toLowerCase();
+  for (let i = 0; i < rHeads.length; i++) {
+    const el = rHeads[i].toString().toLowerCase();
     var index = parseInt(iObj[el]);
     newRosterRecord[0].push(stuToAdd[index]);
   }
@@ -1741,98 +1755,6 @@ function findLastRowById(fileId, sheet, column) {
     theValues.filter(String).length > 0 ? theValues.filter(String).length : 1;
   return last;
 }
-// from updateRoster.ts
-function updateRoster() {
-  // get seis data
-  // get seis data
-  var seisValues = parseCSV("roster_seis.csv");
-  var seisHeadings_1 = seisValues.shift();
-  var [headings, values, sheet, range, lastR, lastC] = myGet("roster_seis");
-  var seisHeadings = seisHeadings_1.map(function (x, n, arr) {
-    return x.replace(/[^A-z^0-9+]/gi, "_").toLowerCase();
-  });
-  var prefOrder = [];
-  prefOrder.push(
-    "seis_id",
-    "last_name",
-    "first_name",
-    "date_of_birth",
-    "case_manager",
-    "gender",
-    "grade_code",
-    "date_of_last_annual_plan_review",
-    "date_of_next_annual_plan_review",
-    "date_of_last_eligibility_evaluation",
-    "date_of_next_eligibility_evaluation",
-    "date_of_initial_parent_consent",
-    "parent_guardian_1_name",
-    "parent_1_email",
-    "parent_1_cell_phone",
-    "parent_1_home_phone",
-    "parent_1_work_phone_h1",
-    "parent_1_other_phone",
-    "parent_1_mail_address",
-    "parent_1_mail_city",
-    "parent_1_mail_zip",
-    "disability_1_code",
-    "disability_2_code"
-  );
-  if (seisHeadings.length !== prefOrder.length) {
-    throw (
-      "There is a missing or extra field name somewhere. The var prefOrder has a length of " +
-      prefOrder.length +
-      "; headings has a length of " +
-      seisHeadings.length +
-      "."
-    );
-  }
-  // get current data
-  // importXLS_2();
-  var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("roster");
-  var last = roster.getRange("a1:a").getValues().filter(String).length;
-  var rosterVals = roster
-    .getRange(1, 1, last, seisHeadings.length)
-    .getDisplayValues();
-  var rosterHeadings = rosterVals.shift().map((x) =>
-    x
-      .toString()
-      .replace(/[ -\/]/g, "_")
-      .toLowerCase()
-  );
-  var curIndices = [];
-  var newData = [];
-  var row = [];
-  for (let i = 0; i < prefOrder.length; i++) {
-    const el = prefOrder[i];
-    if (seisHeadings.indexOf(el) == -1) {
-      throw (
-        "One of the data fields was unexpected: '" +
-        el +
-        "' is in the seis csv file, but was not found in the coded field list."
-      );
-    }
-    curIndices.push(seisHeadings.indexOf(el));
-  }
-  for (let i = 0; i < seisValues.length; i++) {
-    const el = seisValues[i];
-    for (let j = 0; j < el.length; j++) {
-      const data = el[curIndices[j]];
-      row.push(data);
-    }
-    newData.push(row);
-    row = [];
-  }
-  var newDataWithHeadings = [prefOrder].concat(newData);
-  var merged = getFromAeriesData(newDataWithHeadings);
-  // Logger.log(JSON.stringify(newData));
-  // var seis_aeries_merge = getFromAeriesData(newDataWithHeadings);
-  var dest = ss.getSheetByName("roster");
-  var destRng = dest.getRange(1, 1, merged.length, merged[0].length);
-  destRng.setValues(merged);
-  SpreadsheetApp.flush();
-  // Utilities.sleep(5000);
-  return ScriptApp.getService().getUrl().toString();
-}
 function parseCSV(fName) {
   var folderId = "1DLxHwR7QlDloES0RCAkuN2bBawdAaAp9";
   var folder = DriveApp.getFolderById(folderId);
@@ -1840,12 +1762,12 @@ function parseCSV(fName) {
   var fileIds = [];
   // looking for .csv file
   var found = false;
-  while (files.hasNext() && found == false) {
+  while (files.hasNext() && found === false) {
     var file = files.next();
     var fileName = file.getName();
     var status; // '1' if parse function is successful
     var re = /(fName)/;
-    if (fileName.toString() == fName.toString()) {
+    if (fileName.toString() === fName.toString()) {
       found = true;
       var csvFile = file.getBlob().getDataAsString();
       fileIds.push(file.getId());
@@ -1866,18 +1788,7 @@ function matchRosterFieldsToSeis(rosH, seisH) {
   Logger.log("fieldMatches = %s", JSON.stringify(fieldMatches));
   return fieldMatches;
 }
-/**
- * @returns allPupils table from file currentRamonaStudents
- */
-function getAllPupilsList() {
-  var sheet, last, range, values, keys;
-  var ss2 = allPupilsSheet();
-  sheet = ss2.getSheetByName("allPupils");
-  last = sheet.getRange("a1:a").getValues().filter(String).length;
-  range = sheet.getRange(1, 1, last - 1, sheet.getLastColumn());
-  values = range.getDisplayValues();
-  return values;
-}
+
 function getAeriesData() {
   var data = myGet("roster");
   var [headings, values, sheet, range, lastR, lastC] = data;
@@ -1920,23 +1831,17 @@ function lookForTeachers(id, refresh) {
   }
   var [c_headings, c_values, sheet, range, lastR, lastC] =
     myGet("coursesTeachers");
-  var [
-    rost_headings,
-    rost_values,
-    rost_sheet,
-    rost_range,
-    rost_lastR,
-    rost_lastC,
-  ] = myGet("roster");
+  var [r_heads, r_vals, rost_sheet, rost_range, rost_lastR, rost_lastC] =
+    myGet("roster");
   var ctStuIdIdx = c_headings.indexOf("Student ID");
-  var seisIdIdx = rost_headings.indexOf("seis_id");
-  var husdIdIdx = rost_headings.indexOf("student_id");
+  var seisIdIdx = r_heads.indexOf("seis_id");
+  var husdIdIdx = r_heads.indexOf("student_id");
   var foundCodes = [];
   var teachersInfo = "Current teachers: ";
   // "teachName", "teachEmail", "Student ID", "studentName"
   var tnIdx = c_headings.indexOf("teachName");
-  for (let i = 0; i < rost_values.length; i++) {
-    const el = rost_values[i];
+  for (let i = 0; i < r_vals.length; i++) {
+    const el = r_vals[i];
     if (el[seisIdIdx] == id) {
       var husd_id = el[husdIdIdx];
       for (let j = 0; j < c_values.length; j++) {
@@ -2403,7 +2308,7 @@ function tester() {
   Logger.log(x.toString());
 }
 function makenmjdob(fn, ln, dob) {
-  var y2 = new Date(dob).getFullYear().toString().slice(-0,-2);
+  var y2 = new Date(dob).getFullYear().toString().slice(-0, -2);
   var doy = daysIntoYear(dob);
   var nmjdob =
     ln.replace(/[- ']/g, "") +
