@@ -1789,41 +1789,7 @@ function matchRosterFieldsToSeis(rosH, seisH) {
   return fieldMatches;
 }
 
-function getAeriesData() {
-  var data = myGet("roster");
-  var [headings, values, sheet, range, lastR, lastC] = data;
-  var aeriesData = getAllPupilsList();
-  var aerHeadings = aeriesData.shift();
-  var teachNameIdx = aerHeadings.indexOf("teachname");
-  var corrIdx = aerHeadings.indexOf("corrlng");
-  var teachEmailIdx = aerHeadings.indexOf("teachemail");
-  var idIdx = aerHeadings.indexOf("student_id");
-  var stuemailIdx = aerHeadings.indexOf("stuemail");
-  var nmjdobIdx = aerHeadings.indexOf("nmjdob");
-  var teachName_R_Idx = headings.indexOf("teachname");
-  var corr_R_Idx = headings.indexOf("corrlng");
-  var teachEmail_R_Idx = headings.indexOf("teachemail");
-  var id_R_Idx = headings.indexOf("student_id");
-  var stuemail_R_Idx = headings.indexOf("stuemail");
-  var nmjdob_R_Idx = headings.indexOf("nmjdob");
-  for (let i = 0; i < values.length; i++) {
-    const elR = values[i];
-    for (let j = 0; j < aeriesData.length; j++) {
-      const elA = aeriesData[j];
-      if (elA[nmjdobIdx] == elR[nmjdob_R_Idx]) {
-        elR.splice(id_R_Idx, 1, elA[idIdx]);
-        elR.splice(teachName_R_Idx, 1, elA[teachNameIdx]);
-        elR.splice(teachEmail_R_Idx, 1, elA[teachEmailIdx]);
-        elR.splice(corr_R_Idx, 1, elR[corr_R_Idx]);
-        elR.splice(stuemail_R_Idx, 1, elA[stuemailIdx]);
-      }
-    }
-  }
-  var destR = ss
-    .getSheetByName("roster")
-    .getRange(2, 1, values.length, values[0].length);
-  destR.setValues(values);
-}
+
 // from 'lookForTeachers.ts
 function lookForTeachers(id, refresh) {
   if (refresh) {
@@ -2317,6 +2283,460 @@ function makenmjdob(fn, ln, dob) {
     doy.toString();
   return nmjdob;
 }
-//
-//
+class StuRec {
+  constructor(array, headings) {
+      this["seis_id"] = array[headings.indexOf("seis_id")];
+      this["last_name"] = array[headings.indexOf("last_name")];
+      this["first_name"] = array[headings.indexOf("first_name")];
+      this["date_of_birth"] = array[headings.indexOf("date_of_birth")];
+      this["case_manager"] = array[headings.indexOf("case_manager")];
+      this["gender"] = array[headings.indexOf("gender")];
+      this["grade_code"] = array[headings.indexOf("grade_code")];
+      this["date_of_last_annual_plan_review"] = array[headings.indexOf("date_of_last_annual_plan_review")];
+      this["date_of_next_annual_plan_review"] = array[headings.indexOf("date_of_next_annual_plan_review")];
+      this["date_of_last_eligibility_evaluation"] = array[headings.indexOf("date_of_last_eligibility_evaluation")];
+      this["date_of_next_eligibility_evaluation"] = array[headings.indexOf("date_of_next_eligibility_evaluation")];
+      this["date_of_initial_parent_consent"] = array[headings.indexOf("date_of_initial_parent_consent")];
+      this["parent_guardian_1_name"] = array[headings.indexOf("parent_guardian_1_name")];
+      this["parent_1_email"] = array[headings.indexOf("parent_1_email")];
+      this["parent_1_cell_phone"] = array[headings.indexOf("parent_1_cell_phone")];
+      this["parent_1_home_phone"] = array[headings.indexOf("parent_1_home_phone")];
+      this["parent_1_work_phone_h1"] = array[headings.indexOf("parent_1_work_phone_h1")];
+      this["parent_1_other_phone"] = array[headings.indexOf("parent_1_other_phone")];
+      this["parent_1_mail_address"] = array[headings.indexOf("parent_1_mail_address")];
+      this["parent_1_mail_city"] = array[headings.indexOf("parent_1_mail_city")];
+      this["parent_1_mail_zip"] = array[headings.indexOf("parent_1_mail_zip")];
+      this["disability_1_code"] = array[headings.indexOf("disability_1_code")];
+      this["disability_2_code"] = array[headings.indexOf("disability_2_code")];
+      this["nmjdob"] = array[headings.indexOf("nmjdob")];
+      this["student_id"] = array[headings.indexOf("student_id")];
+      this["tchr_num"] = array[headings.indexOf("tchr_num")];
+      this["teachname"] = array[headings.indexOf("teachname")];
+      this["total_minutes___frequency"] = array[headings.indexOf("total_minutes___frequency")];
+      this["frequency"] = array[headings.indexOf("frequency")];
+      this["location"] = array[headings.indexOf("location")];
+      this["firstname_lastname"] = array[headings.indexOf("firstname_lastname")];
+      this["langflu"] = array[headings.indexOf("langflu")];
+      this["corrlng"] = array[headings.indexOf("corrlng")];
+      this["teachemail"] = array[headings.indexOf("teachemail")];
+      this["stuemail"] = array[headings.indexOf("stuemail")];
+      this["firslinit"] = array[headings.indexOf("firslinit")];
+      this["allServices"] = array[headings.indexOf("allServices")];
+      this["notes2"] = array[headings.indexOf("notes2")];
+      this["mailParTch"] = function () {
+          return this.pem + ", " + this.teachEmail;
+      }
+  }
+}
+
+function getRecord(id) {
+  Logger.log('id is %s', id);
+
+  /**
+   * 
+   * @param sheet [obj]
+   * @param row [0 index]
+   * @returns array (headings), array (record)
+   */
+  function getRowAndHeadings(sheet, row) {
+      Logger.log('row is %s', row);
+
+      var sheet, headings, values, range, lastR, lastC, rangeH, rangeD;
+      lastC = sheet.getLastColumn();
+      rangeD = sheet.getRange(row + 1, 1, 1, lastC);
+      rangeH = sheet.getRange(1, 1, 1, lastC);
+      return [rangeH.getValues()[0], rangeD.getValues()[0]];
+  }
+  function getAllRecords() {
+      var [headings, values, sheet, range, lastR, lastC] = myGet('roster', -1, false);
+      var allRecords = [];
+      var stuRec = {};
+      for (let i = 1; i < values.length; i++) {
+          const el = values[i];
+          for (let j = 0; j < el.length; j++) {
+              const col = el[j];
+              let key = values[0][j].toString();
+              let value = el[j];
+              stuRec[key]=value;
+          }
+          allRecords.push(stuRec);
+          stuRec={};
+      }
+      Logger.log('allRecords is %s', JSON.stringify(allRecords));
+      return allRecords;
+  }
+
+  // record was not cached; search for it
+  if (id == undefined) { throw "no id at getRecord" };
+  if (id == 'all') { return getAllRecords() };
+  var [headings, values, sheet, range, lastR, lastC] = myGet('roster', 0, true);
+  var row = values.indexOf(id);
+  var [arrayH, arrayD] = getRowAndHeadings(sheet, row);
+  Logger.log('arrayH is %s', JSON.stringify(arrayH));
+  Logger.log('arrayD is %s', JSON.stringify(arrayD));
+
+  var record = new StuRec(arrayD, arrayH);
+  Logger.log('record is %s', JSON.stringify(record));
+
+  return JSON.stringify(record);
+}
+function getNotes(data) {
+  var [id, value] = data;
+  Logger.log('params %s, %s', id, value);
+  var sheet = ss.getSheetByName('notes');
+  var array = sheet.getRange('A1:B30').getDisplayValues();
+  for (let i = 0; i < array.length; i++) {
+      const element = array[i];
+      if (id.toString() == element[0])
+          if (value == undefined || value == null) {
+              return element[1];
+          }
+          else {
+              var cell = sheet.getRange(i + 1, 2, 1, 1);
+              cell.setValue(value);
+              return value;
+          }
+  }
+}
+// 
+
+
+
+/**
+*
+* @param sheetName : string
+* @param column : number
+* @param flat :boolean
+* @returns : [headings, values, sheet, range, lastR, lastC]
+*/
+function myGet(sheetName, column = -1, flat = false) {
+  if (!sheetName) {
+      Logger.log('missing value');
+  }
+  else {
+      Logger.log(sheetName);
+  }
+  ;
+  var sheet, headings, values, range, lastR, lastC;
+  sheet = ss.getSheetByName(sheetName);
+  lastR = findLastRow(sheetName, 1);
+  lastC = sheet.getLastColumn();
+  range = (column == -1) ?
+      sheet.getRange(1, 1, lastR, lastC) :
+      sheet.getRange(1, column + 1, lastR, 1);
+  values = flat == true ? range.getDisplayValues().flat() : range.getDisplayValues();
+  headings = (column == -1) ?
+      values[0] :
+      sheet.getRange(1, 1, 1, lastC).getValues();
+  return [headings, values, sheet, range, lastR, lastC];
+}
+function getById(fileId, sheetName, column = -1, flat = false) {
+  var ss = SpreadsheetApp.openById(fileId);
+  if (!sheetName) {
+      Logger.log('missing value');
+  }
+  else {
+      Logger.log(sheetName);
+  }
+  var sheet, headings, values, range, lastR, lastC;
+  sheet = ss.getSheetByName(sheetName);
+  lastR = findLastRowById(fileId, sheetName, 1);
+  lastC = sheet.getLastColumn();
+  range = (column == -1) ?
+      sheet.getRange(1, 1, lastR, lastC) :
+      sheet.getRange(1, column, lastR, 1);
+  values = (flat == undefined || flat == false) ?
+      range.getValues() :
+      range.getValues().flat();
+  headings = values.shift();
+  return [headings, values, sheet, range, lastR, lastC];
+}
+// from 'library.ts'
+function rosterGet() {
+  var sheetName = 'roster';
+  var values = [];
+  var [headings, avalues, sheet, range, lastR, lastC] = myGet('roster');
+  values.shift();
+  return [headings, values, sheet, range, lastR, lastC];
+}
+function updateContactInfo(seisId, fldNm, fieldVal) {
+  var [headings, values, sheet, range, lastR, lastC] = myGet('roster', 0, true);
+  headings = headings.flat();
+  Logger.log('headings is %s', JSON.stringify(headings));
+
+  var row = values.indexOf(seisId);
+  var col = headings.indexOf(fldNm);
+  var el_range = sheet.getRange(row + 1, col + 1, 1, 1);
+  el_range.setValue(fieldVal);
+  return [seisId, fldNm, fieldVal];
+}
+function updateRoster() {
+  // get seis data
+  // get seis data
+  var count = 0;
+  var newRecs = [];
+  var deletedRecords = [];
+  function reformatHeadings(array) {
+    var aryFmt = array.map(function (x, n, arr) {
+      return x.replace(/[^A-z^0-9+]/gi, "_").toLowerCase();
+    });
+    return aryFmt;
+  }
+  function indexHeadings(array) {
+    var i, obj, key, val;
+    obj = {};
+    for (let i = 0; i < array.length; i++) {
+      const el = array[i];
+      key = array[i];
+      val = i;
+      obj[key] = val;
+    }
+    return obj;
+  }
+  function getRecNmjdobInd(array, index) {
+    var indicesOfMatch = {};
+    for (let i = 0; i < array.length; i++) {
+      const el = array[i];
+      indicesOfMatch[el[index]] = i;
+    }
+    return indicesOfMatch;
+  }
+
+  // seis csv report
+  var sVals = parseCSV("roster_seis.csv");
+  for (let i = 0; i < sVals.length; i++) {
+    const element = sVals[i];
+    if (i === 0) {
+      element.unshift("nmjdob");
+    } else {
+      element.unshift(makeMatchVar([element[1], element[2], element[3]]));
+    }
+  }
+  var sHeads = reformatHeadings(sVals.shift());
+  // roster -- the current roster sheet
+  var [rHeads, rVals, rSheet, rRange, rLastR, rLastC] = myGet("roster");
+  rHeads = reformatHeadings(rHeads);
+
+  // allPupils -- data from Aeries
+  var pSheet, pLast, pRange, pVals, pHeads, pMatch, sMatch, rMatch, x;
+  var ss2 = allPupilsSheet();
+  pSheet = ss2.getSheetByName("allPupilsModNames");
+  pLast = pSheet.getRange("a1:a").getValues().filter(String).length;
+  pRange = pSheet.getRange(1, 1, pLast - 1, pSheet.getLastColumn());
+  pVals = pRange.getDisplayValues();
+  pHeads = reformatHeadings(pVals[0]);
+
+  // now update existing records and add new records
+  //The IND objects havefield names as keys and indexes to those fields as values
+  //  fieldName: index within record
+  var rInd = indexHeadings(rHeads);
+  var pInd = indexHeadings(pHeads);
+  var sInd = indexHeadings(sHeads);
+  // The  match items are objects with 
+  // nmdjob: index,
+  rMatch = getRecNmjdobInd(rVals, rInd["nmjdob"]);
+  sMatch = getRecNmjdobInd(sVals, sInd["nmjdob"]);
+  pMatch = getRecNmjdobInd(pVals, pInd["nmjdob"]);
+
+  // find new records
+  // The y loop is going through records imported most recently from the Seis system
+  for (let y = 0; y < sVals.length; y++) {
+    const sEl = sVals[y];
+    if (y === 0) {
+      // initialize rIds and newrec
+      var rIds = [];
+      for (let r = 0; r < rVals.length; r++) {
+        const id = rVals[r][rInd['nmjdob']];
+        rIds.push(id);
+      }
+    }
+    if (rIds.indexOf(sEl[sInd['nmjdob']]) === -1) {
+      let newRec = [];
+      for (let r = 0; r < rVals[0].length; r++) {
+        newRec.push("");
+      }
+      newRec.splice(rInd["nmjdob"], 1, sEl[sInd["nmjdob"]]);
+      newRecs.push(newRec);
+    }
+  }
+
+  if (newRecs.length > 0) {
+    rVals = rVals.concat(newRecs);
+    newRecs = [];
+  }
+  // The J loop is going through records already in the roster
+  for (let j = 1; j < rVals.length; j++) {
+    const rEl = rVals[j];
+    var r_nmjdob = rEl[rInd["nmjdob"]];
+    if (sMatch[r_nmjdob] === undefined) {
+      // record is not in the seis file; assume deleted
+      deletedRecords.push(rEl);
+      rVals.splice(j, 1);
+    } else {
+      for (let u = 0; u < rEl.length; u++) {
+        var nextField = sInd[rHeads[u]];
+        if (nextField > -1) {
+          let col = sInd[rHeads[u]];
+          let row: number = sMatch[r_nmjdob];
+          rEl.splice(u, 1, sVals[row][col]);
+        } else {
+          var nextField = pInd[rHeads[u]];
+          if (nextField > -1) {
+            let row: number = pMatch[r_nmjdob];
+            let col = pInd[rHeads[u]];
+            rEl.splice(u, 1, pVals[row][col]);
+          }
+        }
+      }
+    }
+  }
+  var dest = ss.getSheetByName("roster");
+  dest.clear();
+  var range = dest.getRange(1, 1, rVals.length, rVals[0].length);
+  range.setValues(rVals);
+
+  if(deletedRecords.length > 0) {
+    var dest = ss.getSheetByName("deleted");
+    dest.clear();
+    var range = dest.getRange(dest.getLastRow() + 1, 1, deletedRecords.length, deletedRecords[0].length);
+    range.setValues(deletedRecords);
+  }
+
+  Logger.log("done");
+}
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+// takes Data sent from the client side and saves it on the server side spreadsheet;
+// returns id for 'show...' function
+/**
+ * 
+ * @param logObj 
+ * @returns 
+ */
+function saveLogEntryServer(logObj) {
+    // var obj = {
+    //     "seis_id": id,
+    //     "logEntry": entry,
+    //     "nmjdob": nmjdob,
+    //     "logId"
+    // } [timestamp	email	studentMC	log_entry	log_entry_id	SEIS_ID]
+    Logger.log('obj received = %s', JSON.stringify(logObj));
+    if (logObj == undefined || logObj == null || logObj.length == 0) {
+        Logger.log('logObj is null, undefined, or empty');
+    } else {
+        Logger.log(JSON.stringify(logObj));
+    }
+    var [headings, logVals, logResp, range, last, lastC] = myGet('logRespMerged');
+    logObj.logId = getNextLogEntryId();
+    var row = [[new Date(), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id]];
+    var range = logResp.getRange(last + 1, 1, 1, row[0].length);
+    range.setValues(row);
+    row = row[0];
+    SpreadsheetApp.flush();
+    return [JSON.stringify(logObj), JSON.stringify(row)];
+}
+/**
+ * 
+ * @param logObjStr
+ * {
+            "logEntry": str, 
+            "logDate": str, 
+            "logId": str, 
+            "nmjdob": str, 
+            "seis_id": str, 
+            "remove": boolean
+        }
+ 
+ * @returns 
+ */
+function saveEditedLogEntryServer(logObjStr) {
+    Logger.log(logObjStr);
+    var [headings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
+    var logObj = JSON.parse(logObjStr);
+    var row = [logObj.logDate, Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id];
+    Logger.log('the row is %s', JSON.stringify(row));
+    var lid_index = headings.indexOf('log_entry_id');
+    for (let i = 0; i < values.length; i++) {
+        var el = values[i];
+        var entryIDindex = headings.indexOf('logId');
+        if (el[lid_index] == logObj.logId) {
+            if (logObj.remove == true) {
+                values.splice(i, 1);
+            } else {
+                values.splice(i, 1, row);
+            }
+            Logger.log('the index to the record was %s', i);
+            break;
+        }
+        // var test = ss.insertSheet('test');
+    }
+    // var test = ss.getSheetByName('test');
+    sheet.clearContents();
+    var output = [headings].concat(values);
+    range = sheet.getRange(1, 1, output.length, output[0].length);
+    range.setValues(output);
+    return JSON.stringify(logObj);
+}
+
+function getNextLogEntryId() {
+    var sheet = ss.getSheetByName('logRespMerged');
+    var last = sheet.getRange('A1:A').getValues().filter(String).length;
+    var entry_ids = sheet.getRange('E2:E' + last).getValues().flat();
+    return Math.max(...entry_ids) + 1;
+}
+function getLogEntry(logId = '1') {
+    var [headings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
+    for (let i = values.length - 1; i > -1; i--) {
+        const el = values[i];
+        var [timestamp, email, studentMC, log_entry, log_entry_id, SEIS_ID] = el;
+
+        if (el[4] == logId) {
+            var obj = {
+                "nmjdob": el[2],
+                "entry": el[3],
+                "logId": el[4],
+                "seis_id": el[5]
+            };
+            Logger.log('log entry is %s', JSON.stringify(obj));
+            return JSON.stringify(obj);
+        }
+    }
+}
+
+function getLogEntries(id = '1010101', loc = null, startDate, endDate) {
+    var [headings, ids, sheet, range, lastR, lastC] = myGet('roster', 0, true);
+    ids.shift(); // file has an extra headings line
+    var allRecords = [];
+    var [logTableHeadings, values, sheet, range, lastR, lastC] = myGet('logRespMerged');
+    values.sort(function (a, b) {
+        if (a[0] < b[0]) {
+            return -1;
+        }
+        else if (a[0] > b[0]) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    });
+    for (let i = 0; i < ids.length; i++) {
+        var el = ids[i];
+        var entryIDindex = (logTableHeadings.indexOf('SEIS_ID'));
+        var stuRecord = [];
+        var count = 0;
+        for (let j = values.length - 1; j > -1; j--) {
+            var log = values[j];
+            if (log[entryIDindex] == el) {
+                stuRecord.push(log);
+                count++;
+                // if (count > 10) {
+                // break;
+                // }
+            }
+        }
+        allRecords.push([el, stuRecord]);
+    }
+    // Logger.log('allRecords = %s', JSON.stringify(allRecords));
+    return JSON.stringify(allRecords, loc);
+}
 //# sourceMappingURL=module.jsx.map
