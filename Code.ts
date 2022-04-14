@@ -21,7 +21,7 @@ function doGet(e) {
   ss.getSheetByName("roster").sort(2);
   ss.getSheetByName("logRespMerged").sort(1);
   var t = HtmlService.createTemplateFromFile("caseLog");
-  t.version = "v4-devel";
+  t.version = "v4-1x (dev)";
   var url = ss.getUrl();
   t.url = url;
   return t
