@@ -1,0 +1,76 @@
+{/* <script> */ }
+// $("body").on("change",)
+// // shift-click clears a litte goal number box
+// // click builds text blaze snippet from data in table
+// $("body").on("click", "li", function(e) {
+function opt() {
+    getGoals(tableOneGoal, 45);
+}
+function tableOneGoal(goals, glId) {
+    for (let i = 0; i < goals.length; i++) {
+        const el = goals[i];
+        if (glId === el[0]) {
+            console.log('goal 45 is %s', JSON.stringify(el));
+        }
+    }
+}
+function getGoals(handler, data) {
+    if (localStorage.getItem('goals') === null) {
+        google.script.run
+            .withSuccessHandler(handler)
+            .myGet('goals', data);
+    } else {
+        var values = JSON.parse(localStorage.getItem('goals'));
+        handler([true, values, true, true, true, true], data);
+    }
+}
+function haveGoals(data) {
+    var [headings, values, sheet, range, lastR, lastC] = data;
+    if (headings !== true) {
+        localStorage.setItem('goals', JSON.stringify(values));
+    }
+}
+
+//     var thisGoal = JSON.parse($(this).text());
+//     var [grdLvl, area, annual, standard, id] = thisGoal;
+//     console.log('thisGoal is %s', JSON.stringify(thisGoal));
+//     if (localStorage.getItem('goals-' + $('#seis_id').val() !== null)) {
+//         var myGoals = JSON.parse(localStorage.getItem('goals-' + $('#seis_id').val()));
+//     } else {
+//         myGoals = [];
+//     }
+//     myGoals.push(thisGoal);
+
+//     localStorage.setItem('goals-' + $('#seis_id').val(), JSON.stringify(thisGoal));
+
+//     $("#tbSnippetCopy").val(snip);
+//     document.execCommand("copy");
+//     showSelectedGoals();
+//     showToast('goal copied; type "/gl" starting in date field');
+
+//     $(this).attr("title", "");
+// } else {
+//     var id = $("#seis_id").val();
+//     var gId = $(this).val();
+//     var thisGoal = $(this).text();
+//     console.log('thisGoal is %s', thisGoal);
+//     $(this).attr("title", "");
+// }
+function showSelectedGoals() {
+    if (selectedGoals.length > 0) {
+
+    }
+    var selectedGoals = JSON.parse(localStorage.getItem('goals-' + $('#seis_id').val()));
+    for (let i = 0; i < selectedGoals.length; i++) {
+        const el = selectedGoals[i];
+        var [grdLvl, area, annual, standard, id] = el;
+        $('#selectedGoals').append('<tr class="tdGoal">' +
+            '<td class="goalList">' + area + '</td>' +
+            '<td class="goalList">' + annual + '</td>' +
+            '<td class="goalList">' + standard + '</td></tr>' +
+            '<td class="goalList">' + id + '</td></tr>'
+        )
+    }
+}
+
+// </script>

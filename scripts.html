@@ -5,6 +5,7 @@
   $(document).ready(function () {
     // click student name in roster table switches to that student for both contact info and
     // log entries
+    // $("#tbSnippetCopy").hide();
     if (sessionStorage.getItem("lastId") == null) {
       google.script.run.withSuccessHandler(cacheEm).getRecord("all");
 
@@ -22,6 +23,15 @@
       var id = sessionStorage.getItem("lastId");
       contactInfo(id);
     }
+    if (localStorage.getItem('goals') === null) {
+      google.script.run
+        .withSuccessHandler(haveGoals)
+        .myGet('goals');
+    } else {
+      var values = JSON.parse(localStorage.getItem('goals'));
+      haveGoals([true, values, true, true, true, true]);
+    }
+
     var tooltipTriggerList = [].slice.call(
       document.querySelectorAll('[data-bs-toggle="tooltip"]')
     );
@@ -29,9 +39,60 @@
       return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
+    $("body").on("click", ".goalList", function (e) {
+      // alert('fired');
+      e.preventDefault();
+      if (e.ctrlKey) {
+
+        var glId = $(this).attr("data-obj").toString();
+        var allGoals = JSON.parse(localStorage.getItem('goals'));
+        for (let i = 0; i < allGoals.length; i++) {
+          var el = allGoals[i];
+          // alert(el[0] + ' ' + glId);
+          if (el[0] == glId) {
+            // alert('found');
+            var thisGoal = new Goal(el.flat());
+            var snip = thisGoal.snip();
+
+            $('#tbSnippetCopy').text(snip);
+            $("#tbSnippetCopy").select();
+            document.execCommand("copy");
+          }
+        }
+      }
+    })
+    $("body").on("change", "input:checkbox", function (e) {
+      e.preventDefault();
+      var glId = $(this).attr("data-obj");
+      var allGoals = JSON.parse(localStorage.getItem('goals'));
+      for (let i = 0; i < allGoals.length; i++) {
+        const el = allGoals[i];
+        if (el[0] === glId) {
+          var thisGoal = new Goal(el.flat());
+          console.log('the new goal is %s; el is %s', JSON.stringify(thisGoal), JSON.stringify(el.flat));
+        }
+      }
+      if (localStorage.getItem('selGoals_' + $("#seis_id").val()) === null) {
+        obj = {};
+      } else {
+        obj = JSON.parse(localStorage.getItem('selGoals_' + $("#seis_id").val()));
+      }
+      var isChecked = $(this).is(":checked");
+      if (isChecked) {
+        // alert('checked' + $(this).val());
+        console.log('the data-obj is %s', $(this).attr("data-obj"));
+        let id = thisGoal['id'].toString();
+        obj[thisGoal.id] = thisGoal;
+      } else {
+        delete obj[thisGoal.id];
+      }
+      localStorage.setItem('selGoals_' + $("#seis_id").val(), JSON.stringify(obj));
+    }
+    );
     $("table").on("click tap", ".setStudent", function (event) {
       event.preventDefault();
       var id = $(this).attr("data-stuId");
+      
       //       console.log('id = %s', id);
       focus(id);
     });
@@ -70,21 +131,21 @@
       }
     });
 
-    // shift-click clears a litte goal number box
-    // click builds text blaze snippet from data in table
-    $("body").on("click", ".gls", function (event) {
-      if (event.shiftKey) {
-        e.preventDefault();
-        $(this).val("");
-        $(this).attr("title", "");
-      } else {
-        var id = $("#seis_id").val();
-        var gId = $(this).val();
-        google.script.run
-          .withSuccessHandler(showTBsnippetGl)
-          .getOneGoalForEditing(gId);
-      }
-    });
+    // // shift-click clears a litte goal number box
+    // // click builds text blaze snippet from data in table
+    // $("body").on("click", ".gls", function (event) {
+    //   if (event.shiftKey) {
+    //     e.preventDefault();
+    //     $(this).val("");
+    //     $(this).attr("title", "");
+    //   } else {
+    //     var id = $("#seis_id").val();
+    //     var gId = $(this).val();
+    //     google.script.run
+    //       .withSuccessHandler(showTBsnippetGl)
+    //       .getOneGoalForEditing(gId);
+    //   }
+    // });
 
     // $("body").on("click", "#emParentsMenuItem", emParents());
 
@@ -119,7 +180,7 @@
     });
 
     // modals
-    $("body").on("show.srchModal.modal", function () {});
+    $("body").on("show.srchModal.modal", function () { });
 
     $("body").on("show.bs.modal", function () {
       // alert('event');
@@ -177,7 +238,7 @@
     });
 
     // this goes with the one just above changing the color back to White
-    $("body").on("mouseup", ".setStudent", function (event) {
+    $("body").on("mouseup mouseleave", ".setStudent", function (event) {
       event.preventDefault();
       $(this).css("background-color", "#ffffff");
       // console.log('mouse up');
@@ -347,7 +408,9 @@
   });
   startup();
 
-  // calls function on server side to return data for this student
+
+
+
   function startup(id = sessionStorage.getItem("lastId")) {
     $("#spinner01").show();
     // id = getPointer();
@@ -366,6 +429,7 @@
         .getTableData_roster();
 
       focus(id);
+
     }
   }
   function setPointerAndStart(id) {
@@ -386,6 +450,7 @@
   function focus(id) {
     setPointer(id);
     contactInfo(id);
+    appendSelectedGoals();
 
     if (sessionStorage.getItem("reclog" + id) != null) {
       var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
@@ -396,6 +461,7 @@
         .withSuccessHandler(logsToCache)
         .getLogEntries(id, "loc01");
     }
+
   }
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -405,7 +471,7 @@
     if (id == undefined || id == null || id == "") {
       alert("no id at contactInfo()");
     }
-
+    // $('#foundGoals').empty();
     if (sessionStorage.getItem("rec" + id.toString()) != null) {
       console.log("rec + id key was not null");
       showContactInfo(sessionStorage.getItem("rec" + id.toString()));
@@ -423,21 +489,8 @@
   //   $("#notes2").val(notes);
   // }
   function showTBsnippetGl(goalObj) {
-    var snippet =
-      "[" +
-      '"area" = "' +
-      goalObj.area +
-      '",' +
-      '"strand" = "' +
-      goalObj.strand +
-      '",' +
-      '"stnd" = "' +
-      goalObj.standard +
-      '",' +
-      '"gl" = "' +
-      goalObj.annual +
-      '"' +
-      "]";
+    var snippet = goalObj.snip;
+    console.log('snippet is %s', snippet);
     $("#tbSnippetCopy").text(snippet);
     $("#tbSnippetCopy").select();
     document.execCommand("copy");
@@ -474,31 +527,7 @@
       .getLogEntries([id, loc, startDate, endDate]);
   }
 
-  // search the goal bank for goals of a given level and area
-  function findGoals() {
-    var glLvl = $("#glLvl").children("option:selected").val();
-    var glLvlElid = $("#glLvl").children("option:selected").attr("id");
 
-    var glArea = $("#glArea").children("option:selected").val();
-    var glAreaElid = $("#glArea").children("option:selected").attr("id");
-
-    var id = $("#seis_id").val();
-    // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
-
-    sessionStorage.setItem("glLvl", glLvl);
-    sessionStorage.setItem("glArea", glArea);
-    var search = glLvl + "_" + glArea;
-
-    if (sessionStorage.getItem("goals" + search)) {
-      // console.log('getting items from cache for ' + search);
-      showGoals(sessionStorage.getItem("goals" + search));
-    } else {
-      google.script.run
-        .withSuccessHandler(showGoals)
-        .getGoalListItems([glLvl, glArea, id]);
-    }
-    // returns [[gId, gLvl, gArea, gDmn, gAnl, gO1, gO2, gO3]]
-  }
 
   function findGoals_m() {
     var glLvl = $("#m-glLvl").children("option:selected").val();
@@ -818,14 +847,14 @@
     var url = obj.url;
     $("#pdfUrl").html(
       "<p>" +
-        msg +
-        "</p>" +
-        "\n" +
-        '<a href="' +
-        url +
-        '" target="_blank">' +
-        filename +
-        "</a>"
+      msg +
+      "</p>" +
+      "\n" +
+      '<a href="' +
+      url +
+      '" target="_blank">' +
+      filename +
+      "</a>"
     );
     document.body.style.cursor = "default";
     sleep(1000);
@@ -844,7 +873,6 @@
     document.body.style.cursor = "default";
     $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
   }
-
   // display table of names sorted by due dates
   function showRosterTable(dataStr) {
     // console.log('data is %s', dataStr);
@@ -922,27 +950,27 @@
         // console.log('evalDate hello is %s for %s', evalDate, first_name);
         list.append(
           '<tr class="d-flex"><td class="setStudent  col-6" data-stuId=' +
-            seis_id +
-            "> " +
-            last_name +
-            ", " +
-            first_name +
-            "</td>" +
-            '<td class="tableDate setStudent col-3" data-stuId=' +
-            seis_id +
-            ">" +
-            dayjs(date_of_next_annual_plan_review).format("YYYY-MM-DD") +
-            "</td>" +
-            '<td class="tableDate setStudent col-3" style="background-color:' +
-            pending[0] +
-            "; color:" +
-            pending[1] +
-            ';" data-stuId=' +
-            seis_id +
-            ">" +
-            dayjs(evalDate).format("YYYY-MM-DD") +
-            "</td>" +
-            "</tr></div>"
+          seis_id +
+          "> " +
+          last_name +
+          ", " +
+          first_name +
+          "</td>" +
+          '<td class="tableDate setStudent col-3" data-stuId=' +
+          seis_id +
+          ">" +
+          dayjs(date_of_next_annual_plan_review).format("YYYY-MM-DD") +
+          "</td>" +
+          '<td class="tableDate setStudent col-3" style="background-color:' +
+          pending[0] +
+          "; color:" +
+          pending[1] +
+          ';" data-stuId=' +
+          seis_id +
+          ">" +
+          dayjs(evalDate).format("YYYY-MM-DD") +
+          "</td>" +
+          "</tr></div>"
         );
       }
     }
@@ -965,12 +993,12 @@
 
       $("#loc00hd").append(
         "<li ' class='upcomingEvent'>" +
-          dayjs(c, "YYYY-MM-DDTHH:mm").format("dd MM-DD-YY @ HH:mm") +
-          "     " +
-          b +
-          "; \n" +
-          f +
-          "\n"
+        dayjs(c, "YYYY-MM-DDTHH:mm").format("dd MM-DD-YY @ HH:mm") +
+        "     " +
+        b +
+        "; \n" +
+        f +
+        "\n"
       );
       document.body.style.cursor = "default";
     }
@@ -1095,8 +1123,7 @@
   }
 
   function showToast(msg) {
-    $("#toastBody").html("<p>" + msg + "</p>");
-    $(".toast").toast({ delay: 5000 });
+    $("#toastMsg").html("<h6>" + msg + "</h6>");
     $(".toast").toast("show");
     document.body.style.cursor = "default";
   }
@@ -1131,70 +1158,6 @@
   function saveGoalSuccess(value) {
     // console.log('returned: %s', value);
     findGoals();
-  }
-
-  function Goal(
-    id,
-    grdLvl,
-    area,
-    strand,
-    annual,
-    standard,
-    objctv1,
-    objctv2,
-    objctv3,
-    timestamp
-  ) {
-    this.id = id;
-    this.lvl = grdLvl;
-    this.area = area;
-    this.strand = strand;
-    this.annual = annual;
-    this.standard = standard;
-    this.objective1 = objctv1;
-    this.objective2 = objctv2;
-    this.objective3 = objctv3;
-    this.timestamp = timestamp;
-
-    this.snip = function () {
-      return (
-        "[" +
-        '"area" = "' +
-        this.area +
-        '",' +
-        '"strand" = "' +
-        this.strand +
-        '",' +
-        '"stnd" = "' +
-        this.standard +
-        '",' +
-        '"gl" = "' +
-        this.annual +
-        '"' +
-        "]"
-      );
-    };
-    this.list = function () {
-      return (
-        '<li class="goalList" glId="' +
-        this.id +
-        '["' +
-        this.lvl +
-        '"' +
-        ", " +
-        '"' +
-        this.strand +
-        '"' +
-        ", " +
-        '"' +
-        this.annual +
-        '"' +
-        ", " +
-        '"' +
-        this.id +
-        '"]</li>'
-      );
-    };
   }
 
   function firstSnipThenGvoice() {
@@ -1361,27 +1324,27 @@
         // console.log('evalDate hello is %s for %s', evalDate, first_name);
         list.append(
           '<tr class="d-flex"><td class="setStudent  col-6" data-stuId=' +
-            seis_id +
-            "> " +
-            last_name +
-            ", " +
-            first_name +
-            "</td>" +
-            '<td class="tableDate setStudent col-3" data-stuId=' +
-            seis_id +
-            ">" +
-            dayjs(date_of_last_annual_plan_review).format("YYYY-MM-DD") +
-            "</td>" +
-            '<td class="tableDate setStudent col-3" style="background-color:' +
-            pending[0] +
-            "; color:" +
-            pending[1] +
-            ';" data-stuId=' +
-            seis_id +
-            ">" +
-            dayjs(evalDate).format("YYYY-MM-DD") +
-            "</td>" +
-            "</tr></div>"
+          seis_id +
+          "> " +
+          last_name +
+          ", " +
+          first_name +
+          "</td>" +
+          '<td class="tableDate setStudent col-3" data-stuId=' +
+          seis_id +
+          ">" +
+          dayjs(date_of_last_annual_plan_review).format("YYYY-MM-DD") +
+          "</td>" +
+          '<td class="tableDate setStudent col-3" style="background-color:' +
+          pending[0] +
+          "; color:" +
+          pending[1] +
+          ';" data-stuId=' +
+          seis_id +
+          ">" +
+          dayjs(evalDate).format("YYYY-MM-DD") +
+          "</td>" +
+          "</tr></div>"
         );
       }
     }
@@ -1561,19 +1524,19 @@
       ] = el;
       list.append(
         '<tr class="d-flex">' +
-          "<td data-entry_id=" +
-          logId +
-          ' class="col-3 logEntry"' +
-          'data-toggle="tooltip" data-placement="right" ' +
-          'title= "double-click to edit">' +
-          dayjs(el[0]).format("YYYY-MM-DD") +
-          "</td>" +
-          "<td data-entry_id=" +
-          logId +
-          ' class="logEntry col-9">' +
-          el[3] +
-          "</td>" +
-          "</tr>"
+        "<td data-entry_id=" +
+        logId +
+        ' class="col-3 logEntry"' +
+        'data-toggle="tooltip" data-placement="right" ' +
+        'title= "double-click to edit">' +
+        dayjs(el[0]).format("YYYY-MM-DD") +
+        "</td>" +
+        "<td data-entry_id=" +
+        logId +
+        ' class="logEntry col-9">' +
+        el[3] +
+        "</td>" +
+        "</tr>"
       );
     }
     $("#corrlng[value='01']", function () {
@@ -1668,19 +1631,19 @@
       ] = el;
       list.append(
         '<tr class="d-flex">' +
-          "<td data-entry_id=" +
-          logId +
-          ' class="col-3 logEntry"' +
-          'data-toggle="tooltip" data-placement="right" ' +
-          'title= "double-click to edit">' +
-          dayjs(el[0]).format("YYYY-MM-DD") +
-          "</td>" +
-          "<td data-entry_id=" +
-          logId +
-          ' class="logEntry col-9">' +
-          el[3] +
-          "</td>" +
-          "</tr>"
+        "<td data-entry_id=" +
+        logId +
+        ' class="col-3 logEntry"' +
+        'data-toggle="tooltip" data-placement="right" ' +
+        'title= "double-click to edit">' +
+        dayjs(el[0]).format("YYYY-MM-DD") +
+        "</td>" +
+        "<td data-entry_id=" +
+        logId +
+        ' class="logEntry col-9">' +
+        el[3] +
+        "</td>" +
+        "</tr>"
       );
     }
     $("#corrlng[value='01']", function () {
@@ -1699,7 +1662,72 @@
     cachedRecord[fldNm] = fieldVal;
     sessionStorage.setItem(key, JSON.stringify(cachedRecord));
   }
+  function haveGoals(data) {
+    var [headings, values, sheet, range, lastR, lastC] = data;
+    if (headings !== true) {
+      localStorage.setItem('goals', JSON.stringify(values));
+    }
+  }
+  // search the goal bank for goals of a given level and area
+  function findGoals() {
+    var glLvl = $("#glLvl").children("option:selected").val().toString();
+    var glLvlElid = $("#glLvl").children("option:selected").attr("id").toString();
 
+    var glArea = $("#glArea").children("option:selected").val().toString();
+    var glAreaElid = $("#glArea").children("option:selected").attr("id").toString();
+
+    var id = $("#seis_id").val();
+    // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
+
+    localStorage.setItem("glLvl", glLvl);
+    localStorage.setItem("glArea", glArea);
+    // localStorage.setItem("grdLvl", grdLvl);
+    // localStorage.setItem("area", area);
+
+    var goalTable = JSON.parse(localStorage.getItem('goals'));
+    console.log('got goal table');
+    $("#foundGoals").empty();
+    appendSelectedGoals();
+
+    for (let i = 0; i < goalTable.length; i++) {
+      const el = goalTable[i];
+      let [id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, modified] = el;
+      // console.log(glLvl, grdLvl, glArea, area);
+      if (glArea == area && glLvl == grdLvl) {
+        let item = new Goal([id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, modified]);
+        $("#foundGoals").append(item.checkboxItem());
+      }
+    }
+    document.body.style.cursor = "default";
+  }
+  function appendSelectedGoals() {
+    $('#foundGoals').empty();
+    if (localStorage.getItem('selGoals_' + $('#seis_id').val()) !== null) {
+      var obj = JSON.parse(localStorage.getItem('selGoals_' + $('#seis_id').val()));
+      // console.log('hello world');
+      // console.log('the obj is %s', JSON.stringify(obj));
+      for (const key in obj) {
+        if (Object.hasOwnProperty.call(obj, key)) {
+          const element = obj[key];
+          console.log('key, element is %s, %s', JSON.stringify(key), JSON.stringify(element));
+          var annual = element.annual.toString();
+          console.log('annual is %s', annual);
+
+          $('#foundGoals').append(
+            //   element.checkboxItem()
+            // )
+            "<div class='input-group-prepend'>" +
+            "<div  class='input-group-text'>" +
+            "<input type='checkbox' checked class='glChkBx' data-obj=" + element.id + ">" +
+            "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + element.id + " readonly>" +
+            element.annual +
+            "</textarea>" +
+            "</div>" +
+            "</div>");
+        }
+      }
+    }
+  }
   // function editLogEntryInModal(logObjStr){
   //     logObj = JSON.stringify(logObjStr);
   //     var myModal = new bootstrap.Modal(document.getElementById('logModal'), { focus: true });
