@@ -15,33 +15,33 @@ function tableOneGoal(goals, glId) {
     }
 }
 function getGoals(handler, data) {
-    if (localStorage.getItem('goals') === null) {
+    if (sessionStorage.getItem('goals') === null) {
         google.script.run
             .withSuccessHandler(handler)
             .myGet('goals', data);
     } else {
-        var values = JSON.parse(localStorage.getItem('goals'));
+        var values = JSON.parse(sessionStorage.getItem('goals'));
         handler([true, values, true, true, true, true], data);
     }
 }
 function haveGoals(data) {
     var [headings, values, sheet, range, lastR, lastC] = data;
     if (headings !== true) {
-        localStorage.setItem('goals', JSON.stringify(values));
+        sessionStorage.setItem('goals', JSON.stringify(values));
     }
 }
 
 //     var thisGoal = JSON.parse($(this).text());
 //     var [grdLvl, area, annual, standard, id] = thisGoal;
 //     console.log('thisGoal is %s', JSON.stringify(thisGoal));
-//     if (localStorage.getItem('goals-' + $('#seis_id').val() !== null)) {
-//         var myGoals = JSON.parse(localStorage.getItem('goals-' + $('#seis_id').val()));
+//     if (sessionStorage.getItem('goals-' + $('#seis_id').val() !== null)) {
+//         var myGoals = JSON.parse(sessionStorage.getItem('goals-' + $('#seis_id').val()));
 //     } else {
 //         myGoals = [];
 //     }
 //     myGoals.push(thisGoal);
 
-//     localStorage.setItem('goals-' + $('#seis_id').val(), JSON.stringify(thisGoal));
+//     sessionStorage.setItem('goals-' + $('#seis_id').val(), JSON.stringify(thisGoal));
 
 //     $("#tbSnippetCopy").val(snip);
 //     document.execCommand("copy");
@@ -60,7 +60,7 @@ function showSelectedGoals() {
     if (selectedGoals.length > 0) {
 
     }
-    var selectedGoals = JSON.parse(localStorage.getItem('goals-' + $('#seis_id').val()));
+    var selectedGoals = JSON.parse(sessionStorage.getItem('goals-' + $('#seis_id').val()));
     for (let i = 0; i < selectedGoals.length; i++) {
         const el = selectedGoals[i];
         var [grdLvl, area, annual, standard, id] = el;

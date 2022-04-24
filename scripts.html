@@ -23,12 +23,12 @@
       var id = sessionStorage.getItem("lastId");
       contactInfo(id);
     }
-    if (localStorage.getItem('goals') === null) {
+    if (sessionStorage.getItem('goals') === null) {
       google.script.run
         .withSuccessHandler(haveGoals)
         .myGet('goals');
     } else {
-      var values = JSON.parse(localStorage.getItem('goals'));
+      var values = JSON.parse(sessionStorage.getItem('goals'));
       haveGoals([true, values, true, true, true, true]);
     }
 
@@ -45,7 +45,7 @@
       if (e.ctrlKey) {
 
         var glId = $(this).attr("data-obj").toString();
-        var allGoals = JSON.parse(localStorage.getItem('goals'));
+        var allGoals = JSON.parse(sessionStorage.getItem('goals'));
         for (let i = 0; i < allGoals.length; i++) {
           var el = allGoals[i];
           // alert(el[0] + ' ' + glId);
@@ -64,7 +64,7 @@
     $("body").on("change", "input:checkbox", function (e) {
       e.preventDefault();
       var glId = $(this).attr("data-obj");
-      var allGoals = JSON.parse(localStorage.getItem('goals'));
+      var allGoals = JSON.parse(sessionStorage.getItem('goals'));
       for (let i = 0; i < allGoals.length; i++) {
         const el = allGoals[i];
         if (el[0] === glId) {
@@ -72,10 +72,10 @@
           console.log('the new goal is %s; el is %s', JSON.stringify(thisGoal), JSON.stringify(el.flat));
         }
       }
-      if (localStorage.getItem('selGoals_' + $("#seis_id").val()) === null) {
+      if (sessionStorage.getItem('selGoals_' + $("#seis_id").val()) === null) {
         obj = {};
       } else {
-        obj = JSON.parse(localStorage.getItem('selGoals_' + $("#seis_id").val()));
+        obj = JSON.parse(sessionStorage.getItem('selGoals_' + $("#seis_id").val()));
       }
       var isChecked = $(this).is(":checked");
       if (isChecked) {
@@ -86,7 +86,7 @@
       } else {
         delete obj[thisGoal.id];
       }
-      localStorage.setItem('selGoals_' + $("#seis_id").val(), JSON.stringify(obj));
+      sessionStorage.setItem('selGoals_' + $("#seis_id").val(), JSON.stringify(obj));
     }
     );
     $("table").on("click tap", ".setStudent", function (event) {
@@ -450,7 +450,7 @@
   function focus(id) {
     setPointer(id);
     contactInfo(id);
-    appendSelectedGoals();
+    // appendSelectedGoals();
 
     if (sessionStorage.getItem("reclog" + id) != null) {
       var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
@@ -1665,7 +1665,7 @@
   function haveGoals(data) {
     var [headings, values, sheet, range, lastR, lastC] = data;
     if (headings !== true) {
-      localStorage.setItem('goals', JSON.stringify(values));
+      sessionStorage.setItem('goals', JSON.stringify(values));
     }
   }
   // search the goal bank for goals of a given level and area
@@ -1679,15 +1679,15 @@
     var id = $("#seis_id").val();
     // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
 
-    localStorage.setItem("glLvl", glLvl);
-    localStorage.setItem("glArea", glArea);
-    // localStorage.setItem("grdLvl", grdLvl);
-    // localStorage.setItem("area", area);
+    sessionStorage.setItem("glLvl", glLvl);
+    sessionStorage.setItem("glArea", glArea);
+    // sessionStorage.setItem("grdLvl", grdLvl);
+    // sessionStorage.setItem("area", area);
 
-    var goalTable = JSON.parse(localStorage.getItem('goals'));
+    var goalTable = JSON.parse(sessionStorage.getItem('goals'));
     console.log('got goal table');
     $("#foundGoals").empty();
-    appendSelectedGoals();
+    // appendSelectedGoals();
 
     for (let i = 0; i < goalTable.length; i++) {
       const el = goalTable[i];
@@ -1700,34 +1700,34 @@
     }
     document.body.style.cursor = "default";
   }
-  function appendSelectedGoals() {
-    $('#foundGoals').empty();
-    if (localStorage.getItem('selGoals_' + $('#seis_id').val()) !== null) {
-      var obj = JSON.parse(localStorage.getItem('selGoals_' + $('#seis_id').val()));
-      // console.log('hello world');
-      // console.log('the obj is %s', JSON.stringify(obj));
-      for (const key in obj) {
-        if (Object.hasOwnProperty.call(obj, key)) {
-          const element = obj[key];
-          console.log('key, element is %s, %s', JSON.stringify(key), JSON.stringify(element));
-          var annual = element.annual.toString();
-          console.log('annual is %s', annual);
+  // function appendSelectedGoals() {
+  //   $('#foundGoals').empty();
+  //   if (sessionStorage.getItem('selGoals_' + $('#seis_id').val()) !== null) {
+  //     var obj = JSON.parse(sessionStorage.getItem('selGoals_' + $('#seis_id').val()));
+  //     // console.log('hello world');
+  //     // console.log('the obj is %s', JSON.stringify(obj));
+  //     for (const key in obj) {
+  //       if (Object.hasOwnProperty.call(obj, key)) {
+  //         const element = obj[key];
+  //         console.log('key, element is %s, %s', JSON.stringify(key), JSON.stringify(element));
+  //         var annual = element.annual.toString();
+  //         console.log('annual is %s', annual);
 
-          $('#foundGoals').append(
-            //   element.checkboxItem()
-            // )
-            "<div class='input-group-prepend'>" +
-            "<div  class='input-group-text'>" +
-            "<input type='checkbox' checked class='glChkBx' data-obj=" + element.id + ">" +
-            "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + element.id + " readonly>" +
-            element.annual +
-            "</textarea>" +
-            "</div>" +
-            "</div>");
-        }
-      }
-    }
-  }
+  //         $('#foundGoals').append(
+  //           //   element.checkboxItem()
+  //           // )
+  //           "<div class='input-group-prepend'>" +
+  //           "<div  class='input-group-text'>" +
+  //           "<input type='checkbox' checked class='glChkBx' data-obj=" + element.id + ">" +
+  //           "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + element.id + " readonly>" +
+  //           element.annual +
+  //           "</textarea>" +
+  //           "</div>" +
+  //           "</div>");
+  //       }
+  //     }
+  //   }
+  // }
   // function editLogEntryInModal(logObjStr){
   //     logObj = JSON.stringify(logObjStr);
   //     var myModal = new bootstrap.Modal(document.getElementById('logModal'), { focus: true });
