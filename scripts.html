@@ -1,6 +1,77 @@
 <script>
-  // named functions
-  // c<script>
+  class Goal {
+    constructor(array) {
+      this['id'] = array[0];
+      this['lvl'] = array[1];
+      this['area'] = array[2];
+      this['strand'] = array[3];
+      this['annual'] = array[4];
+      this['standard'] = array[5];
+      this['objective1'] = array[6];
+      this['objective2'] = array[7];
+      this['objective3'] = array[8];
+      this['mod'] = array[9];
+    }
+    list() {
+      var item = '<li class="goalList" glId="' +
+        this.id +
+        '">' +
+        '["' +
+        this.lvl +
+        '"' +
+        ", " +
+        '"' +
+        this.strand +
+        '"' +
+        ", " +
+        '"' +
+        this.annual +
+        '"' +
+        ", " +
+        '"' +
+        this.standard +
+        '"' +
+        ", " +
+        '"' +
+        this.id +
+        '"]</li>';
+
+      return (item);
+    }
+    snip() {
+      var snip = "[" +
+        '"area" = "' +
+        this.area +
+        '",' +
+        '"gl" = "' +
+        this.annual +
+        '",' +
+        '"strand" = "' +
+        this.strand +
+        '",' +
+        '"stnd" = "' +
+        this.standard +
+        '"' +
+        "]";
+      return snip;
+    };
+    checkboxItem() {
+      var me = this.id;
+      console.log('i am %s', me);
+      return "<div class='input-group-prepend'>" +
+        "<div  class='input-group-text'>" +
+        "<input type='checkbox' class='glChkBx' data-obj=" + me + ">" +
+        "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + me + " readonly >" +
+        "(" + this.standard + ") " + this.annual
+      "</textarea>"
+      "</div>" +
+        "</div>"
+    }
+    saved() {
+      "<li data-saved='" + snip() + "'>" + this.area + "</li>"
+    }
+  }
+
   // The code in this function runs when the page is loaded.
   $(document).ready(function () {
     // click student name in roster table switches to that student for both contact info and
@@ -63,217 +134,230 @@
     })
     $("body").on("change", "input:checkbox", function (e) {
       e.preventDefault();
+      var selGoals = 'selGoals_' + $("#seis_id").val();
       var glId = $(this).attr("data-obj");
       var allGoals = JSON.parse(sessionStorage.getItem('goals'));
       for (let i = 0; i < allGoals.length; i++) {
         const el = allGoals[i];
         if (el[0] === glId) {
-          var thisGoal = new Goal(el.flat());
-          console.log('the new goal is %s; el is %s', JSON.stringify(thisGoal), JSON.stringify(el.flat));
+          var thisGoal = new Goal(el);
+          var thisGoalId = thisGoal.id;
+          console.log('the new goal is %s; el is %s', JSON.stringify(thisGoal), JSON.stringify(el));
         }
       }
-      if (sessionStorage.getItem('selGoals_' + $("#seis_id").val()) === null) {
+      if (sessionStorage.getItem(selGoals) === null) {
         obj = {};
+        obj[thisGoalId] = thisGoal;
+        console.log('created a selGoal obj, %s', JSON.stringify(obj));
+
       } else {
-        obj = JSON.parse(sessionStorage.getItem('selGoals_' + $("#seis_id").val()));
+        obj = JSON.parse(sessionStorage.getItem(selGoals));
+        console.log('selGoals already exits: %s', JSON.stringify(obj));
       }
       var isChecked = $(this).is(":checked");
       if (isChecked) {
         // alert('checked' + $(this).val());
         console.log('the data-obj is %s', $(this).attr("data-obj"));
-        let id = thisGoal['id'].toString();
         obj[thisGoal.id] = thisGoal;
       } else {
-        delete obj[thisGoal.id];
-      }
-      sessionStorage.setItem('selGoals_' + $("#seis_id").val(), JSON.stringify(obj));
-    }
-    );
-    $("table").on("click tap", ".setStudent", function (event) {
-      event.preventDefault();
-      var id = $(this).attr("data-stuId");
-      
-      //       console.log('id = %s', id);
-      focus(id);
-    });
+        for (const key in obj) {
+          if (Object.hasOwnProperty.call(obj, key)) {
+            const element = obj[key];
+            if (element === glId) {
+              delete obj.key;
+            }
 
-    $("#ready").hide();
-    $(".pleaseHide").hide();
-    // document.body.style.cursor = "wait";
-
-    $("body").on("dblclick dbl-tap", ".goalList", function (e) {
-      // console.log('event triggered a[name=goalList clicked');
-      e.preventDefault();
-      // open goal for editing
-      // console.log('this is %s', JSON.stringify($(this).text()));
-      var thisGoal = JSON.parse($(this).text());
-      var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
-      console.log("gId = %s", gId);
-      google.script.run.withSuccessHandler(editGoalInModal).getGoal(gId);
-    });
-    // console.log('sent to goal edit: %s', $(this).text());
-    $("body").on("click", ".goalList", function (e) {
-      // console.log('put the goal number into a gl field');
-      if (e.ctrlKey) {
-        e.preventDefault();
-        var item = JSON.parse($(this).text());
-        var gId = item[item.length - 1];
-        // item = item.toString().match(/\d+$/);
-
-        $(".gls").each(function (i, el) {
-          if ($(this).val() == "") {
-            $(this).val(gId);
-            $(this).attr("title", gId);
-            return false;
           }
-        });
-        var crntScrl = $(window).scrollTop();
+        }
       }
-    });
+      sessionStorage.setItem(selGoals, JSON.stringify(obj));
+  }
+  );
+  $("table").on("click tap", ".setStudent", function (event) {
+    event.preventDefault();
+    var id = $(this).attr("data-stuId");
 
-    // // shift-click clears a litte goal number box
-    // // click builds text blaze snippet from data in table
-    // $("body").on("click", ".gls", function (event) {
-    //   if (event.shiftKey) {
-    //     e.preventDefault();
-    //     $(this).val("");
-    //     $(this).attr("title", "");
-    //   } else {
-    //     var id = $("#seis_id").val();
-    //     var gId = $(this).val();
-    //     google.script.run
-    //       .withSuccessHandler(showTBsnippetGl)
-    //       .getOneGoalForEditing(gId);
-    //   }
-    // });
+    //       console.log('id = %s', id);
+    focus(id);
+  });
 
-    // $("body").on("click", "#emParentsMenuItem", emParents());
+  $("#ready").hide();
+  $(".pleaseHide").hide();
+  // document.body.style.cursor = "wait";
 
-    $(function () {
-      $('[data-toggle="tooltip"]').tooltip();
-    });
-    // console.log('gSmL is %s', gSmL);
+  $("body").on("dblclick dbl-tap", ".goalList", function (e) {
+    // console.log('event triggered a[name=goalList clicked');
+    e.preventDefault();
+    // open goal for editing
+    // console.log('this is %s', JSON.stringify($(this).text()));
+    var thisGoal = JSON.parse($(this).text());
+    var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
+    console.log("gId = %s", gId);
+    google.script.run.withSuccessHandler(editGoalInModal).getGoal(gId);
+  });
+  // console.log('sent to goal edit: %s', $(this).text());
+  $("body").on("click", ".goalList", function (e) {
+    // console.log('put the goal number into a gl field');
+    if (e.ctrlKey) {
+      e.preventDefault();
+      var item = JSON.parse($(this).text());
+      var gId = item[item.length - 1];
+      // item = item.toString().match(/\d+$/);
 
-    $("body").on("click", "#gVoiceMenuItem", function () {
-      firstSnipThenGvoice();
-    });
-    $(".alert").alert();
+      $(".gls").each(function (i, el) {
+        if ($(this).val() == "") {
+          $(this).val(gId);
+          $(this).attr("title", gId);
+          return false;
+        }
+      });
+      var crntScrl = $(window).scrollTop();
+    }
+  });
 
-    //set cursor to pointer when entering a nav item
-    $("body").on("mouseenter", ".nav-link", function () {
-      $(this).css("cursor", "pointer");
-    });
+  // // shift-click clears a litte goal number box
+  // // click builds text blaze snippet from data in table
+  // $("body").on("click", ".gls", function (event) {
+  //   if (event.shiftKey) {
+  //     e.preventDefault();
+  //     $(this).val("");
+  //     $(this).attr("title", "");
+  //   } else {
+  //     var id = $("#seis_id").val();
+  //     var gId = $(this).val();
+  //     google.script.run
+  //       .withSuccessHandler(showTBsnippetGl)
+  //       .getOneGoalForEditing(gId);
+  //   }
+  // });
 
-    // set cursor to pointer when entering table row
-    $("body").on("mouseenter", ".setStudent", function () {
-      $(".setStudent").css("cursor", "pointer");
-    });
+  // $("body").on("click", "#emParentsMenuItem", emParents());
 
-    //set cursor to pointer when entering an icon
-    $("body").on("mouseenter", ".material-icons", function () {
-      $(".setStudent").css("cursor", "pointer");
-    });
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+  // console.log('gSmL is %s', gSmL);
 
-    // set cursor to normal when leaving an icon
-    $("body").on("mouseleave", ".material-icons", function () {
-      $(".setStudent").css("cursor", "default");
-    });
+  $("body").on("click", "#gVoiceMenuItem", function () {
+    firstSnipThenGvoice();
+  });
+  $(".alert").alert();
 
-    // modals
-    $("body").on("show.srchModal.modal", function () { });
+  //set cursor to pointer when entering a nav item
+  $("body").on("mouseenter", ".nav-link", function () {
+    $(this).css("cursor", "pointer");
+  });
 
-    $("body").on("show.bs.modal", function () {
-      // alert('event');
-      var addresses = (
-        $("#teachemail").val() +
-        "," +
-        $("#Parent_1_Email").val() +
-        "," +
-        $("#u3_Parent_1a_Email").val()
-      ).replace(/,$/, "");
-      var subject = $("#stuName").val();
-      // console.log(addresses);
-      $("#emailRecipients").val(addresses);
-      $("#emailSubject").val(subject);
-    });
-    // change the cursor to a pointer when entering a text Blaze field
-    $("body").on("mouseenter", '[name$="Copy"]', function () {
-      $("[name$='Copy']").css("cursor", "pointer");
-    });
+  // set cursor to pointer when entering table row
+  $("body").on("mouseenter", ".setStudent", function () {
+    $(".setStudent").css("cursor", "pointer");
+  });
 
-    // if shift key is down turning the cursor into a trash can and then delete on click (next function)
-    $("body").on("mousemove", ".gls", function () {
-      if (event.shiftKey) {
-        e.preventDefault();
-        $(".gls").css(
-          "cursor",
-          "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto"
-        );
-      } else {
-        $(".gls").css("cursor", "pointer");
-      }
-    });
+  //set cursor to pointer when entering an icon
+  $("body").on("mouseenter", ".material-icons", function () {
+    $(".setStudent").css("cursor", "pointer");
+  });
 
-    $("body").on("click", ".snipThis", function (event) {
-      event.preventDefault();
-      snipInfo();
-    });
-    $(".btn").mouseup(function () {
-      $(this).blur();
-    });
-    // copy a text blaze snippet to clipboard when clicking on the item
-    $("body").on("click", '[name$="Copy"]', function () {
-      $(this).select();
-      document.execCommand("copy");
-    });
-    $(".btn-success").click(function () {
-      $(this).toggleClass("btn-active").siblings().removeClass("btn-active");
-      $(this).blur();
-    });
-    // when clicking on a table row, change the color of the field
-    $("body").on("mousedown", ".setStudent", function (event) {
-      event.preventDefault();
-      $(this).css("background-color", "#5bf5db");
-      // console.log('mouse down');
-    });
+  // set cursor to normal when leaving an icon
+  $("body").on("mouseleave", ".material-icons", function () {
+    $(".setStudent").css("cursor", "default");
+  });
 
-    // this goes with the one just above changing the color back to White
-    $("body").on("mouseup mouseleave", ".setStudent", function (event) {
-      event.preventDefault();
-      $(this).css("background-color", "#ffffff");
-      // console.log('mouse up');
-    });
+  // modals
+  $("body").on("show.srchModal.modal", function () { });
 
-    // record edited fields
-    $("body").on("change", ".stuEdit", function () {
-      var seisId = $("#seis_id").val();
-      var fieldVal = $(this).val();
-      var fldNm = $(this).attr("id");
+  $("body").on("show.bs.modal", function () {
+    // alert('event');
+    var addresses = (
+      $("#teachemail").val() +
+      "," +
+      $("#Parent_1_Email").val() +
+      "," +
+      $("#u3_Parent_1a_Email").val()
+    ).replace(/,$/, "");
+    var subject = $("#stuName").val();
+    // console.log(addresses);
+    $("#emailRecipients").val(addresses);
+    $("#emailSubject").val(subject);
+  });
+  // change the cursor to a pointer when entering a text Blaze field
+  $("body").on("mouseenter", '[name$="Copy"]', function () {
+    $("[name$='Copy']").css("cursor", "pointer");
+  });
 
-      if (!seisId || !fieldVal || !fldNm) {
-        alert("missing data in html");
-        return;
-      }
-      // sessionStorage.removeItem('rec' + seisId);
-      // alert('rec' + seisId + ", " + seisId + ", " + fieldVal + ", " + fldNm);
-      if (fldNm.toString().search(/date/g) > -1) {
-        fieldVal = fieldVal.toString().replace(/-/g, "/");
-        $(this).val(fieldVal);
-      }
-      var cacheRec = JSON.parse(sessionStorage.getItem("rec" + seisId));
-      cacheRec[fldNm] = fieldVal;
-      sessionStorage.setItem("rec" + seisId, JSON.stringify(cacheRec));
+  // if shift key is down turning the cursor into a trash can and then delete on click (next function)
+  $("body").on("mousemove", ".gls", function () {
+    if (event.shiftKey) {
+      e.preventDefault();
+      $(".gls").css(
+        "cursor",
+        "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto"
+      );
+    } else {
+      $(".gls").css("cursor", "pointer");
+    }
+  });
 
+  $("body").on("click", ".snipThis", function (event) {
+    event.preventDefault();
+    snipInfo();
+  });
+  $(".btn").mouseup(function () {
+    $(this).blur();
+  });
+  // copy a text blaze snippet to clipboard when clicking on the item
+  $("body").on("click", '[name$="Copy"]', function () {
+    $(this).select();
+    document.execCommand("copy");
+  });
+  $(".btn-success").click(function () {
+    $(this).toggleClass("btn-active").siblings().removeClass("btn-active");
+    $(this).blur();
+  });
+  // when clicking on a table row, change the color of the field
+  $("body").on("mousedown", ".setStudent", function (event) {
+    event.preventDefault();
+    $(this).css("background-color", "#5bf5db");
+    // console.log('mouse down');
+  });
+
+  // this goes with the one just above changing the color back to White
+  $("body").on("mouseup mouseleave", ".setStudent", function (event) {
+    event.preventDefault();
+    $(this).css("background-color", "#ffffff");
+    // console.log('mouse up');
+  });
+
+  // record edited fields
+  $("body").on("change", ".stuEdit", function () {
+    var seisId = $("#seis_id").val();
+    var fieldVal = $(this).val();
+    var fldNm = $(this).attr("id");
+
+    if (!seisId || !fieldVal || !fldNm) {
+      alert("missing data in html");
+      return;
+    }
+    // sessionStorage.removeItem('rec' + seisId);
+    // alert('rec' + seisId + ", " + seisId + ", " + fieldVal + ", " + fldNm);
+    if (fldNm.toString().search(/date/g) > -1) {
+      fieldVal = fieldVal.toString().replace(/-/g, "/");
+      $(this).val(fieldVal);
+    }
+    var cacheRec = JSON.parse(sessionStorage.getItem("rec" + seisId));
+    cacheRec[fldNm] = fieldVal;
+    sessionStorage.setItem("rec" + seisId, JSON.stringify(cacheRec));
+
+    google.script.run
+      .withSuccessHandler()
+      .updateContactInfo(seisId, fldNm, fieldVal);
+
+    setTimeout(() => {
       google.script.run
-        .withSuccessHandler()
-        .updateContactInfo(seisId, fldNm, fieldVal);
-
-      setTimeout(() => {
-        google.script.run
-          .withSuccessHandler(showRosterTable)
-          .getTableData_roster();
-      }, 3000);
-    });
+        .withSuccessHandler(showRosterTable)
+        .getTableData_roster();
+    }, 3000);
+  });
   });
 
   $("body").on("change", ".logWindow", function () {
@@ -1700,46 +1784,35 @@
     }
     document.body.style.cursor = "default";
   }
-  // function appendSelectedGoals() {
-  //   $('#foundGoals').empty();
-  //   if (sessionStorage.getItem('selGoals_' + $('#seis_id').val()) !== null) {
-  //     var obj = JSON.parse(sessionStorage.getItem('selGoals_' + $('#seis_id').val()));
-  //     // console.log('hello world');
-  //     // console.log('the obj is %s', JSON.stringify(obj));
-  //     for (const key in obj) {
-  //       if (Object.hasOwnProperty.call(obj, key)) {
-  //         const element = obj[key];
-  //         console.log('key, element is %s, %s', JSON.stringify(key), JSON.stringify(element));
-  //         var annual = element.annual.toString();
-  //         console.log('annual is %s', annual);
+  function appendSelectedGoals() {
+    $('#foundGoals').empty();
+    if (sessionStorage.getItem('selGoals_' + $('#seis_id').val()) !== null) {
+      var obj = JSON.parse(sessionStorage.getItem('selGoals_' + $('#seis_id').val()));
+      // console.log('hello world');
+      // console.log('the obj is %s', JSON.stringify(obj));
+      for (const key in obj) {
+        if (Object.hasOwnProperty.call(obj, key)) {
+          const element = obj[key];
+          console.log('key, element is %s, %s', JSON.stringify(key), JSON.stringify(element));
+          var annual = element.annual.toString();
+          var standard = element.standard.toString();
+          console.log('annual is %s; standard is %s', annual, standard);
 
-  //         $('#foundGoals').append(
-  //           //   element.checkboxItem()
-  //           // )
-  //           "<div class='input-group-prepend'>" +
-  //           "<div  class='input-group-text'>" +
-  //           "<input type='checkbox' checked class='glChkBx' data-obj=" + element.id + ">" +
-  //           "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + element.id + " readonly>" +
-  //           element.annual +
-  //           "</textarea>" +
-  //           "</div>" +
-  //           "</div>");
-  //       }
-  //     }
-  //   }
-  // }
-  // function editLogEntryInModal(logObjStr){
-  //     logObj = JSON.stringify(logObjStr);
-  //     var myModal = new bootstrap.Modal(document.getElementById('logModal'), { focus: true });
-  // "seis_id": seis_id,
-  // "logEntry": logEntry,
-  // "nmjdob": nmjdob,
-  // "logId": logId
+          $('#foundGoals').append(
+            //   element.checkboxItem()
+            // )
 
-  //     $('#seis_id').val(logObj.seis_id);
-  //     $('#glEditLvl').val();
-  //     $('#glEditStrand').val(goal.strand);
-  //     myModal.show();
+            "<div class='input-group-prepend'>" +
+            "<div  class='input-group-text'>" +
+            "<input type='checkbox' checked class='glChkBx' data-obj=" + element.id + ">" +
+            "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + element.id + " readonly>" +
+            element.annual +
+            "</textarea>" +
+            "</div>" +
+            "</div>");
+        }
+      }
+    }
+  }
 
-  // }
 </script>
