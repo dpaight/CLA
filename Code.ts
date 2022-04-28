@@ -10,6 +10,93 @@ function allPupilsSheet() {
   );
   return ss2;
 }
+
+class Goal {
+  constructor(array) {
+    this['id'] = array[0];
+    this['lvl'] = array[1];
+    this['area'] = array[2];
+    this['strand'] = array[3];
+    this['annual'] = array[4];
+    this['standard'] = array[5];
+    this['objective1'] = array[6];
+    this['objective2'] = array[7];
+    this['objective3'] = array[8];
+    this['mod'] = array[9];
+  }
+  list() {
+    var item = '<li class="goalList" glId="' +
+      // @ts-ignore
+      this.id +
+      '">' +
+      '["' +
+      // @ts-ignore
+      this.lvl +
+      '"' +
+      ", " +
+      '"' +
+      // @ts-ignore
+      this.strand +
+      '"' +
+      ", " +
+      '"' +
+      // @ts-ignore
+      this.annual +
+      '"' +
+      ", " +
+      '"' +
+      // @ts-ignore
+      this.standard +
+      '"' +
+      ", " +
+      '"' +
+      // @ts-ignore
+      this.id +
+      '"]</li>';
+
+    return (item);
+  }
+  snip() {
+    var snip = "[" +
+      '"area" = "' +
+      // @ts-ignore
+      this.area +
+      '",' +
+      '"gl" = "' +
+      // @ts-ignore
+      this.annual +
+      '",' +
+      '"strand" = "' +
+      // @ts-ignore
+      this.strand +
+      '",' +
+      '"stnd" = "' +
+      // @ts-ignore
+      this.standard +
+      '"' +
+      "]";
+    return snip;
+  };
+  checkboxItem() {
+      // @ts-ignore
+    var me = this.id;
+    console.log('i am %s', me);
+    return "<div class='input-group-prepend'>" +
+      "<div  class='input-group-text'>" +
+      "<input type='checkbox' class='glChkBx' data-obj=" + me + ">" +
+      "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + me + " readonly >" +
+      // @ts-ignore
+      this.annual +
+      "</textarea>"
+    "</div>" +
+      "</div>"
+  }
+  saved() {
+      // @ts-ignore
+    "<li data-saved='" + snip() + "'>" + this.area + "</li>"
+  }
+}
+
 // from updateRoster.ts
 
 /**
@@ -297,7 +384,7 @@ function getGoalListItems(lvlArea = [2, "reading", "1010101"]) {
       (gLvl.toString() == glLvl.toString() && gArea == glArea) ||
       (glLvl == -1 && gArea == glArea)
     ) {
-      let foundGoal = new Goal(
+      var foundGoal = new Goal([
         gId,
         gLvl,
         gArea,
@@ -307,7 +394,7 @@ function getGoalListItems(lvlArea = [2, "reading", "1010101"]) {
         gO1,
         gO2,
         gO3
-      );
+      ]);
       listItems.push(foundGoal.list());
       foundGoals.push(foundGoal);
     }
@@ -339,7 +426,7 @@ function getGoal(gId = 47) {
         objctv2,
         objctv3,
       ] = el;
-      var goal = new Goal(
+      var goal = new Goal([
         id,
         grdLvl,
         area,
@@ -349,7 +436,7 @@ function getGoal(gId = 47) {
         objctv1,
         objctv2,
         objctv3
-      );
+      ]);
     }
     // return false;
   }
@@ -373,7 +460,7 @@ function getOneGoalForEditing(gId) {
         objctv3,
       ] = el;
 
-      return new Goal(
+      return new Goal([
         id,
         grdLvl,
         area,
@@ -383,7 +470,7 @@ function getOneGoalForEditing(gId) {
         objctv1,
         objctv2,
         objctv3
-      );
+      ]);
     }
   }
   return "goal " + gId + " not found";
@@ -2649,4 +2736,7 @@ function getLogEntries(id = '1010101', loc = null, startDate, endDate) {
   // Logger.log('allRecords = %s', JSON.stringify(allRecords));
   return JSON.stringify(allRecords, loc);
 }
+// function pullCached_selGoals_items() {
+//   return ss.getSheetByName('goalObjs').getDataRange().getValues();
+// }
 //# sourceMappingURL=module.jsx.map

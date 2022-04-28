@@ -23,6 +23,19 @@
             .withSuccessHandler(catchCheck)
             .withFailureHandler(catchFail)
             .checkForNewLogEntryRecordInCache();
+        // if (sessionStorage.getItem('selGoalChange') === null || sessionStorage.getItem('selGoalChange') !== 'false') {
+        //     google.script.run
+        //         .withSuccessHandler(update_selGoals_token)
+        //         .pullCached_selGoals_items();
+        // }
+    }
+    function update_selGoals_token(array) {
+        if (array.length > 0) {
+            array.forEach(element => {
+                sessionStorage.setItem(JSON.stringify(element[0]), JSON.stringify(element[1]));
+            });
+            sessionStorage.setItem('selGoalChange', 'false');
+        }
     }
 
     function catchCheck(record) {
