@@ -2628,7 +2628,7 @@ function saveLogEntryServer(logObj) {
   var row = [[new Date(), Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id]];
   var range = logResp.getRange(last + 1, 1, 1, row[0].length);
   range.setValues(row);
-  row = row[0];
+  row = row[0];elGoals_
   SpreadsheetApp.flush();
   return [JSON.stringify(logObj), JSON.stringify(row)];
 }
