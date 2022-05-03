@@ -1,517 +1,8 @@
-<script>
-  class Goal {
-    constructor( array ) {
-      this[ 'id' ] = array[ 0 ];
-      this[ 'lvl' ] = array[ 1 ];
-      this[ 'area' ] = array[ 2 ];
-      this[ 'strand' ] = array[ 3 ];
-      this[ 'annual' ] = array[ 4 ];
-      this[ 'standard' ] = array[ 5 ];
-      this[ 'objective1' ] = array[ 6 ];
-      this[ 'objective2' ] = array[ 7 ];
-      this[ 'objective3' ] = array[ 8 ];
-      this[ 'mod' ] = array[ 9 ];
-    }
-    list () {
-      var item = '<li class="goalList" glId="' +
-        this.id +
-        '">' +
-        '["' +
-        this.lvl +
-        '"' +
-        ", " +
-        '"' +
-        this.strand +
-        '"' +
-        ", " +
-        '"' +
-        this.annual +
-        '"' +
-        ", " +
-        '"' +
-        this.standard +
-        '"' +
-        ", " +
-        '"' +
-        this.id +
-        '"]</li>';
-
-      return ( item );
-    }
-    snip () {
-      var snip = "[" +
-        '"area" = "' +
-        this.area +
-        '",' +
-        '"gl" = "' +
-        this.annual +
-        '",' +
-        '"strand" = "' +
-        this.strand +
-        '",' +
-        '"stnd" = "' +
-        this.standard +
-        '"' +
-        "]";
-      return snip;
-    };
-    checkboxItem ( checked ) {
-      var me = this.id;
-      if ( checked === true ) {
-        var chkd = 'checked';
-      } else {
-        chkd = '';
-      }
-      console.log( 'i am %s', me );
-      return "<div class='input-group-prepend'>" +
-        "<div  class='input-group-text'>" +
-        "<input type='checkbox' class='glChkBx' " + chkd + " data-obj=" + me + ">" +
-        "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + me + " readonly >" +
-        "(" + this.standard + ") " + this.annual
-      "</textarea>"
-      "</div>" +
-        "</div>"
-    }
-    saved () {
-      "<li data-saved='" + snip() + "'>" + this.area + "</li>"
-    }
-  }
-
-  // The code in this function runs when the page is loaded.
-  $( document ).ready( function () {
-    // click student name in roster table switches to that student for both contact info and
-    // log entries
-    // $("#tbSnippetCopy").hide();
-    if ( sessionStorage.getItem( "lastId" ) == null ) {
-      google.script.run.withSuccessHandler( cacheEm ).getRecord( "all" );
-
-      function cacheEm ( array ) {
-        for ( let i = 0; i < array.length; i++ ) {
-          const el = array[ i ];
-
-          sessionStorage.setItem( "lastId", el.seis_id );
-          let nm = "rec" + el.seis_id;
-          let val = JSON.stringify( el );
-          sessionStorage.setItem( nm, val );
-        }
-      }
-    } else {
-      var id = sessionStorage.getItem( "lastId" );
-      contactInfo( id );
-    }
-    if ( sessionStorage.getItem( 'goals' ) === null ) {
-      google.script.run
-        .withSuccessHandler( haveGoals )
-        .myGet( 'goals' );
-    } else {
-      var values = JSON.parse( sessionStorage.getItem( 'goals' ) );
-      haveGoals( [ true, values, true, true, true, true ] );
-    }
-
-    var tooltipTriggerList = [].slice.call(
-      document.querySelectorAll( '[data-bs-toggle="tooltip"]' )
-    );
-    var tooltipList = tooltipTriggerList.map( function ( tooltipTriggerEl ) {
-      return new bootstrap.Tooltip( tooltipTriggerEl );
-    } );
-
-    $( "body" ).on( "click", ".goalList", function ( e ) {
-      // alert('fired');
-      e.preventDefault();
-      if ( e.ctrlKey ) {
-
-        var glId = $( this ).attr( "data-obj" ).toString();
-        var allGoals = JSON.parse( sessionStorage.getItem( 'goals' ) );
-        for ( let i = 0; i < allGoals.length; i++ ) {
-          var el = allGoals[ i ];
-          // alert(el[0] + ' ' + glId);
-          if ( el[ 0 ] == glId ) {
-            // alert('found');
-            var thisGoal = new Goal( el.flat() );
-            var snip = thisGoal.snip();
-
-            $( '#tbSnippetCopy' ).text( snip );
-            $( "#tbSnippetCopy" ).select();
-            document.execCommand( "copy" );
-          }
-        }
-      }
-    } )
-    $( "body" ).on( "change", "input:checkbox", function ( e ) {
-      e.preventDefault();
-      var selGoalsNm = 'selGoals_' + $( "#seis_id" ).val();
-      var glId = $( this ).attr( "data-obj" );
-      var isChecked = $( this ).is( ":checked" );
-
-      if ( sessionStorage.getItem( selGoalsNm ) === null ) {
-        var obj = [ "" ];
-        obj.shift();
-        console.log( 'created a selGoal obj, %s', JSON.stringify( obj ) );
-      } else {
-        obj = JSON.parse( sessionStorage.getItem( selGoalsNm ) );
-        console.log( selGoalsNm + ' already exits' );
-      }
-
-      if ( sessionStorage.getItem( 'selGoalsQueue' ) === null ) {
-        var selGoalsQueue = [ "" ];
-        selGoalsQueue.shift();
-        console.log( 'created a selGoalsQueue , %s', JSON.stringify( selGoalsQueue ) );
-      } else {
-        selGoalsQueue = JSON.parse( sessionStorage.getItem( 'selGoalsQueue' ) );
-        console.log( 'selGoalsQueue already exits: %s', JSON.stringify( selGoalsQueue ) );
-      }
-
-      if ( selGoalsQueue.indexOf( selGoalsNm ) === -1 ) {
-        selGoalsQueue.push( selGoalsNm );
-      }
-
-      var allGoals = JSON.parse( sessionStorage.getItem( 'goals' ) );
-      for ( let i = 0; i < allGoals.length; i++ ) {
-        const el = allGoals[ i ][ 0 ];
-        if ( el === glId ) {
-          var thisGoal = new Goal( allGoals[ i ] );
-          console.log( 'the new goal is %s; el is %s', JSON.stringify( thisGoal ), JSON.stringify( allGoals[ i ] ) );
-        }
-      }
-
-      if ( isChecked ) {
-        // alert('checked' + $(this).val());
-        console.log( 'the data-obj is %s', $( this ).attr( "data-obj" ) );
-        obj.push( glId );
-      } else {
-        obj.splice( obj.indexOf( glId ), 1 );
-      }
-      sessionStorage.setItem( selGoalsNm, JSON.stringify( obj ) );
-      sessionStorage.setItem( 'selGoalsQueue', JSON.stringify( selGoalsQueue ) );
-
-    } );
-
-    $( "table" ).on( "click tap", ".setStudent", function ( event ) {
-      event.preventDefault();
-      var id = $( this ).attr( "data-stuId" );
-
-      //       console.log('id = %s', id);
-      focus( id );
-    } );
-
-    $( "#ready" ).hide();
-    $( ".pleaseHide" ).hide();
-    // document.body.style.cursor = "wait";
-
-    $( "body" ).on( "dblclick dbl-tap", ".goalList", function ( e ) {
-      // console.log('event triggered a[name=goalList clicked');
-      e.preventDefault();
-      // open goal for editing
-      // console.log('this is %s', JSON.stringify($(this).text()));
-      var thisGoal = JSON.parse( $( this ).text() );
-      var gId = parseInt( thisGoal[ thisGoal.length - 1 ], 10 );
-      console.log( "gId = %s", gId );
-      google.script.run.withSuccessHandler( editGoalInModal ).getGoal( gId );
-    } );
-    // console.log('sent to goal edit: %s', $(this).text());
-    $( "body" ).on( "click", ".goalList", function ( e ) {
-      // console.log('put the goal number into a gl field');
-      if ( e.ctrlKey ) {
-        e.preventDefault();
-        var item = JSON.parse( $( this ).text() );
-        var gId = item[ item.length - 1 ];
-        // item = item.toString().match(/\d+$/);
-
-        $( ".gls" ).each( function ( i, el ) {
-          if ( $( this ).val() == "" ) {
-            $( this ).val( gId );
-            $( this ).attr( "title", gId );
-            return false;
-          }
-        } );
-        var crntScrl = $( window ).scrollTop();
-      }
-    } );
-
-    // // shift-click clears a litte goal number box
-    // // click builds text blaze snippet from data in table
-    // $("body").on("click", ".gls", function (event) {
-    //   if (event.shiftKey) {
-    //     e.preventDefault();
-    //     $(this).val("");
-    //     $(this).attr("title", "");
-    //   } else {
-    //     var id = $("#seis_id").val();
-    //     var gId = $(this).val();
-    //     google.script.run
-    //       .withSuccessHandler(showTBsnippetGl)
-    //       .getOneGoalForEditing(gId);
-    //   }
-    // });
-
-    // $("body").on("click", "#emParentsMenuItem", emParents());
-
-    $( function () {
-      $( '[data-toggle="tooltip"]' ).tooltip();
-    } );
-    // console.log('gSmL is %s', gSmL);
-
-    $( "body" ).on( "click", "#gVoiceMenuItem", function () {
-      firstSnipThenGvoice();
-    } );
-    $( ".alert" ).alert();
-
-    //set cursor to pointer when entering a nav item
-    $( "body" ).on( "mouseenter", ".nav-link", function () {
-      $( this ).css( "cursor", "pointer" );
-    } );
-
-    // set cursor to pointer when entering table row
-    $( "body" ).on( "mouseenter", ".setStudent", function () {
-      $( ".setStudent" ).css( "cursor", "pointer" );
-    } );
-
-    //set cursor to pointer when entering an icon
-    $( "body" ).on( "mouseenter", ".material-icons", function () {
-      $( ".setStudent" ).css( "cursor", "pointer" );
-    } );
-
-    // set cursor to normal when leaving an icon
-    $( "body" ).on( "mouseleave", ".material-icons", function () {
-      $( ".setStudent" ).css( "cursor", "default" );
-    } );
-
-    // modals
-    $( "body" ).on( "show.srchModal.modal", function () { } );
-
-    $( "body" ).on( "show.bs.modal", function () {
-      // alert('event');
-      var addresses = (
-        $( "#teachemail" ).val() +
-        "," +
-        $( "#Parent_1_Email" ).val() +
-        "," +
-        $( "#u3_Parent_1a_Email" ).val()
-      ).replace( /,$/, "" );
-      var subject = $( "#stuName" ).val();
-      // console.log(addresses);
-      $( "#emailRecipients" ).val( addresses );
-      $( "#emailSubject" ).val( subject );
-    } );
-    // change the cursor to a pointer when entering a text Blaze field
-    $( "body" ).on( "mouseenter", '[name$="Copy"]', function () {
-      $( "[name$='Copy']" ).css( "cursor", "pointer" );
-    } );
-
-    // if shift key is down turning the cursor into a trash can and then delete on click (next function)
-    $( "body" ).on( "mousemove", ".gls", function () {
-      if ( event.shiftKey ) {
-        e.preventDefault();
-        $( ".gls" ).css(
-          "cursor",
-          "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto"
-        );
-      } else {
-        $( ".gls" ).css( "cursor", "pointer" );
-      }
-    } );
-
-    $( "body" ).on( "click", ".snipThis", function ( event ) {
-      event.preventDefault();
-      snipInfo();
-    } );
-    $( ".btn" ).mouseup( function () {
-      $( this ).blur();
-    } );
-    // copy a text blaze snippet to clipboard when clicking on the item
-    $( "body" ).on( "click", '[name$="Copy"]', function () {
-      $( this ).select();
-      document.execCommand( "copy" );
-    } );
-    $( ".btn-success" ).click( function () {
-      $( this ).toggleClass( "btn-active" ).siblings().removeClass( "btn-active" );
-      $( this ).blur();
-    } );
-    // when clicking on a table row, change the color of the field
-    $( "body" ).on( "mousedown", ".setStudent", function ( event ) {
-      event.preventDefault();
-      $( this ).css( "background-color", "#5bf5db" );
-      // console.log('mouse down');
-    } );
-
-    // this goes with the one just above changing the color back to White
-    $( "body" ).on( "mouseup mouseleave", ".setStudent", function ( event ) {
-      event.preventDefault();
-      $( this ).css( "background-color", "#ffffff" );
-      // console.log('mouse up');
-    } );
-
-    // record edited fields
-    $( "body" ).on( "change", ".stuEdit", function () {
-      var seisId = $( "#seis_id" ).val();
-      var fieldVal = $( this ).val();
-      var fldNm = $( this ).attr( "id" );
-
-      if ( !seisId || !fieldVal || !fldNm ) {
-        alert( "missing data in html" );
-        return;
-      }
-      // sessionStorage.removeItem('rec' + seisId);
-      // alert('rec' + seisId + ", " + seisId + ", " + fieldVal + ", " + fldNm);
-      if ( fldNm.toString().search( /date/g ) > -1 ) {
-        fieldVal = fieldVal.toString().replace( /-/g, "/" );
-        $( this ).val( fieldVal );
-      }
-      var cacheRec = JSON.parse( sessionStorage.getItem( "rec" + seisId ) );
-      cacheRec[ fldNm ] = fieldVal;
-      sessionStorage.setItem( "rec" + seisId, JSON.stringify( cacheRec ) );
-
-      google.script.run
-        .withSuccessHandler()
-        .updateContactInfo( seisId, fldNm, fieldVal );
-
-      setTimeout( () => {
-        google.script.run
-          .withSuccessHandler( showRosterTable )
-          .getTableData_roster();
-      }, 3000 );
-    } );
-  } );
-
-  $( "body" ).on( "change", ".logWindow", function () {
-    filterLogEntriesByDateWindow();
-  } );
-  //save changes to spreadsheet
-  $( "body" ).on( "change", "#notes2", function ( event ) {
-    var id = $( "#seis_id" ).val();
-    var field = $( this ).attr( "id" );
-    var value = $( this ).val();
-
-    console.log( "id = %s, field = %s, value = %s", id, field, value );
-    google.script.run
-      .withSuccessHandler( showNotes ) // works with returned values: id, index, value
-      .getNotes( [ id, value ] );
-  } );
-
-  $( "body" ).on( "click", ".saveEntryBtn", function ( event ) {
-    event.preventDefault();
-    document.body.style.cursor = "wait";
-    if ( entry.length > 0 ) {
-      var logObj = LogEntry( [
-        $( "#seis_id" ).val(),
-        $( "#logEntry" ).val(),
-        $( "#nmjdob" ).val(),
-        null,
-      ] );
-      // console.log('id and entry are %s and %s', id, entry);
-      console.log( "saving: %s", JSON.stringify( logObj ) );
-
-      google.script.run
-        .withSuccessHandler( updateLogEntryCache )
-        .saveLogEntry( [ logObj, null ] );
-    }
-    document.body.style.cursor = "default";
-    $( "#logEntry" ).val( "" );
-  } );
-
-  $( "body" ).on( "keypress", ".saveEntryBtn", function ( event ) {
-    $( this ).addClass( "active" );
-    event.preventDefault();
-    document.body.style.cursor = "wait";
-
-    var entry = $( "#logEntry" ).val().toString().replace( /\n/g, "->" );
-    console.log( "entry is %s", entry );
-    var id = $( "#seis_id" ).val();
-    var nmjdob = $( "#nmjdob" ).val();
-    if ( entry.length > 0 ) {
-      $( "html,body" ).css( "cursor", "wait" );
-      // console.log('id and entry are %s and %s', id, entry);
-      google.script.run
-        .withSuccessHandler( updateLogEntryCache )
-        .saveLogEntry( [ id, entry, nmjdob ] );
-    }
-    document.body.style.cursor = "default";
-    $( this ).removeClass( "active" );
-    $( "#logEntry" ).val( "" );
-  } );
-  // turn the color of the button back to green without doing anything
-  $( "body" ).on( "click", "#cancelEntryBtn", function ( event ) {
-    event.preventDefault();
-    $( "#saveEntry" ).attr( "class", "btn btn-sm btn-success my-1 svChngs" );
-  } );
-
-  // click builds text blaze snippet from data in table
-  $( "body" ).on( "click", "#getIEPcompForm", function ( event ) {
-    var flName = $( "#stuName" ).val( "" );
-    var fn = flName.replace( /([A-z]+)( .*)/g, "$1" );
-    var ln = flName.replace( /([A-z]+ )(.*)/g, "$2" );
-    var dob = $( "#dob" ).val( "" );
-
-    document.execCommand( "copy" );
-
-    $( this ).attr( "title", "" );
-
-    var gId = $( this ).val();
-    google.script.run.withSuccessHandler( showTBsnippetGl ).getGoal( gId );
-  } );
-
-  // retrieves data from a seis generated csv file (seis search report)
-  $( "body" ).on( "click", "#seis_roster", function ( event ) {
-    event.preventDefault();
-    document.body.style.cursor = "wait";
-    var id = $( "#seis_id" ).val();
-    google.script.run.withSuccessHandler( reloadMe ).updateRoster();
-    setTimeout( () => {
-      "google.script.run.updateLogForm();";
-    }, 15000 );
-  } );
-
-  $( "body" ).on( "mouseenter", ".logEntry", function () {
-    $( this ).css( "cursor", "pointer" );
-  } );
-
-  $( "body" ).on( "dblclick", ".logEntry", function ( e ) {
-    // console.log('event triggered a[name=goalList clicked');
-    // open goal for editing
-    e.preventDefault();
-    // $("#logEntry").val($(this).closest("tr").find("td:nth-child(2)").text());
-    //       console.log('log entry id is %s', logId);
-    $( "#editEntry" ).val();
-    console.log( $( this ).closest( "tr" ).find( "td:nth-child(1)" ).text() );
-    console.log( $( this ).closest( "tr" ).find( "td:nth-child(2)" ).text() );
-    // console.log($(this).closest("tr").find("td:nth-child(2)").text());
-
-    $( "#editEntry" ).val( $( this ).closest( "tr" ).find( "td:nth-child(2)" ).text() );
-    $( "#editDate" ).val( $( this ).closest( "tr" ).find( "td:nth-child(1)" ).text() );
-    $( "#editId" ).val(
-      $( this ).closest( "tr" ).find( "td:nth-child(2)" ).data( "entry_id" )
-    );
-
-    var myModal = new bootstrap.Modal( document.getElementById( "logEntryModal" ) );
-    myModal.show();
-
-    // console.log(JSON.stringify(logObj));
-  } );
-  $( ".logEntry" ).bind( "taphold", function ( e ) {
-    // console.log('event triggered a[name=goalList clicked');
-    e.preventDefault();
-    // open goal for editing
-    var logId = $( this ).data( "entry_id" );
-    //       console.log('log entry id is %s', logId);
-    google.script.run
-      .withSuccessHandler( editLogEntryInModal )
-      .getLogEntry( logId );
-  } );
-
-  $( "body" ).on( "click", ".sendEmail", function () {
-    //       console.log('seis_id is ', $("#seis_id").val());
-    var emadr = $( "#teach_email" ).val();
-    //       console.log('email address is: %s', emadr);
-  } );
-  startup();
-
-
-
 
   function startup ( id = sessionStorage.getItem( "lastId" ) ) {
     $( "#spinner01" ).show();
     // id = getPointer();
-    getSelGoals_client();
+    get_selGoals_from_server_clientSide();
     if ( id == undefined || id == null ) {
       google.script.run
         .withSuccessHandler( setPointerAndStart )
@@ -520,16 +11,23 @@
       // contactInfo(id);
       // focus(id);
       // console.log('current id at startup is %s', id);
-
       document.body.style.cursor = "wait";
       google.script.run
         .withSuccessHandler( showRosterTable )
         .getTableData_roster();
-
-      getSelGoals_client();
-      focus( id );
+    }
+    if ( sessionStorage.getItem( 'goals' ) === null ) {
+      google.script.run
+        .withSuccessHandler( haveGoals )
+        .myGet( 'goals' );
+    } else {
+      var values = JSON.parse( sessionStorage.getItem( 'goals' ) );
+      haveGoals( [ true, values, true, true, true, true ] );
 
     }
+
+    focus( id );
+
   }
   function setPointerAndStart ( id ) {
     setPointer( id );
@@ -549,7 +47,7 @@
   function focus ( id ) {
     setPointer( id );
     contactInfo( id );
-
+    appendSelectedGoals( id );
     if ( sessionStorage.getItem( "reclog" + id ) != null ) {
       var logs = JSON.parse( sessionStorage.getItem( "reclog" + id ) );
       showLog( logs, "loc01" );
@@ -559,7 +57,7 @@
         .withSuccessHandler( logsToCache )
         .getLogEntries( id, "loc01" );
     }
-    getSelGoals_client();
+
   }
   function sleep ( ms ) {
     return new Promise( ( resolve ) => setTimeout( resolve, ms ) );
@@ -569,7 +67,7 @@
     if ( id == undefined || id == null || id == "" ) {
       alert( "no id at contactInfo()" );
     }
-    // $('#foundGoals').empty();
+    $( '#foundGoals' ).empty();
     if ( sessionStorage.getItem( "rec" + id.toString() ) != null ) {
       console.log( "rec + id key was not null" );
       showContactInfo( sessionStorage.getItem( "rec" + id.toString() ) );
@@ -579,6 +77,7 @@
         .withSuccessHandler( showContactInfo )
         .getRecord( id.toString() );
     }
+
     // google.script.run
     //   .withSuccessHandler(showNotes)
     //   .getNotes(id);
@@ -681,6 +180,8 @@
     function shortDate ( dateObj ) {
       return dayjs( dateObj ).format( "MM/DD/YYYY" );
     }
+
+
     console.log( "record = %s", JSON.stringify( record ) );
     var key = "rec" + record.seis_id;
     sessionStorage.setItem( key, JSON.stringify( record ) );
@@ -737,7 +238,10 @@
     } else {
       $( "#corrlng" ).css( "color", "#000000" );
     }
+
+    get_selGoals_from_server_clientSide();
   }
+
   function phoneFmt ( phone ) {
     if ( phone == null || phone == undefined || phone == "" ) {
       return "";
@@ -1074,7 +578,6 @@
     }
     store( data );
     $( "#spinner01" ).hide();
-
     return "rosterList", 0;
   }
 
@@ -1573,6 +1076,7 @@
       var val = JSON.stringify( elAll[ 1 ] );
       sessionStorage.setItem( key, val );
     }
+
     focus( sessionStorage.getItem( "lastId" ) );
   }
   function openLogPrintDialog () {
@@ -1753,109 +1257,31 @@
     document.body.style.cursor = "default";
   }
 
-  function updateSessionStorage ( array ) {
-    var [ seisId, fldNm, fieldVal ] = array;
-    var key = sessionStorage.getItem( "rec" + seisId );
-    var cachedRecord = JSON.parse( sessionStorage.getItem( key ) );
-    cachedRecord[ fldNm ] = fieldVal;
-    sessionStorage.setItem( key, JSON.stringify( cachedRecord ) );
+  <script>
+
+$( document ).ready( function () {
+
+  // idleLogout();
+  // function idleLogout() {
+  var t;
+  window.addEventListener( "mousemove", resetTimer, true );
+  window.addEventListener( "mousedown", resetTimer, true );
+  window.addEventListener( "mousedown", resetTimer, true );
+  window.addEventListener( "touchstart", resetTimer, true );
+  window.addEventListener( "click", resetTimer, true );
+  window.addEventListener( "keydown", resetTimer, true );
+  window.addEventListener( 'scroll', resetTimer, true ); // improved; see comments
+  function catchFail ( error ) { };
+
+  function resetTimer () {
+    clearTimeout( t );
+    t = setTimeout( checkForNewLogEntries, 6000 );  // time is in milliseconds
   }
-  function haveGoals ( data ) {
-    var [ headings, values, sheet, range, lastR, lastC ] = data;
-    if ( headings !== true ) {
-      sessionStorage.setItem( 'goals', JSON.stringify( values ) );
-    }
-  }
-  // search the goal bank for goals of a given level and area
-  function findGoals () {
-    var glLvl = $( "#glLvl" ).children( "option:selected" ).val().toString();
-    var glLvlElid = $( "#glLvl" ).children( "option:selected" ).attr( "id" ).toString();
+  function checkForNewLogEntries () {
+  google.script.run
+    .withSuccessHandler( catchCheck )
+    .withFailureHandler( catchFail )
+    .checkForNewLogEntryRecordInCache();
+}
 
-    var glArea = $( "#glArea" ).children( "option:selected" ).val().toString();
-    var glAreaElid = $( "#glArea" ).children( "option:selected" ).attr( "id" ).toString();
-
-    var id = $( "#seis_id" ).val();
-    // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
-
-    sessionStorage.setItem( "glLvl", glLvl );
-    sessionStorage.setItem( "glArea", glArea );
-    // sessionStorage.setItem("grdLvl", grdLvl);
-    // sessionStorage.setItem("area", area);
-
-    var goalTable = JSON.parse( sessionStorage.getItem( 'goals' ) );
-    console.log( 'got goal table' );
-    $( "#foundGoals" ).empty();
-
-    var selGoals = ( sessionStorage.getItem( 'selGoals_' + $( '#seis_id' ).val() ) ) !== null ?
-      JSON.parse( sessionStorage.getItem( 'selGoals_' + $( '#seis_id' ).val() ) ) :
-      [];
-
-    console.log( 'the selGoals_nnnnnnn is %s', JSON.stringify( selGoals ) );
-
-
-    var goalItemsChkd = [];
-    var goalItemsUnChkd = [];
-    for ( let i = 0; i < goalTable.length; i++ ) {
-      const el = goalTable[ i ];
-      var [ id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, modified ] = el;
-      // console.log(glLvl, grdLvl, glArea, area);
-      if ( selGoals.indexOf( el[ 0 ] ) > -1 ) {
-        let item = new Goal( [ id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, modified ] );
-        goalItemsChkd.push( item );
-      } else if ( glArea == area && glLvl == grdLvl ) {
-        let item = new Goal( [ id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, modified ] );
-        goalItemsUnChkd.push( item );
-      }
-    }
-    for ( let j = 0; j < goalItemsChkd.length; j++ ) {
-      const el = goalItemsChkd[ j ];
-      $( "#foundGoals" ).append( el.checkboxItem( true ) );
-    }
-    for ( let j = 0; j < goalItemsUnChkd.length; j++ ) {
-      const el = goalItemsUnChkd[ j ];
-      $( "#foundGoals" ).append( el.checkboxItem( false ) );
-    }
-    document.body.style.cursor = "default";
-  }
-  function putSelGoals_client () {
-    if ( sessionStorage.getItem( 'selGoalsQueue' ) !== null ) {
-      var selGoalsQueue = JSON.parse( sessionStorage.getItem( 'selGoalsQueue' ) );
-      var putData = [];
-      for ( let i = 0; i < selGoalsQueue.length; i++ ) {
-        const key = selGoalsQueue[ i ];
-        const value = sessionStorage.getItem( key );
-        putData.push( [ key, value ] )
-      }
-      google.script.run
-        .withSuccessHandler( function () { sessionStorage.removeItem( 'selGoalsQueue' ); } )
-        .withFailureHandler()
-        .putSelGoals_server( putData );
-    }
-
-  }
-  function getSelGoals_client () {
-    var selGoalsQueue = JSON.parse( sessionStorage.getItem( 'selGoalsQueue' ) );
-    google.script.run
-      .withSuccessHandler( cacheAndDisplaySelGoals )
-      .getSelGoals_server( selGoalsQueue );
-
-    function cacheAndDisplaySelGoals ( array ) {
-      for ( let i = 0; i < array.length; i++ ) {
-        const el = array[ i ];
-        sessionStorage.setItem( el[ 0 ], el[ 1 ] );
-      }
-      var key = 'selGoals_' + $( '#seis_id' ).val();
-      var goals = JSON.parse( sessionStorage.getItem( 'goals' ) );
-      $( '#foundGoals' ).empty();
-      if ( sessionStorage.getItem( key ) !== null ) {
-        var selGoals = JSON.parse( sessionStorage.getItem( key ) );
-        goals.forEach( element => {
-          if ( selGoals.indexOf( element[ 0 ] ) !== -1 ) {
-            let grbGoal = new Goal( element );
-            $( '#foundGoals' ).append( grbGoal.checkboxItem( true ) );
-          }
-        } );
-      }
-    }
-  }
-</script>
+} );

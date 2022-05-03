@@ -3,12 +3,12 @@
     // function idleLogout() {
     var t;
 
-    window.addEventListener("mousemove", resetTimer, true);
-    window.addEventListener("mousedown", resetTimer, true);
-    window.addEventListener("mousedown", resetTimer, true);
-    window.addEventListener("touchstart", resetTimer, true);
-    window.addEventListener("click", resetTimer, true);
-    window.addEventListener("keydown", resetTimer, true);
+    window.addEventListener( "mousemove", resetTimer, true );
+    window.addEventListener( "mousedown", resetTimer, true );
+    window.addEventListener( "mousedown", resetTimer, true );
+    window.addEventListener( "touchstart", resetTimer, true );
+    window.addEventListener( "click", resetTimer, true );
+    window.addEventListener( "keydown", resetTimer, true );
 
     // window.onload = resetTimer;
     // window.onmousemove = resetTimer;
@@ -16,12 +16,12 @@
     // window.ontouchstart = resetTimer; // catches touchscreen swipes as well 
     // window.onclick = resetTimer;      // catches touchpad clicks as well
     // window.onkeydown = resetTimer;
-    window.addEventListener('scroll', resetTimer, true); // improved; see comments
+    window.addEventListener( 'scroll', resetTimer, true ); // improved; see comments
 
-    function checkForNewLogEntries() {
+    function checkForNewLogEntries () {
         google.script.run
-            .withSuccessHandler(catchCheck)
-            .withFailureHandler(catchFail)
+            .withSuccessHandler( catchCheck )
+            .withFailureHandler( catchFail )
             .checkForNewLogEntryRecordInCache();
         // if (sessionStorage.getItem('selGoalChange') === null || sessionStorage.getItem('selGoalChange') !== 'false') {
         //     google.script.run
@@ -29,28 +29,20 @@
         //         .pullCached_selGoals_items();
         // }
     }
-    function update_selGoals_token(array) {
-        if (array.length > 0) {
-            array.forEach(element => {
-                sessionStorage.setItem(JSON.stringify(element[0]), JSON.stringify(element[1]));
-            });
-            sessionStorage.setItem('selGoalChange', 'false');
-        }
-    }
-
-    function catchCheck(record) {
+    function catchCheck ( record ) {
         //         console.log('val at catchCheck:', record);
-        if (record == -1) {
+        putSelGoals_client();
+        if ( record == -1 ) {
             return;
         } else {
-            updateLogEntryCache(record);
+            updateLogEntryCache( record );
         }
     }
-    function catchFail(error) { };
+    function catchFail ( error ) { };
 
-    function resetTimer() {
-        clearTimeout(t);
-        t = setTimeout(checkForNewLogEntries, 6000);  // time is in milliseconds
+    function resetTimer () {
+        clearTimeout( t );
+        t = setTimeout( checkForNewLogEntries, 6000 );  // time is in milliseconds
     }
     // }
 </script>
