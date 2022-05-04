@@ -82,6 +82,7 @@
     // click student name in roster table switches to that student for both contact info and
     // log entries
     // $("#tbSnippetCopy").hide();
+
     if ( sessionStorage.getItem( "lastId" ) == null ) {
       google.script.run.withSuccessHandler( cacheEm ).getRecord( "all" );
 
@@ -152,12 +153,12 @@
         console.log( selGoalsNm + ' already exits' );
       }
 
-      if ( sessionStorage.getItem( 'selGoalsQueue' ) === null ) {
+      if ( localStorage.getItem( 'selGoalsQueue' ) === null ) {
         var selGoalsQueue = [ "" ];
         selGoalsQueue.shift();
         console.log( 'created a selGoalsQueue , %s', JSON.stringify( selGoalsQueue ) );
       } else {
-        selGoalsQueue = JSON.parse( sessionStorage.getItem( 'selGoalsQueue' ) );
+        selGoalsQueue = JSON.parse( localStorage.getItem( 'selGoalsQueue' ) );
         console.log( 'selGoalsQueue already exits: %s', JSON.stringify( selGoalsQueue ) );
       }
 
@@ -182,7 +183,7 @@
         obj.splice( obj.indexOf( glId ), 1 );
       }
       sessionStorage.setItem( selGoalsNm, JSON.stringify( obj ) );
-      sessionStorage.setItem( 'selGoalsQueue', JSON.stringify( selGoalsQueue ) );
+      localStorage.setItem( 'selGoalsQueue', JSON.stringify( selGoalsQueue ) );
 
     } );
 
@@ -1818,8 +1819,8 @@
     document.body.style.cursor = "default";
   }
   function putSelGoals_client () {
-    if ( sessionStorage.getItem( 'selGoalsQueue' ) !== null ) {
-      var selGoalsQueue = JSON.parse( sessionStorage.getItem( 'selGoalsQueue' ) );
+    if ( localStorage.getItem( 'selGoalsQueue' ) !== null ) {
+      var selGoalsQueue = JSON.parse( localStorage.getItem( 'selGoalsQueue' ) );
       var putData = [];
       for ( let i = 0; i < selGoalsQueue.length; i++ ) {
         const key = selGoalsQueue[ i ];
@@ -1827,14 +1828,15 @@
         putData.push( [ key, value ] )
       }
       google.script.run
-        .withSuccessHandler( function () { sessionStorage.removeItem( 'selGoalsQueue' ); } )
+        .withSuccessHandler( remove_selGoalsQueue )
         .withFailureHandler()
         .putSelGoals_server( putData );
     }
-
+    function remove_selGoalsQueue () { localStorage.removeItem( 'selGoalsQueue' ); } 
   }
   function getSelGoals_client () {
-    var selGoalsQueue = JSON.parse( sessionStorage.getItem( 'selGoalsQueue' ) );
+
+    var selGoalsQueue = JSON.parse( localStorage.getItem( 'selGoalsQueue' ) );
     google.script.run
       .withSuccessHandler( cacheAndDisplaySelGoals )
       .getSelGoals_server( selGoalsQueue );
@@ -1846,16 +1848,22 @@
       }
       var key = 'selGoals_' + $( '#seis_id' ).val();
       var goals = JSON.parse( sessionStorage.getItem( 'goals' ) );
+      var count = 0;
       $( '#foundGoals' ).empty();
       if ( sessionStorage.getItem( key ) !== null ) {
+        // var count = 0;
         var selGoals = JSON.parse( sessionStorage.getItem( key ) );
-        goals.forEach( element => {
+        for ( let i = 0; i < goals.length; i++ ) {
+          const element = goals[ i ];
           if ( selGoals.indexOf( element[ 0 ] ) !== -1 ) {
             let grbGoal = new Goal( element );
             $( '#foundGoals' ).append( grbGoal.checkboxItem( true ) );
+            count++;
+            if(count >= selGoals.length){break};
           }
-        } );
+        }
       }
     }
   }
+
 </script>

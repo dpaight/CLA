@@ -2,7 +2,7 @@
     // idleLogout();
     // function idleLogout() {
     var t;
-
+    window.addEventListener( "close", checkForUnsaved, true );
     window.addEventListener( "mousemove", resetTimer, true );
     window.addEventListener( "mousedown", resetTimer, true );
     window.addEventListener( "mousedown", resetTimer, true );
@@ -44,5 +44,12 @@
         clearTimeout( t );
         t = setTimeout( checkForNewLogEntries, 6000 );  // time is in milliseconds
     }
-    // }
+    function checkForUnsaved() {
+    if(localStorage.getItem('selGoalsQueue') === null) {
+      // do nothing
+    } else {
+      alert('unsaved data');
+      throw "aborted";
+    }
+  }
 </script>
