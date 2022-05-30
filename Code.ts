@@ -2617,7 +2617,7 @@ var ss = SpreadsheetApp.getActiveSpreadsheet();
  * @param logObj 
  * @returns 
  */
-function saveLogEntryServer ( logObj ) {
+function saveNewLogEntryServer ( logObj ) {
   // var obj = {
   //     "seis_id": id,
   //     "logEntry": entry,
@@ -2653,16 +2653,17 @@ function saveLogEntryServer ( logObj ) {
  
  * @returns 
  */
-function saveEditedLogEntryServer ( logObjStr ) {
+function saveEditedLogEntryServer_hold ( logObjStr ) {
   Logger.log( logObjStr );
   var [ headings, values, sheet, range, lastR, lastC ] = myGet( 'logRespMerged' );
+  headings.shift();
   var logObj = JSON.parse( logObjStr );
   var row = [ logObj.logDate, Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id ];
   Logger.log( 'the row is %s', JSON.stringify( row ) );
   var lid_index = headings.indexOf( 'log_entry_id' );
   for ( let i = 0; i < values.length; i++ ) {
     var el = values[ i ];
-    var entryIDindex = headings.indexOf( 'logId' );
+    // var entryIDindex = headings.indexOf( 'logId' );
     if ( el[ lid_index ] == logObj.logId ) {
       if ( logObj.remove == true ) {
         values.splice( i, 1 );
@@ -2679,6 +2680,45 @@ function saveEditedLogEntryServer ( logObjStr ) {
   var output = [ headings ].concat( values );
   range = sheet.getRange( 1, 1, output.length, output[ 0 ].length );
   range.setValues( output );
+  return JSON.stringify( logObj );
+}
+function saveEditedLogEntryServer ( logObjStr ) {
+  Logger.log( logObjStr );
+  var [ headings, values, sheet, range, lastR, lastC ] = myGet( 'logRespMerged' );
+  var logObj = JSON.parse( logObjStr );
+  var row = [ logObj.logDate, Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id ];
+  Logger.log( 'the row is %s', JSON.stringify( row ) );
+  if ( !row ) { throw "the 'row' is null or undefined" };
+  var lid_index = headings.indexOf( 'log_entry_id' );
+  Logger.log( 'lid_index is %s', lid_index );
+  for ( let i = 0; i < values.length; i++ ) {
+    var el = values[ i ];
+    // var entryIDindex = headings.indexOf( 'logId' );
+    if ( el[ lid_index ] == logObj.logId ) {
+      range = sheet.getRange( i + 1, 1, 1, el.length );
+
+      var checkRow = range.getValues();
+      checkRow = checkRow[ 0 ];
+      Logger.log( 'i: %s, checkRow: %s, row: %s', i, JSON.stringify( checkRow ), JSON.stringify( row ) );
+      if ( checkRow[ 4 ] === row[ 4 ] ) {
+        if ( logObj.remove == true ) {
+          sheet.deleteRows( i + 1 );
+        } else {
+          range.setValues( [ row ] );
+        }
+      } else {
+        Logger.log( 'checkRow[4] and row[4]: %s, %s', checkRow[ 4 ].toString(), row[ 4 ].toString() )
+      }
+      Logger.log( 'the index to the record was %s', i );
+      break;
+    }
+    // var test = ss.insertSheet('test');
+  }
+  // var test = ss.getSheetByName('test');
+  // sheet.clearContents();
+  // var output = [ headings ].concat( values );
+  // range = sheet.getRange( 1, 1, output.length, output[ 0 ].length );
+  // range.setValues( output );
   return JSON.stringify( logObj );
 }
 
@@ -2773,8 +2813,8 @@ function putSelGoals_server ( checkedGoals ) {
     if ( checkedGoals.length > 0 ) {
       values = values.concat( checkedGoals );
     }
-    Logger.log('the data to write is %s', JSON.stringify(values));
-    
+    Logger.log( 'the data to write is %s', JSON.stringify( values ) );
+
     sheet.clear();
     var destRange = sheet.getRange( 1, 1, values.length, 2 );
     destRange.setValues( values );
@@ -2783,4 +2823,28 @@ function putSelGoals_server ( checkedGoals ) {
     return error;
   }
   return 'success';
+}
+function getCellCounts () {
+  var rows, columns, cells, sheetName, dataRows;
+  var sheets = ss.getSheets();
+  dataRows = [ [ 'name', 'rows', 'columns', 'cells' ] ];
+
+  for ( let i = 0; i < sheets.length; i++ ) {
+    const el = sheets[ i ];
+    let name = el.getName();
+    if ( name === 'counts' ) {
+      el.activate();
+      ss.deleteActiveSheet();
+      sheets.splice( i, 1 );
+    }
+    let rows = el.getMaxRows();
+    let columns = el.getMaxColumns();
+    let cells = rows * columns;
+    dataRows.push( [ name, rows, columns, cells ] );
+  }
+  sheets[ 0 ].activate();
+  var destSheet = ss.insertSheet( 'counts' );
+  var range = destSheet.getRange( 1, 1, dataRows.length, dataRows[ 0 ].length );
+  range.setValues( dataRows );
+  destSheet.setFrozenRows( 1 );
 }

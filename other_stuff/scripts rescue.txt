@@ -1040,10 +1040,10 @@
 
   function logServices ( string ) {
     $( "#logEntry" ).val( string );
-    saveLogEntryClient();
+    saveNewLogEntryClient();
   }
 
-  function saveLogEntryClient () {
+  function saveNewLogEntryClient () {
     console.log( $( "#logEntry" ).val().toString() );
     document.body.style.cursor = "wait";
     if ( $( "#logEntry" ).val().toString().length > 0 ) {
@@ -1060,7 +1060,7 @@
 
       google.script.run
         .withSuccessHandler( updateLogEntryCache ) // server returns the same object
-        .saveLogEntryServer( logObj );
+        .saveNewLogEntryServer( logObj );
     }
     document.body.style.cursor = "default";
     $( "#logEntry" ).val( "" );
@@ -1196,7 +1196,7 @@
     this.logEntry = $( "#logEntry" ).val().toString();
     this.logId = null;
     this.seis_id = $( "#seis_id" ).val().toString();
-    this.nmJdob = $( "#nmjdob" ).val().toString();
+    this.nmjdob = $( "#nmjdob" ).val().toString();
     return this;
   }
   function updateLogEntryCache ( array ) {
