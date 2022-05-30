@@ -108,7 +108,7 @@ function doGet ( e ) {
   ss.getSheetByName( "roster" ).sort( 2 );
   ss.getSheetByName( "logRespMerged" ).sort( 1 );
   var t = HtmlService.createTemplateFromFile( "caseLog" );
-  t.version = "v5-1x (dev)";
+  t.version = "v18";
   var url = ss.getUrl();
   t.url = url;
   return t
@@ -116,7 +116,6 @@ function doGet ( e ) {
     .setSandboxMode( HtmlService.SandboxMode.IFRAME )
     .setXFrameOptionsMode( HtmlService.XFrameOptionsMode.ALLOWALL );
 }
-function findWinningSeries () { }
 function trimSS () {
   var sheets, sheet, last;
   sheets = ss.getSheets();
