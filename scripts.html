@@ -66,7 +66,7 @@
       return "<div class='input-group-prepend'>" +
         "<div  class='input-group-text'>" +
         "<input type='checkbox' class='glChkBx' " + chkd + " data-obj=" + me + ">" +
-        "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + me + " readonly >" +
+        "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:fit-content; width: 700px;' data-obj=" + me + " readonly >" +
         "(" + this.standard + ") " + this.annual
       "</textarea>"
       "</div>" +
@@ -472,7 +472,7 @@
     e.preventDefault();
     // $("#logEntry").val($(this).closest("tr").find("td:nth-child(2)").text());
     //       console.log('log entry id is %s', logId);
-    $( "#editEntry" ).val();
+    // $( "#editEntry" ).val();
     console.log( $( this ).closest( "tr" ).find( "td:nth-child(1)" ).text() );
     console.log( $( this ).closest( "tr" ).find( "td:nth-child(2)" ).text() );
     // console.log($(this).closest("tr").find("td:nth-child(2)").text());
@@ -1659,14 +1659,16 @@
     var nmjdob = $( "#nmjdob" ).val();
     var seis_id = $( "#seis_id" ).val();
 
-    console.log( "vars %s; %s; %s; %s; %s; ", entry, date, id, nmjdob, seis_id );
+    console.log( "vars entry, date, id, nmjdob, seis_id:  %s; %s; %s; %s; %s; ", entry, date, id, nmjdob, seis_id );
+    // alert( 'now aborting' );
+    // throw "quit";
     var logObj = {
-      logEntry: entry,
-      logDate: date,
-      logId: id,
-      nmjdob: nmjdob,
-      seis_id: seis_id,
-      remove: remove,
+      'logEntry': entry,
+      'logDate': date,
+      'logId': id,
+      'nmjdob': nmjdob,
+      'seis_id': seis_id,
+      'remove': remove
     };
     console.log( "logObj: %s", JSON.stringify( logObj ) );
 
@@ -1832,7 +1834,7 @@
         .withFailureHandler()
         .putSelGoals_server( putData );
     }
-    function remove_selGoalsQueue () { localStorage.removeItem( 'selGoalsQueue' ); } 
+    function remove_selGoalsQueue () { localStorage.removeItem( 'selGoalsQueue' ); }
   }
   function getSelGoals_client () {
 
@@ -1859,7 +1861,7 @@
             let grbGoal = new Goal( element );
             $( '#foundGoals' ).append( grbGoal.checkboxItem( true ) );
             count++;
-            if(count >= selGoals.length){break};
+            if ( count >= selGoals.length ) { break };
           }
         }
       }

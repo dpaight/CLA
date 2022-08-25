@@ -61,7 +61,7 @@
                 return "<div class='input-group-prepend'>" +
                     "<div  class='input-group-text'>" +
                     "<input type='checkbox' class='glChkBx' data-obj=" + me + ">" +
-                    "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + me + " readonly >" +
+                    "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:fit-content; width: 700px;' data-obj=" + me + " readonly >" +
                     "(" + this.standard + ") " + this.annual
                 "</textarea>"
                 "</div>" +
@@ -70,7 +70,7 @@
                 return "<div class='input-group-prepend'>" +
                     "<div  class='input-group-text'>" +
                     "<input type='checkbox' class='glChkBx' checked data-obj=" + me + ">" +
-                    "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:auto; width: 700px;' data-obj=" + me + " readonly >" +
+                    "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:fit-content; width: 700px;' data-obj=" + me + " readonly >" +
                     "(" + this.standard + ") " + this.annual
                 "</textarea>"
                 "</div>" +

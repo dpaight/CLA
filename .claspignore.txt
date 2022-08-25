@@ -1,3 +1,0 @@
-\.clasp.json
-**\other_stuff\**
-**\node_modules\**
