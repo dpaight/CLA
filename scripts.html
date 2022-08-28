@@ -1,4 +1,20 @@
 <script>
+  class LogEntry {
+    // as passed from jquery function or from log entry editor (in the former case, there will be no logId value)
+    //  log-entry-obj =
+    //  {
+    //     "seis_id": id,
+    //     "logEntry": entry,
+    //     "nmjdob": nmjdob,
+    //     "logId":
+    //  }
+    constructor( array ) {
+      this[ 'seis_id' ] = array[ 0 ];
+      this[ 'logEntry' ] = array[ 1 ];
+      this[ 'nmjdob' ] = array[ 2 ];
+      this[ 'logId' ] = null;
+    }
+  }
   class Goal {
     constructor( array ) {
       this[ 'id' ] = array[ 0 ];
@@ -1538,27 +1554,32 @@
 
   function logServices ( string ) {
     $( "#logEntry" ).val( string );
-    saveLogEntryClient();
+    saveNewLogEntryClient();
   }
 
-  function saveLogEntryClient () {
+  function saveNewLogEntryClient () {
+    if ( $( "#logEntry" ).val().toString() == "logServices" ) {
+      google.script.run
+        .withSuccessHandler( logServices )
+        .getServices( $( "#seis_id" ).val() );
+      return;
+    }
     console.log( $( "#logEntry" ).val().toString() );
     document.body.style.cursor = "wait";
     if ( $( "#logEntry" ).val().toString().length > 0 ) {
-      if ( $( "#logEntry" ).val().toString() == "serve" ) {
-        google.script.run
-          .withSuccessHandler( logServices )
-          .getServices( $( "#seis_id" ).val() );
-        return;
-      }
-      var logObj = new LogEntry();
+      var logEntry = $( "#logEntry" ).val().toString();
+      var logId = null;
+      var seis_id = $( "#seis_id" ).val().toString();
+      var nmjdob = $( "#nmjdob" ).val().toString();
+
+      var logObj = new LogEntry( [  seis_id, logEntry, nmjdob, logId ] );
       // console.log($('entry is gt 0: %s', $("#logEntry").val().toString()));
       // console.log('id and entry are %s and %s', id, entry);
       console.log( "saving: %s", JSON.stringify( logObj ) );
 
       google.script.run
         .withSuccessHandler( updateLogEntryCache ) // server returns the same object
-        .saveLogEntryServer( logObj );
+        .saveNewLogEntryServer( logObj );
     }
     document.body.style.cursor = "default";
     $( "#logEntry" ).val( "" );
@@ -1655,7 +1676,7 @@
     }
     var entry = $( "#editEntry" ).val();
     var date = $( "#editDate" ).val();
-    var id = $( "#editId" ).val();
+    var id = parseInt( $( "#editId" ).val(), 10 );
     var nmjdob = $( "#nmjdob" ).val();
     var seis_id = $( "#seis_id" ).val();
 
@@ -1683,21 +1704,6 @@
     focus( logObj.seis_id.toString(), "loc01" );
   }
 
-  function LogEntry () {
-    // as passed from jquery function or from log entry editor (in the former case, there will be no logId value)
-    //  log-entry-obj =
-    //  {
-    //     "seis_id": id,
-    //     "logEntry": entry,
-    //     "nmjdob": nmjdob,
-    //     "logId":
-    //  }
-    this.logEntry = $( "#logEntry" ).val().toString();
-    this.logId = null;
-    this.seis_id = $( "#seis_id" ).val().toString();
-    this.nmJdob = $( "#nmjdob" ).val().toString();
-    return this;
-  }
   function updateLogEntryCache ( array ) {
     var [ logObjStr, cacheRow ] = array;
     var logObj = JSON.parse( logObjStr );

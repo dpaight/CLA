@@ -108,7 +108,7 @@ function doGet ( e ) {
   ss.getSheetByName( "roster" ).sort( 2 );
   ss.getSheetByName( "logRespMerged" ).sort( 1 );
   var t = HtmlService.createTemplateFromFile( "caseLog" );
-  t.version = "v5-1x (dev)";
+  t.version = "v18";
   var url = ss.getUrl();
   t.url = url;
   return t
@@ -116,7 +116,6 @@ function doGet ( e ) {
     .setSandboxMode( HtmlService.SandboxMode.IFRAME )
     .setXFrameOptionsMode( HtmlService.XFrameOptionsMode.ALLOWALL );
 }
-function findWinningSeries () { }
 function trimSS () {
   var sheets, sheet, last;
   sheets = ss.getSheets();
@@ -2626,7 +2625,7 @@ var ss = SpreadsheetApp.getActiveSpreadsheet();
  * @param logObj 
  * @returns 
  */
-function saveLogEntryServer ( logObj ) {
+function saveNewLogEntryServer ( logObj ) {
   // var obj = {
   //     "seis_id": id,
   //     "logEntry": entry,
@@ -2694,14 +2693,18 @@ function saveEditedLogEntryServer_hold ( logObjStr ) {
 function saveEditedLogEntryServer ( logObjStr ) {
   Logger.log( logObjStr );
   var [ headings, values, sheet, range, lastR, lastC ] = myGet( 'logRespMerged' );
+<<<<<<< HEAD
   // headings.shift();
   console.log( 'the headings are %s', JSON.stringify( headings ) );
 
+=======
+>>>>>>> 960fcd9d3c282e3d5bed0df99ed3c3891c0b6261
   var logObj = JSON.parse( logObjStr );
   var row = [ logObj.logDate, Session.getActiveUser().getEmail(), logObj.nmjdob, logObj.logEntry, logObj.logId, logObj.seis_id ];
   Logger.log( 'the row is %s', JSON.stringify( row ) );
   if ( !row ) { throw "the 'row' is null or undefined" };
   var lid_index = headings.indexOf( 'log_entry_id' );
+<<<<<<< HEAD
   for ( let i = 0; i < values.length; i++ ) {
     var el = values[ i ];
     // var entryIDindex = headings.indexOf( 'logId' );
@@ -2725,6 +2728,28 @@ function saveEditedLogEntryServer ( logObjStr ) {
       }
       Logger.log( 'the index to the record was %s; the row value in the range is %s', i, ( i + 1 ) );
 
+=======
+  Logger.log( 'lid_index is %s', lid_index );
+  for ( let i = 0; i < values.length; i++ ) {
+    var el = values[ i ];
+    // var entryIDindex = headings.indexOf( 'logId' );
+    if ( el[ lid_index ] == logObj.logId ) {
+      range = sheet.getRange( i + 1, 1, 1, el.length );
+
+      var checkRow = range.getValues();
+      checkRow = checkRow[ 0 ];
+      Logger.log( 'i: %s, checkRow: %s, row: %s', i, JSON.stringify( checkRow ), JSON.stringify( row ) );
+      if ( checkRow[ 4 ] === row[ 4 ] ) {
+        if ( logObj.remove == true ) {
+          sheet.deleteRows( i + 1 );
+        } else {
+          range.setValues( [ row ] );
+        }
+      } else {
+        Logger.log( 'checkRow[4] and row[4]: %s, %s', checkRow[ 4 ].toString(), row[ 4 ].toString() )
+      }
+      Logger.log( 'the index to the record was %s', i );
+>>>>>>> 960fcd9d3c282e3d5bed0df99ed3c3891c0b6261
       break;
     }
     // var test = ss.insertSheet('test');
@@ -2862,6 +2887,7 @@ function getCellCounts () {
   var range = destSheet.getRange( 1, 1, dataRows.length, dataRows[ 0 ].length );
   range.setValues( dataRows );
   destSheet.setFrozenRows( 1 );
+<<<<<<< HEAD
 }
 
 function updateRoster_old2 () {
@@ -3003,4 +3029,6 @@ function updateRoster_old2 () {
   }
 
   Logger.log( "done" );
+=======
+>>>>>>> 960fcd9d3c282e3d5bed0df99ed3c3891c0b6261
 }
