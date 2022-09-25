@@ -1,31 +1,43 @@
 {
-  "name": "contactloghelper",
-  "version": "4.0.0",
-  "description": "record keeping for sped",
-  "main": "Code.ts",
+  "name": "cla",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "balanced-match": "^1.0.2",
+    "brace-expansion": "^2.0.1",
+    "dayjs": "^1.11.0",
+    "escodegen": "^2.0.0",
+    "deep-is": "^0.1.4",
+    "esprima": "^4.0.1",
+    "estraverse": "^5.2.0",
+    "esutils": "^2.0.3",
+    "fast-levenshtein": "^2.0.6",
+    "gas-entry-generator": "^2.1.0",
+    "gas-webpack-plugin": "^2.2.1",
+    "levn": "^0.3.0",
+    "minimatch": "^5.0.1",
+    "jquery": "^3.6.0",
+    "optionator": "^0.8.3",
+    "slash": "^3.0.0",
+    "prelude-ls": "^1.1.2",
+    "source-map": "^0.6.1",
+    "type-check": "^0.3.2",
+    "word-wrap": "^1.2.3",
+    "webpack-sources": "^3.2.3"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Dan Paight",
-  "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dpaight/dan-CL-retry.git"
+    "url": "git+https://github.com/dpaight/contactLogHelper.git"
   },
-  "keywords": [
-    "special",
-    "ed",
-    "log"
-  ],
+  "author": "",
+  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/dpaight/dan-CL-retry/issues"
+    "url": "https://github.com/dpaight/contactLogHelper/issues"
   },
-  "homepage": "https://github.com/dpaight/dan-CL-retry#readme",
-  "dependencies": {
-    "dayjs": "^1.11.0",
-    "jquery": "^3.6.0"
-  },
-  "devDependencies": {
-    "gas-webpack-plugin": "^2.2.1"
-  }
+  "homepage": "https://github.com/dpaight/contactLogHelper#readme"
 }

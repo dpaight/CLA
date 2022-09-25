@@ -1,0 +1,54 @@
+<script>
+
+  function displaySearchNext(hits) {
+    if (hits === undefined) {
+      console.log('hits is undefined');
+      
+      var s = $('#searchField').val();
+      console.log('the searchFields says %s', s);
+      var hits = getData();
+      console.log('these hits is %s', JSON.stringify(hits));
+
+      function getData() {
+        google.script.run
+          .withSuccessHandler(setVars)
+          .withFailureHandler(showErr)
+          .myGet("roster");
+        function setVars(array) {
+          var [headings, values, sheet, range, lastR, lastC] = array;
+          var s = $('#searchField').val();
+          var s_exp = new RegExp(s, "gi");
+          var hits = {};
+          hit = -1;
+          for (let i = 0; i < values.length; i++) {
+            const el = values[i];
+            for (let j = 0; j < el.length; j++) {
+              const field = el[j].toString();
+              if (field.search(s_exp) !== -1) {
+                hit++;
+                hits[hit] = {
+                  seis_id: el[0],
+                  field: headings[j],
+                  searchStr: s
+                };
+              }
+            }
+            sessionStorage.setItem('lastId', seis_id);  
+          }
+          console.log("the hits obj to be returned: %s", JSON.stringify(hits));
+          displaySearchNext(hits);
+        }
+
+      }
+      function showErr(err) {
+        console.log('the error is %s', JSON.stringify(err));
+      }
+    } else {
+      console.log('the seis_id is %s', JSON.stringify(hits.seis_id));
+
+      focus(hits.seis_id);
+      $("#" + hits.field).focus();
+    }
+
+  }
+</script>

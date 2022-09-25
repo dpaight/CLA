@@ -8,28 +8,29 @@
     //     "nmjdob": nmjdob,
     //     "logId":
     //  }
-    constructor( array ) {
-      this[ 'seis_id' ] = array[ 0 ];
-      this[ 'logEntry' ] = array[ 1 ];
-      this[ 'nmjdob' ] = array[ 2 ];
-      this[ 'logId' ] = null;
+    constructor(array) {
+      this["seis_id"] = array[0];
+      this["logEntry"] = array[1];
+      this["nmjdob"] = array[2];
+      this["logId"] = null;
     }
   }
   class Goal {
-    constructor( array ) {
-      this[ 'id' ] = array[ 0 ];
-      this[ 'lvl' ] = array[ 1 ];
-      this[ 'area' ] = array[ 2 ];
-      this[ 'strand' ] = array[ 3 ];
-      this[ 'annual' ] = array[ 4 ];
-      this[ 'standard' ] = array[ 5 ];
-      this[ 'objective1' ] = array[ 6 ];
-      this[ 'objective2' ] = array[ 7 ];
-      this[ 'objective3' ] = array[ 8 ];
-      this[ 'mod' ] = array[ 9 ];
+    constructor(array) {
+      this["id"] = array[0];
+      this["lvl"] = array[1];
+      this["area"] = array[2];
+      this["strand"] = array[3];
+      this["annual"] = array[4];
+      this["standard"] = array[5];
+      this["objective1"] = array[6];
+      this["objective2"] = array[7];
+      this["objective3"] = array[8];
+      this["mod"] = array[9];
     }
-    list () {
-      var item = '<li class="goalList" glId="' +
+    list() {
+      var item =
+        '<li class="goalList" glId="' +
         this.id +
         '">' +
         '["' +
@@ -52,10 +53,11 @@
         this.id +
         '"]</li>';
 
-      return ( item );
+      return item;
     }
-    snip () {
-      var snip = "[" +
+    snip() {
+      var snip =
+        "[" +
         '"area" = "' +
         this.area +
         '",' +
@@ -70,180 +72,196 @@
         '"' +
         "]";
       return snip;
-    };
-    checkboxItem ( checked ) {
-      var me = this.id;
-      if ( checked === true ) {
-        var chkd = 'checked';
-      } else {
-        chkd = '';
-      }
-      console.log( 'i am %s', me );
-      return "<div class='input-group-prepend'>" +
-        "<div  class='input-group-text'>" +
-        "<input type='checkbox' class='glChkBx' " + chkd + " data-obj=" + me + ">" +
-        "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:fit-content; width: 700px;' data-obj=" + me + " readonly >" +
-        "(" + this.standard + ") " + this.annual
-      "</textarea>"
-      "</div>" +
-        "</div>"
     }
-    saved () {
-      "<li data-saved='" + snip() + "'>" + this.area + "</li>"
+    checkboxItem(checked) {
+      var me = this.id;
+      if (checked === true) {
+        var chkd = "checked";
+      } else {
+        chkd = "";
+      }
+      console.log("i am %s", me);
+      return (
+        "<div class='input-group-prepend'>" +
+        "<div  class='input-group-text'>" +
+        "<input type='checkbox' class='glChkBx' " +
+        chkd +
+        " data-obj=" +
+        me +
+        ">" +
+        "<textarea  class='form-control goalList' style='margin-bottom: 5px; height:fit-content; width: 700px;' data-obj=" +
+        me +
+        " readonly >" +
+        "(" +
+        this.standard +
+        ") " +
+        this.annual
+      );
+      ("</textarea>");
+      "</div>" + "</div>";
+    }
+    saved() {
+      "<li data-saved='" + snip() + "'>" + this.area + "</li>";
     }
   }
 
   // The code in this function runs when the page is loaded.
-  $( document ).ready( function () {
+  $(document).ready(function () {
     // click student name in roster table switches to that student for both contact info and
     // log entries
     // $("#tbSnippetCopy").hide();
 
-    if ( sessionStorage.getItem( "lastId" ) == null ) {
-      google.script.run.withSuccessHandler( cacheEm ).getRecord( "all" );
+    if (sessionStorage.getItem("lastId") == null) {
+      google.script.run.withSuccessHandler(cacheEm).getRecord("all");
 
-      function cacheEm ( array ) {
-        for ( let i = 0; i < array.length; i++ ) {
-          const el = array[ i ];
+      function cacheEm(array) {
+        for (let i = 0; i < array.length; i++) {
+          const el = array[i];
 
-          sessionStorage.setItem( "lastId", el.seis_id );
+          sessionStorage.setItem("lastId", el.seis_id);
           let nm = "rec" + el.seis_id;
-          let val = JSON.stringify( el );
-          sessionStorage.setItem( nm, val );
+          let val = JSON.stringify(el);
+          sessionStorage.setItem(nm, val);
         }
       }
     } else {
-      var id = sessionStorage.getItem( "lastId" );
-      contactInfo( id );
+      var id = sessionStorage.getItem("lastId");
+      contactInfo(id);
     }
-    if ( sessionStorage.getItem( 'goals' ) === null ) {
-      google.script.run
-        .withSuccessHandler( haveGoals )
-        .myGet( 'goals' );
+    if (sessionStorage.getItem("goals") === null) {
+      google.script.run.withSuccessHandler(haveGoals).myGet("goals");
     } else {
-      var values = JSON.parse( sessionStorage.getItem( 'goals' ) );
-      haveGoals( [ true, values, true, true, true, true ] );
+      var values = JSON.parse(sessionStorage.getItem("goals"));
+      haveGoals([true, values, true, true, true, true]);
     }
 
     var tooltipTriggerList = [].slice.call(
-      document.querySelectorAll( '[data-bs-toggle="tooltip"]' )
+      document.querySelectorAll('[data-bs-toggle="tooltip"]')
     );
-    var tooltipList = tooltipTriggerList.map( function ( tooltipTriggerEl ) {
-      return new bootstrap.Tooltip( tooltipTriggerEl );
-    } );
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 
-    $( "body" ).on( "click", ".goalList", function ( e ) {
+    $("body").on("click", ".goalList", function (e) {
       // alert('fired');
       e.preventDefault();
-      if ( e.ctrlKey ) {
-
-        var glId = $( this ).attr( "data-obj" ).toString();
-        var allGoals = JSON.parse( sessionStorage.getItem( 'goals' ) );
-        for ( let i = 0; i < allGoals.length; i++ ) {
-          var el = allGoals[ i ];
+      if (e.ctrlKey) {
+        var glId = $(this).attr("data-obj").toString();
+        var allGoals = JSON.parse(sessionStorage.getItem("goals"));
+        for (let i = 0; i < allGoals.length; i++) {
+          var el = allGoals[i];
           // alert(el[0] + ' ' + glId);
-          if ( el[ 0 ] == glId ) {
+          if (el[0] == glId) {
             // alert('found');
-            var thisGoal = new Goal( el.flat() );
+            var thisGoal = new Goal(el.flat());
             var snip = thisGoal.snip();
 
-            $( '#tbSnippetCopy' ).text( snip );
-            $( "#tbSnippetCopy" ).select();
-            document.execCommand( "copy" );
+            $("#tbSnippetCopy").text(snip);
+            $("#tbSnippetCopy").select();
+            document.execCommand("copy");
           }
         }
       }
-    } )
-    $( "body" ).on( "change", "input:checkbox", function ( e ) {
+    });
+    $("body").on("change", "input:checkbox", function (e) {
       e.preventDefault();
-      var selGoalsNm = 'selGoals_' + $( "#seis_id" ).val();
-      var glId = $( this ).attr( "data-obj" );
-      var isChecked = $( this ).is( ":checked" );
+      var selGoalsNm = "selGoals_" + $("#seis_id").val();
+      var glId = $(this).attr("data-obj");
+      var isChecked = $(this).is(":checked");
 
-      if ( sessionStorage.getItem( selGoalsNm ) === null ) {
-        var obj = [ "" ];
+      if (sessionStorage.getItem(selGoalsNm) === null) {
+        var obj = [""];
         obj.shift();
-        console.log( 'created a selGoal obj, %s', JSON.stringify( obj ) );
+        console.log("created a selGoal obj, %s", JSON.stringify(obj));
       } else {
-        obj = JSON.parse( sessionStorage.getItem( selGoalsNm ) );
-        console.log( selGoalsNm + ' already exits' );
+        obj = JSON.parse(sessionStorage.getItem(selGoalsNm));
+        console.log(selGoalsNm + " already exits");
       }
 
-      if ( localStorage.getItem( 'selGoalsQueue' ) === null ) {
-        var selGoalsQueue = [ "" ];
+      if (localStorage.getItem("selGoalsQueue") === null) {
+        var selGoalsQueue = [""];
         selGoalsQueue.shift();
-        console.log( 'created a selGoalsQueue , %s', JSON.stringify( selGoalsQueue ) );
+        console.log(
+          "created a selGoalsQueue , %s",
+          JSON.stringify(selGoalsQueue)
+        );
       } else {
-        selGoalsQueue = JSON.parse( localStorage.getItem( 'selGoalsQueue' ) );
-        console.log( 'selGoalsQueue already exits: %s', JSON.stringify( selGoalsQueue ) );
+        selGoalsQueue = JSON.parse(localStorage.getItem("selGoalsQueue"));
+        console.log(
+          "selGoalsQueue already exits: %s",
+          JSON.stringify(selGoalsQueue)
+        );
       }
 
-      if ( selGoalsQueue.indexOf( selGoalsNm ) === -1 ) {
-        selGoalsQueue.push( selGoalsNm );
+      if (selGoalsQueue.indexOf(selGoalsNm) === -1) {
+        selGoalsQueue.push(selGoalsNm);
       }
 
-      var allGoals = JSON.parse( sessionStorage.getItem( 'goals' ) );
-      for ( let i = 0; i < allGoals.length; i++ ) {
-        const el = allGoals[ i ][ 0 ];
-        if ( el === glId ) {
-          var thisGoal = new Goal( allGoals[ i ] );
-          console.log( 'the new goal is %s; el is %s', JSON.stringify( thisGoal ), JSON.stringify( allGoals[ i ] ) );
+      var allGoals = JSON.parse(sessionStorage.getItem("goals"));
+      for (let i = 0; i < allGoals.length; i++) {
+        const el = allGoals[i][0];
+        if (el === glId) {
+          var thisGoal = new Goal(allGoals[i]);
+          console.log(
+            "the new goal is %s; el is %s",
+            JSON.stringify(thisGoal),
+            JSON.stringify(allGoals[i])
+          );
         }
       }
 
-      if ( isChecked ) {
+      if (isChecked) {
         // alert('checked' + $(this).val());
-        console.log( 'the data-obj is %s', $( this ).attr( "data-obj" ) );
-        obj.push( glId );
+        console.log("the data-obj is %s", $(this).attr("data-obj"));
+        obj.push(glId);
       } else {
-        obj.splice( obj.indexOf( glId ), 1 );
+        obj.splice(obj.indexOf(glId), 1);
       }
-      sessionStorage.setItem( selGoalsNm, JSON.stringify( obj ) );
-      localStorage.setItem( 'selGoalsQueue', JSON.stringify( selGoalsQueue ) );
+      sessionStorage.setItem(selGoalsNm, JSON.stringify(obj));
+      localStorage.setItem("selGoalsQueue", JSON.stringify(selGoalsQueue));
+    });
 
-    } );
-
-    $( "table" ).on( "click tap", ".setStudent", function ( event ) {
+    $("table").on("click tap", ".setStudent", function (event) {
       event.preventDefault();
-      var id = $( this ).attr( "data-stuId" );
+      var id = $(this).attr("data-stuId");
 
       //       console.log('id = %s', id);
-      focus( id );
-    } );
+      focus(id);
+    });
 
-    $( "#ready" ).hide();
-    $( ".pleaseHide" ).hide();
+    $("#ready").hide();
+    $(".pleaseHide").hide();
     // document.body.style.cursor = "wait";
 
-    $( "body" ).on( "dblclick dbl-tap", ".goalList", function ( e ) {
+    $("body").on("dblclick dbl-tap", ".goalList", function (e) {
       // console.log('event triggered a[name=goalList clicked');
       e.preventDefault();
       // open goal for editing
       // console.log('this is %s', JSON.stringify($(this).text()));
-      var thisGoal = JSON.parse( $( this ).text() );
-      var gId = parseInt( thisGoal[ thisGoal.length - 1 ], 10 );
-      console.log( "gId = %s", gId );
-      google.script.run.withSuccessHandler( editGoalInModal ).getGoal( gId );
-    } );
+      var thisGoal = JSON.parse($(this).text());
+      var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
+      console.log("gId = %s", gId);
+      google.script.run.withSuccessHandler(editGoalInModal).getGoal(gId);
+    });
     // console.log('sent to goal edit: %s', $(this).text());
-    $( "body" ).on( "click", ".goalList", function ( e ) {
+    $("body").on("click", ".goalList", function (e) {
       // console.log('put the goal number into a gl field');
-      if ( e.ctrlKey ) {
+      if (e.ctrlKey) {
         e.preventDefault();
-        var item = JSON.parse( $( this ).text() );
-        var gId = item[ item.length - 1 ];
+        var item = JSON.parse($(this).text());
+        var gId = item[item.length - 1];
         // item = item.toString().match(/\d+$/);
 
-        $( ".gls" ).each( function ( i, el ) {
-          if ( $( this ).val() == "" ) {
-            $( this ).val( gId );
-            $( this ).attr( "title", gId );
+        $(".gls").each(function (i, el) {
+          if ($(this).val() == "") {
+            $(this).val(gId);
+            $(this).attr("title", gId);
             return false;
           }
-        } );
-        var crntScrl = $( window ).scrollTop();
+        });
+        var crntScrl = $(window).scrollTop();
       }
-    } );
+    });
 
     // // shift-click clears a litte goal number box
     // // click builds text blaze snippet from data in table
@@ -263,275 +281,272 @@
 
     // $("body").on("click", "#emParentsMenuItem", emParents());
 
-    $( function () {
-      $( '[data-toggle="tooltip"]' ).tooltip();
-    } );
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+    });
     // console.log('gSmL is %s', gSmL);
 
-    $( "body" ).on( "click", "#gVoiceMenuItem", function () {
+    $("body").on("click", "#gVoiceMenuItem", function () {
       firstSnipThenGvoice();
-    } );
-    $( ".alert" ).alert();
+    });
+    $(".alert").alert();
 
     //set cursor to pointer when entering a nav item
-    $( "body" ).on( "mouseenter", ".nav-link", function () {
-      $( this ).css( "cursor", "pointer" );
-    } );
+    $("body").on("mouseenter", ".nav-link", function () {
+      $(this).css("cursor", "pointer");
+    });
 
     // set cursor to pointer when entering table row
-    $( "body" ).on( "mouseenter", ".setStudent", function () {
-      $( ".setStudent" ).css( "cursor", "pointer" );
-    } );
+    $("body").on("mouseenter", ".setStudent", function () {
+      $(".setStudent").css("cursor", "pointer");
+    });
 
     //set cursor to pointer when entering an icon
-    $( "body" ).on( "mouseenter", ".material-icons", function () {
-      $( ".setStudent" ).css( "cursor", "pointer" );
-    } );
+    $("body").on("mouseenter", ".material-icons", function () {
+      $(".setStudent").css("cursor", "pointer");
+    });
 
     // set cursor to normal when leaving an icon
-    $( "body" ).on( "mouseleave", ".material-icons", function () {
-      $( ".setStudent" ).css( "cursor", "default" );
-    } );
+    $("body").on("mouseleave", ".material-icons", function () {
+      $(".setStudent").css("cursor", "default");
+    });
 
     // modals
-    $( "body" ).on( "show.srchModal.modal", function () { } );
+    $("body").on("show.srchModal.modal", function () { });
 
-    $( "body" ).on( "show.bs.modal", function () {
+    $("body").on("show.bs.modal", function () {
       // alert('event');
       var addresses = (
-        $( "#teachemail" ).val() +
+        $("#teachemail").val() +
         "," +
-        $( "#Parent_1_Email" ).val() +
+        $("#Parent_1_Email").val() +
         "," +
-        $( "#u3_Parent_1a_Email" ).val()
-      ).replace( /,$/, "" );
-      var subject = $( "#stuName" ).val();
+        $("#u3_Parent_1a_Email").val()
+      ).replace(/,$/, "");
+      var subject = $("#stuName").val();
       // console.log(addresses);
-      $( "#emailRecipients" ).val( addresses );
-      $( "#emailSubject" ).val( subject );
-    } );
+      $("#emailRecipients").val(addresses);
+      $("#emailSubject").val(subject);
+    });
     // change the cursor to a pointer when entering a text Blaze field
-    $( "body" ).on( "mouseenter", '[name$="Copy"]', function () {
-      $( "[name$='Copy']" ).css( "cursor", "pointer" );
-    } );
+    $("body").on("mouseenter", '[name$="Copy"]', function () {
+      $("[name$='Copy']").css("cursor", "pointer");
+    });
 
     // if shift key is down turning the cursor into a trash can and then delete on click (next function)
-    $( "body" ).on( "mousemove", ".gls", function () {
-      if ( event.shiftKey ) {
+    $("body").on("mousemove", ".gls", function () {
+      if (event.shiftKey) {
         e.preventDefault();
-        $( ".gls" ).css(
+        $(".gls").css(
           "cursor",
           "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto"
         );
       } else {
-        $( ".gls" ).css( "cursor", "pointer" );
+        $(".gls").css("cursor", "pointer");
       }
-    } );
+    });
 
-    $( "body" ).on( "click", ".snipThis", function ( event ) {
+    $("body").on("click", ".snipThis", function (event) {
       event.preventDefault();
       snipInfo();
-    } );
-    $( ".btn" ).mouseup( function () {
-      $( this ).blur();
-    } );
+    });
+    $(".btn").mouseup(function () {
+      $(this).blur();
+    });
     // copy a text blaze snippet to clipboard when clicking on the item
-    $( "body" ).on( "click", '[name$="Copy"]', function () {
-      $( this ).select();
-      document.execCommand( "copy" );
-    } );
-    $( ".btn-success" ).click( function () {
-      $( this ).toggleClass( "btn-active" ).siblings().removeClass( "btn-active" );
-      $( this ).blur();
-    } );
+    $("body").on("click", '[name$="Copy"]', function () {
+      $(this).select();
+      document.execCommand("copy");
+    });
+    $(".btn-success").click(function () {
+      $(this).toggleClass("btn-active").siblings().removeClass("btn-active");
+      $(this).blur();
+    });
     // when clicking on a table row, change the color of the field
-    $( "body" ).on( "mousedown", ".setStudent", function ( event ) {
+    $("body").on("mousedown", ".setStudent", function (event) {
       event.preventDefault();
-      $( this ).css( "background-color", "#5bf5db" );
+      $(this).css("background-color", "#5bf5db");
       // console.log('mouse down');
-    } );
+    });
 
     // this goes with the one just above changing the color back to White
-    $( "body" ).on( "mouseup mouseleave", ".setStudent", function ( event ) {
+    $("body").on("mouseup mouseleave", ".setStudent", function (event) {
       event.preventDefault();
-      $( this ).css( "background-color", "#ffffff" );
+      $(this).css("background-color", "#ffffff");
       // console.log('mouse up');
-    } );
+    });
 
     // record edited fields
-    $( "body" ).on( "change", ".stuEdit", function () {
-      var seisId = $( "#seis_id" ).val();
-      var fieldVal = $( this ).val();
-      var fldNm = $( this ).attr( "id" );
+    $("body").on("change", ".stuEdit", function () {
+      var seisId = $("#seis_id").val();
+      var fieldVal = $(this).val();
+      var fldNm = $(this).attr("id");
 
-      if ( !seisId || !fieldVal || !fldNm ) {
-        alert( "missing data in html" );
+      if (!seisId || !fieldVal || !fldNm) {
+        alert("missing data in html");
         return;
       }
       // sessionStorage.removeItem('rec' + seisId);
       // alert('rec' + seisId + ", " + seisId + ", " + fieldVal + ", " + fldNm);
-      if ( fldNm.toString().search( /date/g ) > -1 ) {
-        fieldVal = fieldVal.toString().replace( /-/g, "/" );
-        $( this ).val( fieldVal );
+      if (fldNm.toString().search(/date/g) > -1) {
+        fieldVal = fieldVal.toString().replace(/-/g, "/");
+        $(this).val(fieldVal);
       }
-      var cacheRec = JSON.parse( sessionStorage.getItem( "rec" + seisId ) );
-      cacheRec[ fldNm ] = fieldVal;
-      sessionStorage.setItem( "rec" + seisId, JSON.stringify( cacheRec ) );
+      var cacheRec = JSON.parse(sessionStorage.getItem("rec" + seisId));
+      cacheRec[fldNm] = fieldVal;
+      sessionStorage.setItem("rec" + seisId, JSON.stringify(cacheRec));
 
       google.script.run
         .withSuccessHandler()
-        .updateContactInfo( seisId, fldNm, fieldVal );
+        .updateContactInfo(seisId, fldNm, fieldVal);
 
-      setTimeout( () => {
+      setTimeout(() => {
         google.script.run
-          .withSuccessHandler( showRosterTable )
+          .withSuccessHandler(showRosterTable)
           .getTableData_roster();
-      }, 3000 );
-    } );
-  } );
+      }, 3000);
+    });
+  });
 
-  $( "body" ).on( "change", ".logWindow", function () {
+  $("body").on("change", ".logWindow", function () {
     filterLogEntriesByDateWindow();
-  } );
+  });
   //save changes to spreadsheet
-  $( "body" ).on( "change", "#notes2", function ( event ) {
-    var id = $( "#seis_id" ).val();
-    var field = $( this ).attr( "id" );
-    var value = $( this ).val();
+  $("body").on("change", "#notes2", function (event) {
+    var id = $("#seis_id").val();
+    var field = $(this).attr("id");
+    var value = $(this).val();
 
-    console.log( "id = %s, field = %s, value = %s", id, field, value );
+    console.log("id = %s, field = %s, value = %s", id, field, value);
     google.script.run
-      .withSuccessHandler( showNotes ) // works with returned values: id, index, value
-      .getNotes( [ id, value ] );
-  } );
+      .withSuccessHandler(showNotes) // works with returned values: id, index, value
+      .getNotes([id, value]);
+  });
 
-  $( "body" ).on( "click", ".saveEntryBtn", function ( event ) {
+  $("body").on("click", ".saveEntryBtn", function (event) {
     event.preventDefault();
     document.body.style.cursor = "wait";
-    if ( entry.length > 0 ) {
-      var logObj = LogEntry( [
-        $( "#seis_id" ).val(),
-        $( "#logEntry" ).val(),
-        $( "#nmjdob" ).val(),
+    if (entry.length > 0) {
+      var logObj = LogEntry([
+        $("#seis_id").val(),
+        $("#logEntry").val(),
+        $("#nmjdob").val(),
         null,
-      ] );
+      ]);
       // console.log('id and entry are %s and %s', id, entry);
-      console.log( "saving: %s", JSON.stringify( logObj ) );
+      console.log("saving: %s", JSON.stringify(logObj));
 
       google.script.run
-        .withSuccessHandler( updateLogEntryCache )
-        .saveLogEntry( [ logObj, null ] );
+        .withSuccessHandler(updateLogEntryCache)
+        .saveLogEntry([logObj, null]);
     }
     document.body.style.cursor = "default";
-    $( "#logEntry" ).val( "" );
-  } );
+    $("#logEntry").val("");
+  });
 
-  $( "body" ).on( "keypress", ".saveEntryBtn", function ( event ) {
-    $( this ).addClass( "active" );
+  $("body").on("keypress", ".saveEntryBtn", function (event) {
+    $(this).addClass("active");
     event.preventDefault();
     document.body.style.cursor = "wait";
 
-    var entry = $( "#logEntry" ).val().toString().replace( /\n/g, "->" );
-    console.log( "entry is %s", entry );
-    var id = $( "#seis_id" ).val();
-    var nmjdob = $( "#nmjdob" ).val();
-    if ( entry.length > 0 ) {
-      $( "html,body" ).css( "cursor", "wait" );
+    var entry = $("#logEntry").val().toString().replace(/\n/g, "->");
+    console.log("entry is %s", entry);
+    var id = $("#seis_id").val();
+    var nmjdob = $("#nmjdob").val();
+    if (entry.length > 0) {
+      $("html,body").css("cursor", "wait");
       // console.log('id and entry are %s and %s', id, entry);
       google.script.run
-        .withSuccessHandler( updateLogEntryCache )
-        .saveLogEntry( [ id, entry, nmjdob ] );
+        .withSuccessHandler(updateLogEntryCache)
+        .saveLogEntry([id, entry, nmjdob]);
     }
     document.body.style.cursor = "default";
-    $( this ).removeClass( "active" );
-    $( "#logEntry" ).val( "" );
-  } );
+    $(this).removeClass("active");
+    $("#logEntry").val("");
+  });
   // turn the color of the button back to green without doing anything
-  $( "body" ).on( "click", "#cancelEntryBtn", function ( event ) {
+  $("body").on("click", "#cancelEntryBtn", function (event) {
     event.preventDefault();
-    $( "#saveEntry" ).attr( "class", "btn btn-sm btn-success my-1 svChngs" );
-  } );
+    $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
+  });
 
   // click builds text blaze snippet from data in table
-  $( "body" ).on( "click", "#getIEPcompForm", function ( event ) {
-    var flName = $( "#stuName" ).val( "" );
-    var fn = flName.replace( /([A-z]+)( .*)/g, "$1" );
-    var ln = flName.replace( /([A-z]+ )(.*)/g, "$2" );
-    var dob = $( "#dob" ).val( "" );
+  $("body").on("click", "#getIEPcompForm", function (event) {
+    var flName = $("#stuName").val("");
+    var fn = flName.replace(/([A-z]+)( .*)/g, "$1");
+    var ln = flName.replace(/([A-z]+ )(.*)/g, "$2");
+    var dob = $("#dob").val("");
 
-    document.execCommand( "copy" );
+    document.execCommand("copy");
 
-    $( this ).attr( "title", "" );
+    $(this).attr("title", "");
 
-    var gId = $( this ).val();
-    google.script.run.withSuccessHandler( showTBsnippetGl ).getGoal( gId );
-  } );
+    var gId = $(this).val();
+    google.script.run.withSuccessHandler(showTBsnippetGl).getGoal(gId);
+  });
 
   // retrieves data from a seis generated csv file (seis search report)
-  $( "body" ).on( "click", "#seis_roster", function ( event ) {
+  $("body").on("click", "#seis_roster", function (event) {
     event.preventDefault();
     document.body.style.cursor = "wait";
-    var id = $( "#seis_id" ).val();
-    google.script.run.withSuccessHandler( reloadMe ).updateRoster();
-    setTimeout( () => {
+    var id = $("#seis_id").val();
+    google.script.run.withSuccessHandler(reloadMe).updateRoster();
+    setTimeout(() => {
       "google.script.run.updateLogForm();";
-    }, 15000 );
-  } );
+    }, 15000);
+  });
 
-  $( "body" ).on( "mouseenter", ".logEntry", function () {
-    $( this ).css( "cursor", "pointer" );
-  } );
+  $("body").on("mouseenter", ".logEntry", function () {
+    $(this).css("cursor", "pointer");
+  });
 
-  $( "body" ).on( "dblclick", ".logEntry", function ( e ) {
+  $("body").on("dblclick", ".logEntry", function (e) {
     // console.log('event triggered a[name=goalList clicked');
     // open goal for editing
     e.preventDefault();
     // $("#logEntry").val($(this).closest("tr").find("td:nth-child(2)").text());
     //       console.log('log entry id is %s', logId);
     // $( "#editEntry" ).val();
-    console.log( $( this ).closest( "tr" ).find( "td:nth-child(1)" ).text() );
-    console.log( $( this ).closest( "tr" ).find( "td:nth-child(2)" ).text() );
+    console.log($(this).closest("tr").find("td:nth-child(1)").text());
+    console.log($(this).closest("tr").find("td:nth-child(2)").text());
     // console.log($(this).closest("tr").find("td:nth-child(2)").text());
 
-    $( "#editEntry" ).val( $( this ).closest( "tr" ).find( "td:nth-child(2)" ).text() );
-    $( "#editDate" ).val( $( this ).closest( "tr" ).find( "td:nth-child(1)" ).text() );
-    $( "#editId" ).val(
-      $( this ).closest( "tr" ).find( "td:nth-child(2)" ).data( "entry_id" )
+    $("#editEntry").val($(this).closest("tr").find("td:nth-child(2)").text());
+    $("#editDate").val($(this).closest("tr").find("td:nth-child(1)").text());
+    $("#editId").val(
+      $(this).closest("tr").find("td:nth-child(2)").data("entry_id")
     );
 
-    var myModal = new bootstrap.Modal( document.getElementById( "logEntryModal" ) );
+    var myModal = new bootstrap.Modal(document.getElementById("logEntryModal"));
     myModal.show();
 
     // console.log(JSON.stringify(logObj));
-  } );
-  $( ".logEntry" ).bind( "taphold", function ( e ) {
+  });
+  $(".logEntry").bind("taphold", function (e) {
     // console.log('event triggered a[name=goalList clicked');
     e.preventDefault();
     // open goal for editing
-    var logId = $( this ).data( "entry_id" );
+    var logId = $(this).data("entry_id");
     //       console.log('log entry id is %s', logId);
     google.script.run
-      .withSuccessHandler( editLogEntryInModal )
-      .getLogEntry( logId );
-  } );
+      .withSuccessHandler(editLogEntryInModal)
+      .getLogEntry(logId);
+  });
 
-  $( "body" ).on( "click", ".sendEmail", function () {
+  $("body").on("click", ".sendEmail", function () {
     //       console.log('seis_id is ', $("#seis_id").val());
-    var emadr = $( "#teach_email" ).val();
+    var emadr = $("#teach_email").val();
     //       console.log('email address is: %s', emadr);
-  } );
+  });
   startup();
 
-
-
-
-  function startup ( id = sessionStorage.getItem( "lastId" ) ) {
-    $( "#spinner01" ).show();
+  function startup(id = sessionStorage.getItem("lastId")) {
+    $("#spinner01").show();
     // id = getPointer();
     getSelGoals_client();
-    if ( id == undefined || id == null ) {
+    if (id == undefined || id == null) {
       google.script.run
-        .withSuccessHandler( setPointerAndStart )
+        .withSuccessHandler(setPointerAndStart)
         .getFirstPointer();
     } else {
       // contactInfo(id);
@@ -540,61 +555,60 @@
 
       document.body.style.cursor = "wait";
       google.script.run
-        .withSuccessHandler( showRosterTable )
+        .withSuccessHandler(showRosterTable)
         .getTableData_roster();
 
       getSelGoals_client();
-      focus( id );
-
+      focus(id);
     }
   }
-  function setPointerAndStart ( id ) {
-    setPointer( id );
+  function setPointerAndStart(id) {
+    setPointer(id);
     //       console.log('setPointerAndStart ran');
     // await sleep(2000);
     document.body.style.cursor = "wait";
     google.script.run
-      .withSuccessHandler( showRosterTable )
-      .getTableData_roster( id );
+      .withSuccessHandler(showRosterTable)
+      .getTableData_roster(id);
 
-    google.script.run.withSuccessHandler( showLog ).getLogEntries( id );
+    google.script.run.withSuccessHandler(showLog).getLogEntries(id);
 
-    focus( id );
+    focus(id);
   }
 
   //  = getPointer()
-  function focus ( id ) {
-    setPointer( id );
-    contactInfo( id );
+  function focus(id) {
+    setPointer(id);
+    contactInfo(id);
 
-    if ( sessionStorage.getItem( "reclog" + id ) != null ) {
-      var logs = JSON.parse( sessionStorage.getItem( "reclog" + id ) );
-      showLog( logs, "loc01" );
-      $( "#spinner01" ).hide();
+    if (sessionStorage.getItem("reclog" + id) != null) {
+      var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
+      showLog(logs, "loc01");
+      $("#spinner01").hide();
     } else {
       google.script.run
-        .withSuccessHandler( logsToCache )
-        .getLogEntries( id, "loc01" );
+        .withSuccessHandler(logsToCache)
+        .getLogEntries(id, "loc01");
     }
     getSelGoals_client();
   }
-  function sleep ( ms ) {
-    return new Promise( ( resolve ) => setTimeout( resolve, ms ) );
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  function contactInfo ( id = sessionStorage.getItem( "lastId" ) ) {
-    if ( id == undefined || id == null || id == "" ) {
-      alert( "no id at contactInfo()" );
+  function contactInfo(id = sessionStorage.getItem("lastId")) {
+    if (id == undefined || id == null || id == "") {
+      alert("no id at contactInfo()");
     }
     // $('#foundGoals').empty();
-    if ( sessionStorage.getItem( "rec" + id.toString() ) != null ) {
-      console.log( "rec + id key was not null" );
-      showContactInfo( sessionStorage.getItem( "rec" + id.toString() ) );
+    if (sessionStorage.getItem("rec" + id.toString()) != null) {
+      console.log("rec + id key was not null");
+      showContactInfo(sessionStorage.getItem("rec" + id.toString()));
     } else {
-      console.log( "rec + id key was null" );
+      console.log("rec + id key was null");
       google.script.run
-        .withSuccessHandler( showContactInfo )
-        .getRecord( id.toString() );
+        .withSuccessHandler(showContactInfo)
+        .getRecord(id.toString());
     }
     // google.script.run
     //   .withSuccessHandler(showNotes)
@@ -603,19 +617,19 @@
   // function showNotes(notes) {
   //   $("#notes2").val(notes);
   // }
-  function showTBsnippetGl ( goalObj ) {
+  function showTBsnippetGl(goalObj) {
     var snippet = goalObj.snip;
-    console.log( 'snippet is %s', snippet );
-    $( "#tbSnippetCopy" ).text( snippet );
-    $( "#tbSnippetCopy" ).select();
-    document.execCommand( "copy" );
-    showToast( 'goal copied; type "/gl" starting in date field' );
+    console.log("snippet is %s", snippet);
+    $("#tbSnippetCopy").text(snippet);
+    $("#tbSnippetCopy").select();
+    document.execCommand("copy");
+    showToast('goal copied; type "/gl" starting in date field');
 
     document.body.style.cursor = "default";
   }
 
-  function store ( records ) {
-    if ( $( "#seis_id" ).val() == null ) {
+  function store(records) {
+    if ($("#seis_id").val() == null) {
       // setTimeout(
       //   function () {
       //     store(records);
@@ -636,204 +650,202 @@
     // printLogs(id, loc);
     document.body.style.cursor = "default";
   }
-  function printLogs ( id, loc, startDate, endDate ) {
+  function printLogs(id, loc, startDate, endDate) {
     google.script.run
-      .withSuccessHandler( showLog )
-      .getLogEntries( [ id, loc, startDate, endDate ] );
+      .withSuccessHandler(showLog)
+      .getLogEntries([id, loc, startDate, endDate]);
   }
 
+  function findGoals_m() {
+    var glLvl = $("#m-glLvl").children("option:selected").val();
+    var glLvlElid = $("#m-glLvl").children("option:selected").attr("id");
 
+    var glArea = $("#m-glArea").children("option:selected").val();
+    var glAreaElid = $("#m-glArea").children("option:selected").attr("id");
 
-  function findGoals_m () {
-    var glLvl = $( "#m-glLvl" ).children( "option:selected" ).val();
-    var glLvlElid = $( "#m-glLvl" ).children( "option:selected" ).attr( "id" );
-
-    var glArea = $( "#m-glArea" ).children( "option:selected" ).val();
-    var glAreaElid = $( "#m-glArea" ).children( "option:selected" ).attr( "id" );
-
-    var id = $( "#seis_id" ).val();
+    var id = $("#seis_id").val();
     // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
 
-    sessionStorage.setItem( "glLvl", glLvl );
-    sessionStorage.setItem( "glArea", glArea );
+    sessionStorage.setItem("glLvl", glLvl);
+    sessionStorage.setItem("glArea", glArea);
     var search = glLvl + "_" + glArea;
 
-    if ( sessionStorage.getItem( "goals" + search ) ) {
+    if (sessionStorage.getItem("goals" + search)) {
       // console.log('getting items from cache for ' + search);
-      showGoals( sessionStorage.getItem( "goals" + search ) );
+      showGoals(sessionStorage.getItem("goals" + search));
     } else {
       google.script.run
-        .withSuccessHandler( showGoals_m )
-        .getGoalListItems( [ glLvl, glArea, id ] );
+        .withSuccessHandler(showGoals_m)
+        .getGoalListItems([glLvl, glArea, id]);
     }
     // returns [[gId, gLvl, gArea, gDmn, gAnl, gO1, gO2, gO3]]
   }
-  function getAllLevSnipForTB () {
-    var id = $( "#seis_id" ).val();
-    if ( sessionStorage[ "lSnp" + $( "#seis_id" ).val() ] != null ) {
-      showTBsnippet( sessionStorage[ "lvlsSnp" + $( "#seis_id" ).val() ] );
+  function getAllLevSnipForTB() {
+    var id = $("#seis_id").val();
+    if (sessionStorage["lSnp" + $("#seis_id").val()] != null) {
+      showTBsnippet(sessionStorage["lvlsSnp" + $("#seis_id").val()]);
     } else {
       google.script.run
-        .withSuccessHandler( showTBsnippet )
-        .getPresentLevelsAsTextBlazeListItem( id );
+        .withSuccessHandler(showTBsnippet)
+        .getPresentLevelsAsTextBlazeListItem(id);
     }
   }
-  function getAllLevSnipForGoal () {
-    var id = $( "#seis_id" ).val();
-    if ( sessionStorage[ "lSnp" + $( "#seis_id" ).val() ] != null ) {
-      makeGoalSnip( sessionStorage[ "lvlsSnp" + $( "#seis_id" ).val() ] );
+  function getAllLevSnipForGoal() {
+    var id = $("#seis_id").val();
+    if (sessionStorage["lSnp" + $("#seis_id").val()] != null) {
+      makeGoalSnip(sessionStorage["lvlsSnp" + $("#seis_id").val()]);
     } else {
       google.script.run
-        .withSuccessHandler( makeGoalSnip )
-        .getPresentLevelsAsTextBlazeListItem( id );
+        .withSuccessHandler(makeGoalSnip)
+        .getPresentLevelsAsTextBlazeListItem(id);
     }
   }
 
   // show functions ; functions named show... should be call backs success handlers
   // that display data retrieved from a script run on the server
-  function showContactInfo ( record ) {
-    console.log( record );
-    record = JSON.parse( record );
+  function showContactInfo(record) {
+    console.log(record);
+    record = JSON.parse(record);
 
-    function shortDate ( dateObj ) {
-      return dayjs( dateObj ).format( "MM/DD/YYYY" );
+    function shortDate(dateObj) {
+      return dayjs(dateObj).format("MM/DD/YYYY");
     }
-    console.log( "record = %s", JSON.stringify( record ) );
+    console.log("record = %s", JSON.stringify(record));
     var key = "rec" + record.seis_id;
-    sessionStorage.setItem( key, JSON.stringify( record ) );
+    sessionStorage.setItem(key, JSON.stringify(record));
 
-    $( "#disability_1_code" ).val( record.disability_1_code );
-    $( "#disability_2_code" ).val( record.disability_2_code );
-    $( "#date_of_last_eligibility_evaluation" ).val(
-      shortDate( record.date_of_last_eligibility_evaluation )
+    $("#disability_1_code").val(record.disability_1_code);
+    $("#disability_2_code").val(record.disability_2_code);
+    $("#date_of_last_eligibility_evaluation").val(
+      shortDate(record.date_of_last_eligibility_evaluation)
     );
-    $( "#date_of_last_annual_plan_review" ).val(
-      shortDate( record.date_of_last_annual_plan_review )
+    $("#date_of_last_annual_plan_review").val(
+      shortDate(record.date_of_last_annual_plan_review)
     );
-    $( "#husd_id" ).val( record.student_id );
-    $( "#first_name" ).val( record.first_name );
-    $( "#last_name" ).val( record.last_name );
-    $( "#langflu" ).val( record.langflu );
-    $( "#corrlng" ).val( record.corrlng );
-    $( "#gradeCode" ).val( record.grade_code );
-    $( "#stuName" ).val( record.first_name + " " + record.last_name );
-    $( "#namenav" ).text( record.first_name + " " + last_name );
-    $( "#dob" ).val( shortDate( record.date_of_birth ) );
-    $( "#parent_guardian_1_name" ).val( record.parent_guardian_1_name );
-    $( "#parent_1_home_phone" ).attr( "title", "cell/home" );
-    $( "#parent_1_home_phone" ).val(
+    $("#husd_id").val(record.student_id);
+    $("#first_name").val(record.first_name);
+    $("#last_name").val(record.last_name);
+    $("#langflu").val(record.langflu);
+    $("#corrlng").val(record.corrlng);
+    $("#gradeCode").val(record.grade_code);
+    $("#stuName").val(record.first_name + " " + record.last_name);
+    $("#namenav").text(record.first_name + " " + last_name);
+    $("#dob").val(shortDate(record.date_of_birth));
+    $("#parent_guardian_1_name").val(record.parent_guardian_1_name);
+    $("#parent_1_home_phone").attr("title", "cell/home");
+    $("#parent_1_home_phone").val(
       record.parent_1_cell_phone + "; " + record.parent_1_home_phone
     );
-    $( "#u1_phone" ).attr( "title", "work/other" );
-    $( "#parent_1_email" ).val( record.parent_1_email );
-    $( "#sex" ).val( record.gender.toString() );
-    $( "#teachname" ).val( record.teachname );
-    $( "#teachemail" ).val( record.teachemail );
-    $( "#addStr" ).val( record.parent_1_mail_address );
-    $( "#addCity" ).val( record.parent_1_mail_city );
-    $( "#addZip" ).val( record.parent_1_mail_zip );
-    $( "#seis_id" ).val( record.seis_id );
-    $( "#stuemail" ).val(
+    $("#u1_phone").attr("title", "work/other");
+    $("#parent_1_email").val(record.parent_1_email);
+    $("#sex").val(record.gender.toString());
+    $("#teachname").val(record.teachname);
+    $("#teachemail").val(record.teachemail);
+    $("#addStr").val(record.parent_1_mail_address);
+    $("#addCity").val(record.parent_1_mail_city);
+    $("#addZip").val(record.parent_1_mail_zip);
+    $("#seis_id").val(record.seis_id);
+    $("#stuemail").val(
       (
-        record.first_name.toString()[ 0 ] +
-        record.last_name.toString()[ 0 ] +
+        record.first_name.toString()[0] +
+        record.last_name.toString()[0] +
         record.student_id +
         "@stu.hemetusd.org"
       ).toLowerCase()
     );
-    $( "#nmjdob" ).val( record.nmjdob );
-    $( "#teachemail" ).val( record.teachemail );
-    $( "#notes2" ).val( record.notes2 );
+    $("#nmjdob").val(record.nmjdob);
+    $("#teachemail").val(record.teachemail);
+    $("#notes2").val(record.notes2);
 
-    console.log( "nmjdob = %s", nmjdob );
+    console.log("nmjdob = %s", nmjdob);
     // console.log('nmjdob = %s', $("#nmjdob").val());
 
-    if ( $( "#corrlng" ).val() == 1 ) {
-      $( "#corrlng" ).css( "background-color", "#FF0000" );
-      $( "#corrlng" ).css( "color", "#FFFFFF" );
+    if ($("#corrlng").val() == 1) {
+      $("#corrlng").css("background-color", "#FF0000");
+      $("#corrlng").css("color", "#FFFFFF");
     } else {
-      $( "#corrlng" ).css( "color", "#000000" );
+      $("#corrlng").css("color", "#000000");
     }
   }
-  function phoneFmt ( phone ) {
-    if ( phone == null || phone == undefined || phone == "" ) {
+  function phoneFmt(phone) {
+    if (phone == null || phone == undefined || phone == "") {
       return "";
     }
 
-    phone = phone.toString().replace( /[^0-9]/g, "" );
+    phone = phone.toString().replace(/[^0-9]/g, "");
     return (
-      phone.substr( 0, 3 ) +
+      phone.substr(0, 3) +
       "-" +
-      phone.substr( 3, 3 ) +
+      phone.substr(3, 3) +
       "-" +
-      phone.substr( 6 ) +
+      phone.substr(6) +
       " ; "
     );
   }
 
-  function sndEm ( buttonVal ) {
+  function sndEm(buttonVal) {
     var params = {};
-    var corrLang = $( "#corrlng" ).val().toString();
-    if ( corrLang == "1" || corrLang == "01" ) {
-      params[ "translate" ] = true;
+    var corrLang = $("#corrlng").val().toString();
+    if (corrLang == "1" || corrLang == "01") {
+      params["translate"] = true;
     } else {
-      params[ "translate" ] = false;
+      params["translate"] = false;
     }
-    params[ "to" ] = $( "#emailRecipients" ).val();
-    params[ "subj" ] = $( "#emailSubject" ).val();
-    params[ "document" ] = $( "#emailBody" ).val();
+    params["to"] = $("#emailRecipients").val();
+    params["subj"] = $("#emailSubject").val();
+    params["document"] = $("#emailBody").val();
 
     google.script.run
-      .withSuccessHandler( copyToClipboard )
-      .createDraftEmail( buttonVal, JSON.stringify( params ) );
+      .withSuccessHandler(copyToClipboard)
+      .createDraftEmail(buttonVal, JSON.stringify(params));
   }
-  function sndMassEm ( buttonVal ) {
+  function sndMassEm(buttonVal) {
     var params = {};
-    var corrLang = $( "#corrlng" ).val().toString();
-    if ( corrLang == "1" || corrLang == "01" ) {
-      params[ "translate" ] = true;
+    var corrLang = $("#corrlng").val().toString();
+    if (corrLang == "1" || corrLang == "01") {
+      params["translate"] = true;
     } else {
-      params[ "translate" ] = false;
+      params["translate"] = false;
     }
 
     var toAsStr = "";
-    $.each( $( "#emSelect" ).val(), function ( i, val ) {
+    $.each($("#emSelect").val(), function (i, val) {
       toAsStr += val + ",";
-    } );
-    $.each( $( "#teacherSelect" ).val(), function ( i, val ) {
+    });
+    $.each($("#teacherSelect").val(), function (i, val) {
       toAsStr += val + ",";
-    } );
+    });
 
     // console.log('asStr = %s', toAsStr);
 
-    params[ "to" ] = toAsStr;
-    params[ "subj" ] = $( "#emailSubject" ).val();
-    params[ "document" ] = $( "#emailBody" ).val();
+    params["to"] = toAsStr;
+    params["subj"] = $("#emailSubject").val();
+    params["document"] = $("#emailBody").val();
 
     // console.log('params = %s', JSON.stringify(params));
     // return;
     google.script.run
-      .withSuccessHandler( copyToClipboard )
-      .createDraftEmail( buttonVal, JSON.stringify( params ) );
+      .withSuccessHandler(copyToClipboard)
+      .createDraftEmail(buttonVal, JSON.stringify(params));
   }
-  function editGoalInModal ( goal ) {
-    $( "#spinner01" ).show();
-    var myModal = new bootstrap.Modal( document.getElementById( "goalModal" ), {
+  function editGoalInModal(goal) {
+    $("#spinner01").show();
+    var myModal = new bootstrap.Modal(document.getElementById("goalModal"), {
       focus: true,
-    } );
-    $( "#glEditId" ).val( goal.id );
-    $( "#glEditLvl" ).val( goal.lvl );
-    $( "#glEditStrand" ).val( goal.strand );
-    $( "#glEditAnnual" ).val( goal.annual );
-    $( "#glEditArea" ).val( goal.area );
-    $( "#glEditStandard" ).val( goal.standard );
-    $( "#glEditobj1" ).val( goal.objective1 );
-    $( "#glEditobj2" ).val( goal.objective2 );
-    $( "#glEditobj3" ).val( goal.objective3 );
-    $( "#timestamp" ).val( goal.timestamp );
+    });
+    $("#glEditId").val(goal.id);
+    $("#glEditLvl").val(goal.lvl);
+    $("#glEditStrand").val(goal.strand);
+    $("#glEditAnnual").val(goal.annual);
+    $("#glEditArea").val(goal.area);
+    $("#glEditStandard").val(goal.standard);
+    $("#glEditobj1").val(goal.objective1);
+    $("#glEditobj2").val(goal.objective2);
+    $("#glEditobj3").val(goal.objective3);
+    $("#timestamp").val(goal.timestamp);
 
     myModal.show();
-    $( "#spinner01" ).hide();
+    $("#spinner01").hide();
 
     // goal is a goal object from 'getGoal'
     // this.id = id;
@@ -850,12 +862,12 @@
     //   focus: true
     // });
   }
-  function clearEmailFields () {
-    $( "textarea.email" ).val( "" );
+  function clearEmailFields() {
+    $("textarea.email").val("");
   }
   // this is a bit of code I stole from w3 schools; works great!;
   // together with the code in the HTML file, this allows sorting by columns when the headings are clicked
-  function sortTable ( t_id, n ) {
+  function sortTable(t_id, n) {
     //     console.log('sortTable args = %s, %s', t_id, n);
     var table,
       rows,
@@ -866,52 +878,52 @@
       shouldSwitch,
       dir,
       switchcount = 0;
-    table = document.getElementById( "rosterList" );
+    table = document.getElementById("rosterList");
     switching = true;
     // Set the sorting direction to ascending:
     dir = "asc";
     /* Make a loop that will continue until
     no switching has been done: */
-    while ( switching ) {
+    while (switching) {
       // Start by saying: no switching is done:
       switching = false;
       rows = table.rows;
       /* Loop through all table rows (except the
       first, which contains table headers): */
-      for ( i = 1; i < rows.length - 1; i++ ) {
+      for (i = 1; i < rows.length - 1; i++) {
         // Start by saying there should be no switching:
         shouldSwitch = false;
         /* Get the two elements you want to compare,
         one from current row and one from the next: */
-        x = rows[ i ].getElementsByTagName( "TD" )[ n ];
-        y = rows[ i + 1 ].getElementsByTagName( "TD" )[ n ];
+        x = rows[i].getElementsByTagName("TD")[n];
+        y = rows[i + 1].getElementsByTagName("TD")[n];
         /* Check if the two rows should switch place,
         based on the direction, asc or desc: */
-        if ( dir == "asc" ) {
-          if ( x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase() ) {
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
             // If so, mark as a switch and break the loop:
             shouldSwitch = true;
             break;
           }
-        } else if ( dir == "desc" ) {
-          if ( x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase() ) {
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
             // If so, mark as a switch and break the loop:
             shouldSwitch = true;
             break;
           }
         }
       }
-      if ( shouldSwitch ) {
+      if (shouldSwitch) {
         /* If a switch has been marked, make the switch
         and mark that a switch has been done: */
-        rows[ i ].parentNode.insertBefore( rows[ i + 1 ], rows[ i ] );
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
         switching = true;
         // Each time a switch is done, increase this count by 1:
         switchcount++;
       } else {
         /* If no switching has been done AND the direction is "asc",
         set the direction to "desc" and run the while loop again. */
-        if ( switchcount == 0 && dir == "asc" ) {
+        if (switchcount == 0 && dir == "asc") {
           dir = "desc";
           switching = true;
         }
@@ -919,48 +931,48 @@
     }
   }
 
-  function filterLogEntriesByDateWindow () {
+  function filterLogEntriesByDateWindow() {
     //     console.log('fired');
     //     console.log('current start date: %s; end date: %s', $('#stDtEdit').val(), $('#endDtEdit').val());
     var logEntries = JSON.parse(
-      sessionStorage.getItem( "reclog" + $( "#seis_id" ).val() )
+      sessionStorage.getItem("reclog" + $("#seis_id").val())
     );
     var keepers = [];
-    for ( let i = 0; i < logEntries.length; i++ ) {
-      const el = logEntries[ i ];
-      var start = dayjs( $( "#stDtEdit" ).val() );
-      var end = dayjs( $( "#endDtEdit" ).val() );
+    for (let i = 0; i < logEntries.length; i++) {
+      const el = logEntries[i];
+      var start = dayjs($("#stDtEdit").val());
+      var end = dayjs($("#endDtEdit").val());
       if (
-        dayjs( el[ 0 ] ).isBefore( end.add( 1, "d" ) ) &&
-        dayjs( el[ 0 ] ).isAfter( start )
+        dayjs(el[0]).isBefore(end.add(1, "d")) &&
+        dayjs(el[0]).isAfter(start)
       ) {
         //         console.log('%s is before %s', dayjs(el[0]).format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
-        keepers.push( el );
+        keepers.push(el);
       }
     }
-    sessionStorage.setItem( "logPrintItems", JSON.stringify( keepers ) );
-    showLog( keepers, "loc04" );
+    sessionStorage.setItem("logPrintItems", JSON.stringify(keepers));
+    showLog(keepers, "loc04");
   }
 
-  function printSelectedLogEntries () {
+  function printSelectedLogEntries() {
     // $('#spinner02').show();
     document.body.style.cursor = "wait";
 
-    var stuName = $( "#stuName" ).val();
-    var array = sessionStorage.getItem( "logPrintItems" );
-    var sDate = $( "#stDtEdit" ).val().toString();
-    var eDate = $( "#endDtEdit" ).val().toString();
+    var stuName = $("#stuName").val();
+    var array = sessionStorage.getItem("logPrintItems");
+    var sDate = $("#stDtEdit").val().toString();
+    var eDate = $("#endDtEdit").val().toString();
 
     google.script.run
-      .withSuccessHandler( showUrl )
-      .printSelectedLogEntries( stuName, sDate, eDate, array );
+      .withSuccessHandler(showUrl)
+      .printSelectedLogEntries(stuName, sDate, eDate, array);
   }
 
-  async function showUrl ( obj ) {
+  async function showUrl(obj) {
     var msg = obj.msg;
     var filename = obj.filename;
     var url = obj.url;
-    $( "#pdfUrl" ).html(
+    $("#pdfUrl").html(
       "<p>" +
       msg +
       "</p>" +
@@ -972,30 +984,30 @@
       "</a>"
     );
     document.body.style.cursor = "default";
-    sleep( 1000 );
+    sleep(1000);
 
     // $('#spinner02').hide();
   }
 
   // clears new log entry field and resets button colors
-  function showLogUpdates ( record ) {
+  function showLogUpdates(record) {
     //update the browser cache with saved data
-    var key = "rec" + record[ 0 ];
-    sessionStorage[ key ] = JSON.stringify( record );
+    var key = "rec" + record[0];
+    sessionStorage[key] = JSON.stringify(record);
     // console.log(sessionStorage[key]);
     // get contact logs
-    $( "#logEntry" ).val( "" );
+    $("#logEntry").val("");
     document.body.style.cursor = "default";
-    $( "#saveEntry" ).attr( "class", "btn btn-sm btn-success my-1 svChngs" );
+    $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
   }
   // display table of names sorted by due dates
-  function showRosterTable ( dataStr ) {
+  function showRosterTable(dataStr) {
     // console.log('data is %s', dataStr);
-    var data = JSON.parse( dataStr );
+    var data = JSON.parse(dataStr);
     var loc = "loc00";
-    var pending = [ "#ffffff", "#000000" ];
-    for ( let i = 0; i < data.length; i++ ) {
-      const el = data[ i ];
+    var pending = ["#ffffff", "#000000"];
+    for (let i = 0; i < data.length; i++) {
+      const el = data[i];
       var [
         seis_id,
         last_name,
@@ -1037,30 +1049,30 @@
         notes2,
       ] = el;
       //       console.log(JSON.stringify(el));
-      list = $( "#" + loc + "tb" );
+      list = $("#" + loc + "tb");
 
-      if ( !seis_id ) {
-        alert( " has no id" ); // lnCmafn +
+      if (!seis_id) {
+        alert(" has no id"); // lnCmafn +
       } else {
-        if ( dayjs( date_of_next_eligibility_evaluation ).isValid() == false ) {
-          var evalDate = dayjs( date_of_initial_parent_consent )
-            .add( 1, "s" )
-            .format( "YYYY-MM-DD" );
-          pending = [ "#f4cccc", "#000000" ];
+        if (dayjs(date_of_next_eligibility_evaluation).isValid() == false) {
+          var evalDate = dayjs(date_of_initial_parent_consent)
+            .add(1, "s")
+            .format("YYYY-MM-DD");
+          pending = ["#f4cccc", "#000000"];
         } else if (
-          dayjs( date_of_next_eligibility_evaluation )
-            .add( 3, "y" )
-            .isBefore( dayjs().add( 6, "month" ) )
+          dayjs(date_of_next_eligibility_evaluation)
+            .add(3, "y")
+            .isBefore(dayjs().add(6, "month"))
         ) {
-          evalDate = dayjs( date_of_next_eligibility_evaluation ).format(
+          evalDate = dayjs(date_of_next_eligibility_evaluation).format(
             "YYYY-MM-DD"
           );
-          pending = [ "#d9ead3", "#000000" ];
+          pending = ["#d9ead3", "#000000"];
         } else {
-          evalDate = dayjs( date_of_next_eligibility_evaluation ).format(
+          evalDate = dayjs(date_of_next_eligibility_evaluation).format(
             "YYYY-MM-DD"
           );
-          pending = [ "#FFFFFF", "#000000" ];
+          pending = ["#FFFFFF", "#000000"];
         }
         // console.log('evalDate hello is %s for %s', evalDate, first_name);
         list.append(
@@ -1074,41 +1086,41 @@
           '<td class="tableDate setStudent col-3" data-stuId=' +
           seis_id +
           ">" +
-          dayjs( date_of_next_annual_plan_review ).format( "YYYY-MM-DD" ) +
+          dayjs(date_of_next_annual_plan_review).format("YYYY-MM-DD") +
           "</td>" +
           '<td class="tableDate setStudent col-3" style="background-color:' +
-          pending[ 0 ] +
+          pending[0] +
           "; color:" +
-          pending[ 1 ] +
+          pending[1] +
           ';" data-stuId=' +
           seis_id +
           ">" +
-          dayjs( evalDate ).format( "YYYY-MM-DD" ) +
+          dayjs(evalDate).format("YYYY-MM-DD") +
           "</td>" +
           "</tr></div>"
         );
       }
     }
-    store( data );
-    $( "#spinner01" ).hide();
+    store(data);
+    $("#spinner01").hide();
 
     return "rosterList", 0;
   }
 
   // bindSetStudentClick();
   // show upcoming iep meetings on the calendar
-  function showCalData ( data ) {
+  function showCalData(data) {
     // console.log('the data: %s', JSON.stringify(data));
-    $( "#loc00hd" ).empty();
-    parsedData = JSON.parse( data );
-    for ( let i = 0; i < parsedData.length; i++ ) {
-      var [ a, b, c, d, e, f, g, h ] = parsedData[ i ];
-      var p = dayjs( c, "YYYY-MM-DDTHH:mm" );
+    $("#loc00hd").empty();
+    parsedData = JSON.parse(data);
+    for (let i = 0; i < parsedData.length; i++) {
+      var [a, b, c, d, e, f, g, h] = parsedData[i];
+      var p = dayjs(c, "YYYY-MM-DDTHH:mm");
       var q = dayjs();
 
-      $( "#loc00hd" ).append(
+      $("#loc00hd").append(
         "<li ' class='upcomingEvent'>" +
-        dayjs( c, "YYYY-MM-DDTHH:mm" ).format( "dd MM-DD-YY @ HH:mm" ) +
+        dayjs(c, "YYYY-MM-DDTHH:mm").format("dd MM-DD-YY @ HH:mm") +
         "     " +
         b +
         "; \n" +
@@ -1123,206 +1135,206 @@
    * @param searchAndItems [search term in form 'gradeLevel_area' , last search result]
    *
    */
-  function showGoals ( goalListItemsArray ) {
+  function showGoals(goalListItemsArray) {
     // console.log(goalListItemsArray);
-    $( "#glLst" ).empty();
+    $("#glLst").empty();
 
-    for ( let i = 0; i < goalListItemsArray.length; i++ ) {
-      const element = goalListItemsArray[ i ];
-      $( "#glLst" ).append( element );
+    for (let i = 0; i < goalListItemsArray.length; i++) {
+      const element = goalListItemsArray[i];
+      $("#glLst").append(element);
     }
 
     document.body.style.cursor = "default";
   }
-  function showGoals_m ( goalListItemsArray ) {
+  function showGoals_m(goalListItemsArray) {
     // console.log(goalListItemsArray);
-    $( "#m-glLst" ).empty();
+    $("#m-glLst").empty();
 
-    for ( let i = 0; i < goalListItemsArray.length; i++ ) {
-      const element = goalListItemsArray[ i ];
-      $( "#m-glLst" ).append( element );
+    for (let i = 0; i < goalListItemsArray.length; i++) {
+      const element = goalListItemsArray[i];
+      $("#m-glLst").append(element);
     }
 
     document.body.style.cursor = "default";
   }
-  function showTBsnippet ( snippet ) {
+  function showTBsnippet(snippet) {
     //     console.log('snippet is: %s', JSON.stringify(snippet));
 
-    $( "#tbSnippetCopy" ).text( snippet );
-    $( "#tbSnippetCopy" ).select();
-    document.execCommand( "copy" );
+    $("#tbSnippetCopy").text(snippet);
+    $("#tbSnippetCopy").select();
+    document.execCommand("copy");
     document.body.style.cursor = "default";
   }
 
-  function snipInfo () {
-    var id = $( "#seis_id" ).val();
+  function snipInfo() {
+    var id = $("#seis_id").val();
     google.script.run
-      .withSuccessHandler( appendSnips )
-      .getPresentLevelsAsTextBlazeListItem( id );
+      .withSuccessHandler(appendSnips)
+      .getPresentLevelsAsTextBlazeListItem(id);
   }
 
-  function appendSnips ( levelsSnip ) {
+  function appendSnips(levelsSnip) {
     var snip = "[";
-    snip += '"corrlng"="' + $( "#corrlng" ).val() + '"';
-    snip += ',"nm"="' + $( "#stuName" ).val() + '"';
+    snip += '"corrlng"="' + $("#corrlng").val() + '"';
+    snip += ',"nm"="' + $("#stuName").val() + '"';
     snip +=
       ',"fn"="' +
-      $( "#stuName" )
+      $("#stuName")
         .val()
         .toString()
-        .replace( /([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1" ) +
+        .replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1") +
       '"';
     snip +=
       ',"ln"="' +
-      $( "#stuName" )
+      $("#stuName")
         .val()
         .toString()
-        .replace( /([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2" ) +
+        .replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2") +
       '"';
-    snip += ',"dob"="' + $( "#dob" ).val() + '"';
-    snip += ',"sex"="' + $( "#sex" ).val() + '"';
-    snip += ',"par"="' + $( "#parent_guardian_1_name" ).val() + '"';
-    snip += ',"ph1"="' + $( "#parent_1_home_phone" ).val() + '"';
-    snip += ',"ph2"="' + $( "#u1_phone" ).val() + '"';
-    snip += ',"pem1"="' + $( "#parent_1_email" ).val() + '"';
-    snip += ',"pem2"="' + $( "#u3_parent_1a_email" ).val() + '"';
-    snip += ',"tem"="' + $( "#teachemail" ).val() + '"';
-    snip += ',"tch"="' + $( "#teachname" ).val() + '"';
-    snip += ',"sid"="' + $( "#seis_id" ).val() + '"';
+    snip += ',"dob"="' + $("#dob").val() + '"';
+    snip += ',"sex"="' + $("#sex").val() + '"';
+    snip += ',"par"="' + $("#parent_guardian_1_name").val() + '"';
+    snip += ',"ph1"="' + $("#parent_1_home_phone").val() + '"';
+    snip += ',"ph2"="' + $("#u1_phone").val() + '"';
+    snip += ',"pem1"="' + $("#parent_1_email").val() + '"';
+    snip += ',"pem2"="' + $("#u3_parent_1a_email").val() + '"';
+    snip += ',"tem"="' + $("#teachemail").val() + '"';
+    snip += ',"tch"="' + $("#teachname").val() + '"';
+    snip += ',"sid"="' + $("#seis_id").val() + '"';
 
-    snip += ',"lst1"="' + $( "#date_of_last_annual_plan_review" ).val() + '"';
-    snip += ',"lst3"="' + $( "#date_of_last_eligibility_evaluation" ).val() + '"';
+    snip += ',"lst1"="' + $("#date_of_last_annual_plan_review").val() + '"';
+    snip += ',"lst3"="' + $("#date_of_last_eligibility_evaluation").val() + '"';
 
     // snip += ',"id"="' +
     snip +=
       ',"sem"="' +
-      $( "#stuemail" )
+      $("#stuemail")
         .val()
         .toString()
-        .replace( /[A-z]{2}(\d{6}).*/, "$1" ) +
+        .replace(/[A-z]{2}(\d{6}).*/, "$1") +
       '"';
     snip += "]";
     // console.log(snip);
 
-    if ( levelsSnip == "not found" ) {
+    if (levelsSnip == "not found") {
       levelsSnip = '["not found"="not found"]';
       // do nothing
     } else {
       // combine snips
-      snip = snip.toString().replace( /\]/, "," );
+      snip = snip.toString().replace(/\]/, ",");
       // console.log(snip);
-      levelsSnip = levelsSnip.toString().replace( /\[/, "" );
+      levelsSnip = levelsSnip.toString().replace(/\[/, "");
       // console.log(levelsSnip);
       snip = snip.toString() + levelsSnip.toString();
     }
     // copy the whole thing to the clipboard
     //     console.log('snip is: %s', JSON.stringify(snip));
-    copyToClipboard( snip );
+    copyToClipboard(snip);
   }
-  function copyToClipboard ( content ) {
-    var container = document.createElement( "div" );
+  function copyToClipboard(content) {
+    var container = document.createElement("div");
     container.textContent = content;
     container.style.position = "fixed";
     container.style.pointerEvents = "none";
     container.style.opacity = 0;
-    document.body.appendChild( container );
+    document.body.appendChild(container);
     window.getSelection().removeAllRanges();
     var range = document.createRange();
-    range.selectNode( container );
-    window.getSelection().addRange( range );
-    document.execCommand( "copy" );
-    document.body.removeChild( container );
-    showToast( "data copied to clipboard" );
+    range.selectNode(container);
+    window.getSelection().addRange(range);
+    document.execCommand("copy");
+    document.body.removeChild(container);
+    showToast("data copied to clipboard");
 
     // alert("The data has been copied as a TextBlaze key-value list to the clipboard.");
   }
 
-  function showToast ( msg ) {
-    $( "#toastMsg" ).html( "<h6>" + msg + "</h6>" );
-    $( ".toast" ).toast( "show" );
+  function showToast(msg) {
+    $("#toastMsg").html("<h6>" + msg + "</h6>");
+    $(".toast").toast("show");
     document.body.style.cursor = "default";
   }
 
-  function saveGoal ( newReplace ) {
-    if ( newReplace === -1 ) {
+  function saveGoal(newReplace) {
+    if (newReplace === -1) {
       var glEditId = -1;
     } else {
-      var glEditId = parseInt( $( "#glEditId" ).val(), 10 );
+      var glEditId = parseInt($("#glEditId").val(), 10);
     }
 
     var obj = {};
 
     obj.glEditId = glEditId;
-    obj.glEditLevel = parseInt( $( "#glEditLvl" ).val(), 10 );
-    obj.glEditArea = $( "#glEditArea" ).val().toString().replace( /\n/g, " " );
-    obj.glEditStrand = $( "#glEditStrand" ).val().toString().replace( /\n/g, " " );
-    obj.glEditStandard = $( "#glEditStandard" )
+    obj.glEditLevel = parseInt($("#glEditLvl").val(), 10);
+    obj.glEditArea = $("#glEditArea").val().toString().replace(/\n/g, " ");
+    obj.glEditStrand = $("#glEditStrand").val().toString().replace(/\n/g, " ");
+    obj.glEditStandard = $("#glEditStandard")
       .val()
       .toString()
-      .replace( /\n/g, " " );
-    obj.glEditAnnual = $( "#glEditAnnual" ).val().toString().replace( /\n/g, " " );
-    obj.glEditObj1 = $( "#glEditobj1" ).val().toString().replace( /\n/g, " " );
-    obj.glEditObj2 = $( "#glEditobj2" ).val().toString().replace( /\n/g, " " );
-    obj.glEditObj3 = $( "#glEditobj3" ).val().toString().replace( /\n/g, " " );
-    obj.timestamp = new Date().toLocaleDateString().replace( /\n/g, " " );
+      .replace(/\n/g, " ");
+    obj.glEditAnnual = $("#glEditAnnual").val().toString().replace(/\n/g, " ");
+    obj.glEditObj1 = $("#glEditobj1").val().toString().replace(/\n/g, " ");
+    obj.glEditObj2 = $("#glEditobj2").val().toString().replace(/\n/g, " ");
+    obj.glEditObj3 = $("#glEditobj3").val().toString().replace(/\n/g, " ");
+    obj.timestamp = new Date().toLocaleDateString().replace(/\n/g, " ");
 
     // console.log('data = %s', JSON.stringify(data));
     // console.log('data is %s', JSON.stringify(obj));
-    google.script.run.withSuccessHandler( saveGoalSuccess ).saveGoalSS( obj );
+    google.script.run.withSuccessHandler(saveGoalSuccess).saveGoalSS(obj);
   }
-  function saveGoalSuccess ( value ) {
+  function saveGoalSuccess(value) {
     // console.log('returned: %s', value);
     findGoals();
   }
 
-  function firstSnipThenGvoice () {
+  function firstSnipThenGvoice() {
     snipInfo();
-    setTimeout( function () {
+    setTimeout(function () {
       window.open(
         "https://voice.google.com/u/0/messages/",
-        ( target = "_blank" )
+        (target = "_blank")
       );
-    }, 2000 );
+    }, 2000);
   }
-  function successMsg ( msgAndUrlJSON ) {
-    var object = JSON.parse( msgAndUrlJSON );
+  function successMsg(msgAndUrlJSON) {
+    var object = JSON.parse(msgAndUrlJSON);
     var msg = object.msg;
     var url = object.url;
     document.body.style.cursor = "default";
-    showToast( msg, url );
+    showToast(msg, url);
   }
 
-  function NORMSDIST ( z ) {
+  function NORMSDIST(z) {
     // Uses https://cdn.jsdelivr.net/jstat/latest/jstat.min.js
-    if ( isNaN( z ) ) return "#VALUE!";
+    if (isNaN(z)) return "#VALUE!";
     var mean = 0,
       sd = 1;
-    return jStat.normal.cdf( z, mean, sd );
+    return jStat.normal.cdf(z, mean, sd);
   }
 
-  function getPointer () {
-    if ( sessionStorage.getItem( "lastId" ) == null ) {
-      google.script.run.withSuccessHandler( getPointer ).getFirstPointer();
+  function getPointer() {
+    if (sessionStorage.getItem("lastId") == null) {
+      google.script.run.withSuccessHandler(getPointer).getFirstPointer();
     }
-    return sessionStorage.getItem( "lastId" );
+    return sessionStorage.getItem("lastId");
   }
-  function setPointer ( id ) {
+  function setPointer(id) {
     try {
-      sessionStorage.setItem( "lastId", id.toString() );
-    } catch ( error ) {
-      google.script.run.withSuccessHandler( setPointer ).getFirstPointer();
+      sessionStorage.setItem("lastId", id.toString());
+    } catch (error) {
+      google.script.run.withSuccessHandler(setPointer).getFirstPointer();
     }
   }
 
-  function deleteRecord () {
-    if ( confirm( "Are you sure you want to remove this record?" ) == true ) {
-      var id = $( "#seis_id" ).val();
+  function deleteRecord() {
+    if (confirm("Are you sure you want to remove this record?") == true) {
+      var id = $("#seis_id").val();
       //     console.log('the id to delete is %s', id);
-      sessionStorage.removeItem( "rec" + id );
+      sessionStorage.removeItem("rec" + id);
       google.script.run
         .withSuccessHandler() // reload
         .withFailureHandler()
-        .deleteRecord( id );
+        .deleteRecord(id);
     }
   }
   // function deleteRecordConfirmed() {
@@ -1333,43 +1345,43 @@
   //     .withFailureHandler()
   //     .deleteRecord(id);
   // }
-  function openAddStudentModal () {
-    $( "#addStuModal" ).modal( {
+  function openAddStudentModal() {
+    $("#addStuModal").modal({
       focus: true,
-    } );
+    });
   }
-  function openRosterChecklistModal () {
+  function openRosterChecklistModal() {
     google.script.run
-      .withSuccessHandler( showRosterChecklist )
+      .withSuccessHandler(showRosterChecklist)
       .getTableData_roster();
-    $( "#checklist" ).modal( {
+    $("#checklist").modal({
       focus: true,
-    } );
+    });
   }
 
-  function addStu () {
+  function addStu() {
     var obj = {};
-    obj.first = $( "#addFn" ).val();
-    obj.last = $( "#addLn" ).val();
-    obj.StudentID = $( "#StudentID" ).val();
-    obj.lastAnnual = $( "#lastAnnual" ).val();
-    obj.lastEval = $( "#lastEval" ).val();
-    obj.seisID = $( "#seisID" ).val();
+    obj.first = $("#addFn").val();
+    obj.last = $("#addLn").val();
+    obj.StudentID = $("#StudentID").val();
+    obj.lastAnnual = $("#lastAnnual").val();
+    obj.lastEval = $("#lastEval").val();
+    obj.seisID = $("#seisID").val();
 
     // console.log(JSON.stringify(obj));
 
     google.script.run
-      .withSuccessHandler( reloadMe )
-      .addStudentByIdFromRESstudentsServer( obj );
+      .withSuccessHandler(reloadMe)
+      .addStudentByIdFromRESstudentsServer(obj);
   }
 
   // display table of names sorted by due dates
-  function showRosterChecklist ( data ) {
+  function showRosterChecklist(data) {
     var loc = "modal00";
 
-    var pending = [ "#ffffff", "#000000" ];
-    for ( let i = 0; i < data.length; i++ ) {
-      const el = data[ i ];
+    var pending = ["#ffffff", "#000000"];
+    for (let i = 0; i < data.length; i++) {
+      const el = data[i];
       var [
         seis_id,
         last_name,
@@ -1411,30 +1423,30 @@
         notes,
       ] = el;
       //       console.log(JSON.stringify(el));
-      list = $( "#" + loc + "tb" );
+      list = $("#" + loc + "tb");
 
-      if ( !seis_id ) {
-        alert( " has no id" ); // lnCmafn +
+      if (!seis_id) {
+        alert(" has no id"); // lnCmafn +
       } else {
-        if ( dayjs( date_of_last_eligibility_evaluation ).isValid() == false ) {
-          var evalDate = dayjs( date_of_initial_parent_consent )
-            .add( 1, "s" )
-            .format( "YYYY-MM-DD" );
-          pending = [ "#f4cccc", "#000000" ];
+        if (dayjs(date_of_last_eligibility_evaluation).isValid() == false) {
+          var evalDate = dayjs(date_of_initial_parent_consent)
+            .add(1, "s")
+            .format("YYYY-MM-DD");
+          pending = ["#f4cccc", "#000000"];
         } else if (
-          dayjs( date_of_last_eligibility_evaluation )
-            .add( 3, "y" )
-            .isBefore( dayjs().add( 6, "month" ) )
+          dayjs(date_of_last_eligibility_evaluation)
+            .add(3, "y")
+            .isBefore(dayjs().add(6, "month"))
         ) {
-          evalDate = dayjs( date_of_last_eligibility_evaluation ).format(
+          evalDate = dayjs(date_of_last_eligibility_evaluation).format(
             "YYYY-MM-DD"
           );
-          pending = [ "#d9ead3", "#000000" ];
+          pending = ["#d9ead3", "#000000"];
         } else {
-          evalDate = dayjs( date_of_last_eligibility_evaluation ).format(
+          evalDate = dayjs(date_of_last_eligibility_evaluation).format(
             "YYYY-MM-DD"
           );
-          pending = [ "#FFFFFF", "#000000" ];
+          pending = ["#FFFFFF", "#000000"];
         }
         // console.log('evalDate hello is %s for %s', evalDate, first_name);
         list.append(
@@ -1448,92 +1460,95 @@
           '<td class="tableDate setStudent col-3" data-stuId=' +
           seis_id +
           ">" +
-          dayjs( date_of_last_annual_plan_review ).format( "YYYY-MM-DD" ) +
+          dayjs(date_of_last_annual_plan_review).format("YYYY-MM-DD") +
           "</td>" +
           '<td class="tableDate setStudent col-3" style="background-color:' +
-          pending[ 0 ] +
+          pending[0] +
           "; color:" +
-          pending[ 1 ] +
+          pending[1] +
           ';" data-stuId=' +
           seis_id +
           ">" +
-          dayjs( evalDate ).format( "YYYY-MM-DD" ) +
+          dayjs(evalDate).format("YYYY-MM-DD") +
           "</td>" +
           "</tr></div>"
         );
       }
     }
-    store( data );
-    $( "#spinner01" ).hide();
+    store(data);
+    $("#spinner01").hide();
 
     return "rosterList", 0;
   }
-  function lookForTemails ( event ) {
-    var id = $( "#seis_id" ).val();
-    if ( event.shiftKey ) {
+  function lookForTemails(event) {
+    var id = $("#seis_id").val();
+    if (event.shiftKey) {
       google.script.run
-        .withSuccessHandler( putInLogEntry )
-        .lookForTeachers( id, true );
+        .withSuccessHandler(putInLogEntry)
+        .lookForTeachers(id, true);
     } else {
       google.script.run
-        .withSuccessHandler( putInLogEntry )
-        .lookForTeachers( id, false );
+        .withSuccessHandler(putInLogEntry)
+        .lookForTeachers(id, false);
     }
   }
-  function putInLogEntry ( data ) {
-    $( "#logEntry" ).val( data );
+  function putInLogEntry(data) {
+    $("#logEntry").val(data);
   }
-  function clearCache () {
+  function clearCache() {
     sessionStorage.clear();
   }
-  function reloadMe ( url ) {
+  function reloadMe(url) {
     // return ScriptApp.getService().getUrl().toString();
-    alert( "reload this page to complete the update" );
+    clearCache();
+    alert("updated file at " + url + ". Reload this page to complete the update.");
     // $("body").html('<a style="font-size: 3rem;  position: fixed; top:20%; left:20%;" href=' + url + '>Click to reload.</a>');
   }
-  function findStuFolder () {
+  function findStuFolder() {
     var id, fname, lname;
-    id = $( "#seis_id" ).val();
-    fname = $( "#first_name" ).val();
-    lname = $( "#last_name" ).val();
+    id = $("#seis_id").val();
+    fname = $("#first_name").val();
+    lname = $("#last_name").val();
 
-    google.script.run.withSuccessHandler( openUrl ).getStuFolder( fname, lname );
+    google.script.run.withSuccessHandler(openUrl).getStuFolder(fname, lname);
   }
-  function openUrl ( url ) {
-    window.open( url, ( target = "_blank" ) );
+  function openUrl(url) {
+    window.open(url, (target = "_blank"));
   }
-  function getPrefilledLevels () {
-    var id = $( "#seis_id" ).val();
-    var stuName = $( "#stuName" ).val();
-    var teachemail = $( "#teachemail" ).val();
+  function getPrefilledLevels() {
+    var id = $("#seis_id").val();
+    var stuName = $("#stuName").val();
+    var teachemail = $("#teachemail").val();
     // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
 
     google.script.run
-      .withSuccessHandler( copyToClipboard )
-      .sendLevelsForm( stuName, id, teachemail );
+      .withSuccessHandler(copyToClipboard)
+      .sendLevelsForm(stuName, id, teachemail);
   }
-  function openDoc ( url ) {
-    copyToClipboard( url );
+  function openDoc(url) {
+    copyToClipboard(url);
     // window.open(url, "_blank");
   }
-  function goToSeisIep () {
+  function goToSeisIep() {
     var url = "https://seis.org/iep/";
-    url += $( "#seis_id" ).val();
+    url += $("#seis_id").val();
     url += "/29368995/forms";
-    window.open( url, "_blank" );
+    window.open(url, "_blank");
   }
-  function sendLevelsQues () {
-    console.log( "send levels button clicked" );
-    var id = $( "#seis_id" ).val();
-    var stuName = $( "#stuName" ).val();
-    var teachemail = $( "#teachemail" ).val();
+  function sendLevelsQues() {
+    console.log("send levels button clicked");
+    var id = $("#seis_id").val();
+    var stuName = $("#stuName").val();
+    var teachemail = $("#teachemail").val();
     // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
     var mLvlAry = [
-      $( "#stuName" ).val(),
-      $( "#seis_id" ).val(),
-      $( "#teachemail" ).val(),
+      $("#stuName").val(),
+      $("#seis_id").val(),
+      $("#teachemail").val(),
     ];
-    google.script.run.withSuccessHandler( alert( 'a draft email has been created' ) ).sendLevelsForm( mLvlAry );
+    google.script.run
+      .withSuccessHandler(alert("a draft email has been created"))
+      .sendLevelsForm(mLvlAry);
   }
   // function openMailModal(objStr) {
   //   // emailData = {
@@ -1552,84 +1567,84 @@
 
   // }
 
-  function logServices ( string ) {
-    $( "#logEntry" ).val( string );
+  function logServices(string) {
+    $("#logEntry").val(string);
     saveNewLogEntryClient();
   }
 
-  function saveNewLogEntryClient () {
-    if ( $( "#logEntry" ).val().toString() == "logServices" ) {
+  function saveNewLogEntryClient() {
+    if ($("#logEntry").val().toString() == "logServices") {
       google.script.run
-        .withSuccessHandler( logServices )
-        .getServices( $( "#seis_id" ).val() );
+        .withSuccessHandler(logServices)
+        .getServices($("#seis_id").val());
       return;
     }
-    console.log( $( "#logEntry" ).val().toString() );
+    console.log($("#logEntry").val().toString());
     document.body.style.cursor = "wait";
-    if ( $( "#logEntry" ).val().toString().length > 0 ) {
-      var logEntry = $( "#logEntry" ).val().toString();
+    if ($("#logEntry").val().toString().length > 0) {
+      var logEntry = $("#logEntry").val().toString();
       var logId = null;
-      var seis_id = $( "#seis_id" ).val().toString();
-      var nmjdob = $( "#nmjdob" ).val().toString();
+      var seis_id = $("#seis_id").val().toString();
+      var nmjdob = $("#nmjdob").val().toString();
 
-      var logObj = new LogEntry( [  seis_id, logEntry, nmjdob, logId ] );
+      var logObj = new LogEntry([seis_id, logEntry, nmjdob, logId]);
       // console.log($('entry is gt 0: %s', $("#logEntry").val().toString()));
       // console.log('id and entry are %s and %s', id, entry);
-      console.log( "saving: %s", JSON.stringify( logObj ) );
+      console.log("saving: %s", JSON.stringify(logObj));
 
       google.script.run
-        .withSuccessHandler( updateLogEntryCache ) // server returns the same object
-        .saveNewLogEntryServer( logObj );
+        .withSuccessHandler(updateLogEntryCache) // server returns the same object
+        .saveNewLogEntryServer(logObj);
     }
     document.body.style.cursor = "default";
-    $( "#logEntry" ).val( "" );
+    $("#logEntry").val("");
   }
-  function logsToCache ( allRecords ) {
+  function logsToCache(allRecords) {
     // console.log('allRecords = %s', allRecords);
 
-    allRecords = JSON.parse( allRecords );
-    for ( let i = 0; i < allRecords.length; i++ ) {
-      const elAll = allRecords[ i ];
+    allRecords = JSON.parse(allRecords);
+    for (let i = 0; i < allRecords.length; i++) {
+      const elAll = allRecords[i];
       // these records have id numbers at 0; within each id number item lies a 2-d array with contact log entries
-      var key = "reclog" + elAll[ 0 ];
-      var val = JSON.stringify( elAll[ 1 ] );
-      sessionStorage.setItem( key, val );
+      var key = "reclog" + elAll[0];
+      var val = JSON.stringify(elAll[1]);
+      sessionStorage.setItem(key, val);
     }
-    focus( sessionStorage.getItem( "lastId" ) );
+    focus(sessionStorage.getItem("lastId"));
   }
-  function openLogPrintDialog () {
-    $( "#logModal" ).modal( {
+  function openLogPrintDialog() {
+    $("#logModal").modal({
       focus: true,
-    } );
-    $( "#pdfUrl" ).empty();
-    $( "#printedLogsth" ).empty();
-    $( "#printedLogstb" ).empty();
-    $( "#printLogStuName" ).html( "<h4>" + $( "#stuName" ).val() + "</h4>" );
-    var start = dayjs().subtract( 1, "y" ).toDate();
+    });
+    $("#pdfUrl").empty();
+    $("#printedLogsth").empty();
+    $("#printedLogstb").empty();
+    $("#printLogStuName").html("<h4>" + $("#stuName").val() + "</h4>");
+    var start = dayjs().subtract(1, "y").toDate();
     var end = dayjs().toDate();
-    document.getElementById( "endDtEdit" ).valueAsDate = end;
-    document.getElementById( "stDtEdit" ).valueAsDate = start;
+    document.getElementById("endDtEdit").valueAsDate = end;
+    document.getElementById("stDtEdit").valueAsDate = start;
 
     // var logCache = filterLogEntriesByDateWindow();
     // showLog(logEntries, 'loc04');
     filterLogEntriesByDateWindow();
     // $('#spinner02').hide();
   }
-  function showLog ( logEntries, loc ) {
+  function showLog(logEntries, loc) {
     // [entries, id]
     // input is an array containing one arrays and one string ('loc'): array contains all the log entries that correspond to that record
     //     console.log('in "showLog" the first log entry is: %s; the loc is %s', JSON.stringify(logEntries[0]), loc);
     //     console.log('logEntries is a type of %s', typeof logEntries);
-    if ( typeof logEntries == "string" ) {
-      logEntries = JSON.parse( logEntries );
+    if (typeof logEntries == "string") {
+      logEntries = JSON.parse(logEntries);
     }
 
-    var list = $( "#" + loc );
+    var list = $("#" + loc);
     list.empty();
 
     var stuName = First_Name + " " + Last_Name;
-    for ( var i = 0; i < logEntries.length; i++ ) {
-      var el = logEntries[ i ];
+    for (var i = 0; i < logEntries.length; i++) {
+      var el = logEntries[i];
       var [
         Timestamp,
         email,
@@ -1649,81 +1664,88 @@
         ' class="col-3 logEntry"' +
         'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
-        dayjs( el[ 0 ] ).format( "YYYY-MM-DD" ) +
+        dayjs(el[0]).format("YYYY-MM-DD") +
         "</td>" +
         "<td data-entry_id=" +
         logId +
         ' class="logEntry col-9">' +
-        el[ 3 ] +
+        el[3] +
         "</td>" +
         "</tr>"
       );
     }
-    $( "#corrlng[value='01']", function () {
-      $( this ).css( "background-color", "#ff0000" );
-    } );
+    $("#corrlng[value='01']", function () {
+      $(this).css("background-color", "#ff0000");
+    });
 
-    $( "#" + "loc01" + "tb" ).show();
+    $("#" + "loc01" + "tb").show();
 
     document.body.style.cursor = "default";
   }
 
-  function saveEditedLogEntryClient ( remove ) {
-    if ( remove == true ) {
-      if ( confirm( "Are you sure you want to remove this log entry?" ) == false ) {
+  function saveEditedLogEntryClient(remove) {
+    if (remove == true) {
+      if (confirm("Are you sure you want to remove this log entry?") == false) {
         return;
       }
     }
-    var entry = $( "#editEntry" ).val();
-    var date = $( "#editDate" ).val();
-    var id = parseInt( $( "#editId" ).val(), 10 );
-    var nmjdob = $( "#nmjdob" ).val();
-    var seis_id = $( "#seis_id" ).val();
+    var entry = $("#editEntry").val();
+    var date = $("#editDate").val();
+    var id = parseInt($("#editId").val(), 10);
+    var nmjdob = $("#nmjdob").val();
+    var seis_id = $("#seis_id").val();
 
-    console.log( "vars entry, date, id, nmjdob, seis_id:  %s; %s; %s; %s; %s; ", entry, date, id, nmjdob, seis_id );
+    console.log(
+      "vars entry, date, id, nmjdob, seis_id:  %s; %s; %s; %s; %s; ",
+      entry,
+      date,
+      id,
+      nmjdob,
+      seis_id
+    );
     // alert( 'now aborting' );
     // throw "quit";
     var logObj = {
-      'logEntry': entry,
-      'logDate': date,
-      'logId': id,
-      'nmjdob': nmjdob,
-      'seis_id': seis_id,
-      'remove': remove
+      logEntry: entry,
+      logDate: date,
+      logId: id,
+      nmjdob: nmjdob,
+      seis_id: seis_id,
+      remove: remove,
     };
-    console.log( "logObj: %s", JSON.stringify( logObj ) );
+    console.log("logObj: %s", JSON.stringify(logObj));
 
     google.script.run
-      .withSuccessHandler( saveLogEntrySuccess )
-      .saveEditedLogEntryServer( JSON.stringify( logObj ) );
+      .withSuccessHandler(saveLogEntrySuccess)
+      .saveEditedLogEntryServer(JSON.stringify(logObj));
   }
-  function saveLogEntrySuccess ( logObjStr ) {
-    var logObj = JSON.parse( logObjStr );
-    console.log( "returned at saveLogEntrySuccess: %s", logObjStr );
-    sessionStorage.removeItem( "reclog" + logObj.seis_id.toString() );
-    focus( logObj.seis_id.toString(), "loc01" );
+  function saveLogEntrySuccess(logObjStr) {
+    var logObj = JSON.parse(logObjStr);
+    console.log("returned at saveLogEntrySuccess: %s", logObjStr);
+    sessionStorage.removeItem("reclog" + logObj.seis_id.toString());
+    focus(logObj.seis_id.toString(), "loc01");
   }
 
-  function updateLogEntryCache ( array ) {
-    var [ logObjStr, cacheRow ] = array;
-    var logObj = JSON.parse( logObjStr );
-    console.log( "caching...logObj is %s", JSON.stringify( logObj ) );
+  function updateLogEntryCache(array) {
+    var [logObjStr, cacheRow] = array;
+    var logObj = JSON.parse(logObjStr);
+    console.log("caching...logObj is %s", JSON.stringify(logObj));
 
     var logCache = JSON.parse(
-      sessionStorage.getItem( "reclog" + logObj.seis_id )
+      sessionStorage.getItem("reclog" + logObj.seis_id)
     );
-    logCache.unshift( JSON.parse( cacheRow ) );
-    sessionStorage.setItem( "reclog" + logObj.seis_id, JSON.stringify( logCache ) );
+    logCache.unshift(JSON.parse(cacheRow));
+    sessionStorage.setItem("reclog" + logObj.seis_id, JSON.stringify(logCache));
 
-    refreshLogDisplay( logCache, "loc01" );
+    refreshLogDisplay(logCache, "loc01");
   }
-  function refreshLogDisplay ( logCache, loc ) {
+  function refreshLogDisplay(logCache, loc) {
     // [entries, id]
-    var list = $( "#" + loc );
+    var list = $("#" + loc);
     list.empty();
 
-    for ( var i = 0; i < logCache.length; i++ ) {
-      var el = logCache[ i ];
+    for (var i = 0; i < logCache.length; i++) {
+      var el = logCache[i];
       var [
         Timestamp,
         email,
@@ -1743,135 +1765,193 @@
         ' class="col-3 logEntry"' +
         'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
-        dayjs( el[ 0 ] ).format( "YYYY-MM-DD" ) +
+        dayjs(el[0]).format("YYYY-MM-DD") +
         "</td>" +
         "<td data-entry_id=" +
         logId +
         ' class="logEntry col-9">' +
-        el[ 3 ] +
+        el[3] +
         "</td>" +
         "</tr>"
       );
     }
-    $( "#corrlng[value='01']", function () {
-      $( this ).css( "background-color", "#ff0000" );
-    } );
+    $("#corrlng[value='01']", function () {
+      $(this).css("background-color", "#ff0000");
+    });
 
-    $( "#" + "loc01" + "tb" ).show();
+    $("#" + "loc01" + "tb").show();
 
     document.body.style.cursor = "default";
   }
 
-  function updateSessionStorage ( array ) {
-    var [ seisId, fldNm, fieldVal ] = array;
-    var key = sessionStorage.getItem( "rec" + seisId );
-    var cachedRecord = JSON.parse( sessionStorage.getItem( key ) );
-    cachedRecord[ fldNm ] = fieldVal;
-    sessionStorage.setItem( key, JSON.stringify( cachedRecord ) );
+  function updateSessionStorage(array) {
+    var [seisId, fldNm, fieldVal] = array;
+    var key = sessionStorage.getItem("rec" + seisId);
+    var cachedRecord = JSON.parse(sessionStorage.getItem(key));
+    cachedRecord[fldNm] = fieldVal;
+    sessionStorage.setItem(key, JSON.stringify(cachedRecord));
   }
-  function haveGoals ( data ) {
-    var [ headings, values, sheet, range, lastR, lastC ] = data;
-    if ( headings !== true ) {
-      sessionStorage.setItem( 'goals', JSON.stringify( values ) );
+  function haveGoals(data) {
+    var [headings, values, sheet, range, lastR, lastC] = data;
+    if (headings !== true) {
+      sessionStorage.setItem("goals", JSON.stringify(values));
     }
   }
   // search the goal bank for goals of a given level and area
-  function findGoals () {
-    var glLvl = $( "#glLvl" ).children( "option:selected" ).val().toString();
-    var glLvlElid = $( "#glLvl" ).children( "option:selected" ).attr( "id" ).toString();
+  function findGoals() {
+    var glLvl = $("#glLvl").children("option:selected").val().toString();
+    var glLvlElid = $("#glLvl")
+      .children("option:selected")
+      .attr("id")
+      .toString();
 
-    var glArea = $( "#glArea" ).children( "option:selected" ).val().toString();
-    var glAreaElid = $( "#glArea" ).children( "option:selected" ).attr( "id" ).toString();
+    var glArea = $("#glArea").children("option:selected").val().toString();
+    var glAreaElid = $("#glArea")
+      .children("option:selected")
+      .attr("id")
+      .toString();
 
-    var id = $( "#seis_id" ).val();
+    var id = $("#seis_id").val();
     // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
 
-    sessionStorage.setItem( "glLvl", glLvl );
-    sessionStorage.setItem( "glArea", glArea );
+    sessionStorage.setItem("glLvl", glLvl);
+    sessionStorage.setItem("glArea", glArea);
     // sessionStorage.setItem("grdLvl", grdLvl);
     // sessionStorage.setItem("area", area);
 
-    var goalTable = JSON.parse( sessionStorage.getItem( 'goals' ) );
-    console.log( 'got goal table' );
-    $( "#foundGoals" ).empty();
+    var goalTable = JSON.parse(sessionStorage.getItem("goals"));
+    console.log("got goal table");
+    $("#foundGoals").empty();
 
-    var selGoals = ( sessionStorage.getItem( 'selGoals_' + $( '#seis_id' ).val() ) ) !== null ?
-      JSON.parse( sessionStorage.getItem( 'selGoals_' + $( '#seis_id' ).val() ) ) :
-      [];
+    var selGoals =
+      sessionStorage.getItem("selGoals_" + $("#seis_id").val()) !== null
+        ? JSON.parse(sessionStorage.getItem("selGoals_" + $("#seis_id").val()))
+        : [];
 
-    console.log( 'the selGoals_nnnnnnn is %s', JSON.stringify( selGoals ) );
-
+    console.log("the selGoals_nnnnnnn is %s", JSON.stringify(selGoals));
 
     var goalItemsChkd = [];
     var goalItemsUnChkd = [];
-    for ( let i = 0; i < goalTable.length; i++ ) {
-      const el = goalTable[ i ];
-      var [ id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, modified ] = el;
+    for (let i = 0; i < goalTable.length; i++) {
+      const el = goalTable[i];
+      var [
+        id,
+        grdLvl,
+        area,
+        strand,
+        annual,
+        standard,
+        objctv1,
+        objctv2,
+        objctv3,
+        modified,
+      ] = el;
       // console.log(glLvl, grdLvl, glArea, area);
-      if ( selGoals.indexOf( el[ 0 ] ) > -1 ) {
-        let item = new Goal( [ id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, modified ] );
-        goalItemsChkd.push( item );
-      } else if ( glArea == area && glLvl == grdLvl ) {
-        let item = new Goal( [ id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, modified ] );
-        goalItemsUnChkd.push( item );
+      if (selGoals.indexOf(el[0]) > -1) {
+        let item = new Goal([
+          id,
+          grdLvl,
+          area,
+          strand,
+          annual,
+          standard,
+          objctv1,
+          objctv2,
+          objctv3,
+          modified,
+        ]);
+        goalItemsChkd.push(item);
+      } else if (glArea == area && glLvl == grdLvl) {
+        let item = new Goal([
+          id,
+          grdLvl,
+          area,
+          strand,
+          annual,
+          standard,
+          objctv1,
+          objctv2,
+          objctv3,
+          modified,
+        ]);
+        goalItemsUnChkd.push(item);
       }
     }
-    for ( let j = 0; j < goalItemsChkd.length; j++ ) {
-      const el = goalItemsChkd[ j ];
-      $( "#foundGoals" ).append( el.checkboxItem( true ) );
+    for (let j = 0; j < goalItemsChkd.length; j++) {
+      const el = goalItemsChkd[j];
+      $("#foundGoals").append(el.checkboxItem(true));
     }
-    for ( let j = 0; j < goalItemsUnChkd.length; j++ ) {
-      const el = goalItemsUnChkd[ j ];
-      $( "#foundGoals" ).append( el.checkboxItem( false ) );
+    for (let j = 0; j < goalItemsUnChkd.length; j++) {
+      const el = goalItemsUnChkd[j];
+      $("#foundGoals").append(el.checkboxItem(false));
     }
     document.body.style.cursor = "default";
   }
-  function putSelGoals_client () {
-    if ( localStorage.getItem( 'selGoalsQueue' ) !== null ) {
-      var selGoalsQueue = JSON.parse( localStorage.getItem( 'selGoalsQueue' ) );
+  function putSelGoals_client() {
+    if (localStorage.getItem("selGoalsQueue") !== null) {
+      var selGoalsQueue = JSON.parse(localStorage.getItem("selGoalsQueue"));
       var putData = [];
-      for ( let i = 0; i < selGoalsQueue.length; i++ ) {
-        const key = selGoalsQueue[ i ];
-        const value = sessionStorage.getItem( key );
-        putData.push( [ key, value ] )
+      for (let i = 0; i < selGoalsQueue.length; i++) {
+        const key = selGoalsQueue[i];
+        const value = sessionStorage.getItem(key);
+        putData.push([key, value]);
       }
       google.script.run
-        .withSuccessHandler( remove_selGoalsQueue )
+        .withSuccessHandler(remove_selGoalsQueue)
         .withFailureHandler()
-        .putSelGoals_server( putData );
+        .putSelGoals_server(putData);
     }
-    function remove_selGoalsQueue () { localStorage.removeItem( 'selGoalsQueue' ); }
+    function remove_selGoalsQueue() {
+      localStorage.removeItem("selGoalsQueue");
+    }
   }
-  function getSelGoals_client () {
-
-    var selGoalsQueue = JSON.parse( localStorage.getItem( 'selGoalsQueue' ) );
+  function getSelGoals_client() {
+    var selGoalsQueue = JSON.parse(localStorage.getItem("selGoalsQueue"));
     google.script.run
-      .withSuccessHandler( cacheAndDisplaySelGoals )
-      .getSelGoals_server( selGoalsQueue );
+      .withSuccessHandler(cacheAndDisplaySelGoals)
+      .getSelGoals_server(selGoalsQueue);
 
-    function cacheAndDisplaySelGoals ( array ) {
-      for ( let i = 0; i < array.length; i++ ) {
-        const el = array[ i ];
-        sessionStorage.setItem( el[ 0 ], el[ 1 ] );
+    function cacheAndDisplaySelGoals(array) {
+      for (let i = 0; i < array.length; i++) {
+        const el = array[i];
+        sessionStorage.setItem(el[0], el[1]);
       }
-      var key = 'selGoals_' + $( '#seis_id' ).val();
-      var goals = JSON.parse( sessionStorage.getItem( 'goals' ) );
+      var key = "selGoals_" + $("#seis_id").val();
+      var goals = JSON.parse(sessionStorage.getItem("goals"));
       var count = 0;
-      $( '#foundGoals' ).empty();
-      if ( sessionStorage.getItem( key ) !== null ) {
+      $("#foundGoals").empty();
+      if (sessionStorage.getItem(key) !== null) {
         // var count = 0;
-        var selGoals = JSON.parse( sessionStorage.getItem( key ) );
-        for ( let i = 0; i < goals.length; i++ ) {
-          const element = goals[ i ];
-          if ( selGoals.indexOf( element[ 0 ] ) !== -1 ) {
-            let grbGoal = new Goal( element );
-            $( '#foundGoals' ).append( grbGoal.checkboxItem( true ) );
+        var selGoals = JSON.parse(sessionStorage.getItem(key));
+        for (let i = 0; i < goals.length; i++) {
+          const element = goals[i];
+          if (selGoals.indexOf(element[0]) !== -1) {
+            let grbGoal = new Goal(element);
+            $("#foundGoals").append(grbGoal.checkboxItem(true));
             count++;
-            if ( count >= selGoals.length ) { break };
+            if (count >= selGoals.length) {
+              break;
+            }
           }
         }
       }
     }
   }
+  function showSearchPage() {
+    google.script.run.withSuccessHandler(openSearchModal).search("target");
+    $("*").val("");
+  }
+  function openSearchModal(h) {
+    console.log(h);
+    // $("#searchResult").append(h);
 
+    // var myModal = new bootstrap.Modal(document.getElementById("searchModal"), {
+    //   focus: true,
+    // });
+  }
+  function sendIEPatGlance() {
+    google.script.run
+      .withSuccessHandler(alert())
+      .sendContentsOfAtAGlanceFolder();
+  }
 </script>

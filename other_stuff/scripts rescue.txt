@@ -1177,12 +1177,6 @@
       .withSuccessHandler( saveLogEntrySuccess )
       .saveEditedLogEntryServer( JSON.stringify( logObj ) );
   }
-  function saveLogEntrySuccess ( logObjStr ) {
-    var logObj = JSON.parse( logObjStr );
-    console.log( "returned at saveLogEntrySuccess: %s", logObjStr );
-    sessionStorage.removeItem( "reclog" + logObj.seis_id.toString() );
-    focus( logObj.seis_id.toString(), "loc01" );
-  }
 
   function LogEntry () {
     // as passed from jquery function or from log entry editor (in the former case, there will be no logId value)
