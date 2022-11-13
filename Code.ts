@@ -95,8 +95,8 @@ var Goal = /** @class */ (function () {
     return Goal;
 }());
 function doGet(e) {
-  var ss = SpreadsheetApp.openById("1eQY13LjBavSjl2aSWnN-xfiu0Pph02CY6kgnx5TeI7A");
-  var roster = ss.getSheetByName('logRespMerged').sort(1);
+    var ss = SpreadsheetApp.openById("1eQY13LjBavSjl2aSWnN-xfiu0Pph02CY6kgnx5TeI7A");
+    var roster = ss.getSheetByName('logRespMerged').sort(1);
 
     roster.sort(2);
     ss.getSheetByName("logRespMerged").sort(1);
@@ -513,7 +513,7 @@ function getSyncedEvents(calendarId) {
     if (calendarId === void 0) { calendarId = "dpaight@hemetusd.org"; }
     var myEvents = [];
     // google code
-     calendarId = "primary";
+    calendarId = "primary";
     var now = new Date();
     var events = Calendar.Events.list(calendarId, {
         timeMin: now.toISOString(),
@@ -786,17 +786,19 @@ function levData(id) {
 }
 function getPresentLevelsAsTextBlazeListItem(seisId, areas) {
     if (seisId === void 0) { seisId = "1010101"; }
-    if (areas === void 0) { areas = [
-        "reading",
-        "writing",
-        "math",
-        "lang",
-        "motor",
-        "bhvr",
-        "health",
-        "wrkHbts",
-        "prefs",
-    ]; }
+    if (areas === void 0) {
+        areas = [
+            "reading",
+            "writing",
+            "math",
+            "lang",
+            "motor",
+            "bhvr",
+            "health",
+            "wrkHbts",
+            "prefs",
+        ];
+    }
     var lvlsRecord = levData(seisId);
     if (lvlsRecord.toString().search(/baseln/) != -1) {
         return lvlsRecord;
@@ -859,8 +861,8 @@ function LevelsPerformance(el) {
     this["lvls"].wrkH2bts =
         el[21].length > 0
             ? "able to attend to a classwork task at instructional level for " +
-                el[21].toString().replace(/"/g, "'") +
-                " minutes"
+            el[21].toString().replace(/"/g, "'") +
+            " minutes"
             : "";
     this["lvls"].writ1eOverall =
         el[12].length > 0
@@ -937,7 +939,7 @@ function LevelsPerformance(el) {
             var counter = 0;
             for (var key in this.lvls) {
                 if (Object.prototype.hasOwnProperty.call(this.lvls, key)) {
-                     el = this.lvls[key];
+                    el = this.lvls[key];
                     counter++;
                     // areas ('math', 'read', 'writ', etc) are contained in first 4 characters of the key and 'snipArea'
                     // this should gather all the parts that match the category
@@ -952,7 +954,7 @@ function LevelsPerformance(el) {
                         wholeSnip =
                             wholeSnip == "["
                                 ? // if this is the firs addition to wholeSnip, omit the comma
-                                    wholeSnip + partSnip
+                                wholeSnip + partSnip
                                 : wholeSnip + "," + partSnip;
                         partSnip = "";
                     }
@@ -1022,8 +1024,8 @@ function addStudentByIdFromRESstudentsServer(obj) {
         .getValues()
         .flat();
     var newRosterRecord = [[]];
-    for (var i = 0; i < rHeads.length; i++) {
-         el = rHeads[0][i].toString().toLowerCase();
+    for (let i = 0; i < rHeads.length; i++) {
+        let el = rHeads[0][i].toString().toLowerCase();
         var index = parseInt(iObj[el]);
         newRosterRecord[0].push(stuToAdd[index]);
     }
@@ -1825,8 +1827,8 @@ function getFromAeriesData(newDataWithHeadings) {
         el.push(location);
         firstname_lastname =
             el[newDataWithHeadings[0].indexOf("first_name")] +
-                " " +
-                el[newDataWithHeadings[0].indexOf("last_name")];
+            " " +
+            el[newDataWithHeadings[0].indexOf("last_name")];
         el.push(firstname_lastname);
         langflu = aerLookup(nmjdob, aerHeadings.indexOf("langflu"));
         el.push(langflu);
@@ -1838,9 +1840,9 @@ function getFromAeriesData(newDataWithHeadings) {
         el.push(stuemail);
         firslinit =
             el[newDataWithHeadings[0].indexOf("first_name")] +
-                " " +
-                el[newDataWithHeadings[0].indexOf("last_name")][0] +
-                ".";
+            " " +
+            el[newDataWithHeadings[0].indexOf("last_name")][0] +
+            ".";
         el.push(firslinit);
         allServices = getServices(seis_id);
         el.push(allServices);
@@ -2118,21 +2120,27 @@ function getRecord(id) {
     Logger.log('record is %s', JSON.stringify(record));
     return JSON.stringify(record);
 }
-function getNotes(data) {
-    var id = data[0], value = data[1];
-    Logger.log('params %s, %s', id, value);
-    var sheet = ss.getSheetByName('notes');
-    var array = sheet.getRange('A1:B30').getDisplayValues();
+function saveNotes(array) {
+    var [id, providers] = array;
+    var seis_id = array[0], fldNm = array[1], fldVal = array[2];
+    Logger.log('params %s, %s', seis_id, fldVal);
+
+    var [headings, values, sheet, range, lastR, lastC] = myGet('roster');
+    var fldIndex = headings.indexOf(fldNm);
+    var idIndex = headings.indexOf('seis_id');
+    var array = sheet.getRange(1, 1, lastR, lastC).getDisplayValues();
     for (var i = 0; i < array.length; i++) {
         var element = array[i];
-        if (id.toString() == element[0])
-            if (value == undefined || value == null) {
-                return element[1];
+        if (seis_id.toString() == element[idIndex].toString())
+            if (fldVal == undefined || fldVal == null) {
+                return element[fldIndex];
             }
             else {
-                var cell = sheet.getRange(i + 1, 2, 1, 1);
-                cell.setValue(value);
-                return value;
+                Logger.log('got to me');
+                var cell = sheet.getRange(i + 1, fldIndex + 1, 1, 1);
+                cell.setValue(fldVal);
+                console.log('%s, %s, %s: ', seis_id, fldNm, fldVal);
+                return [seis_id, fldNm, fldVal];
             }
     }
 }
@@ -2207,9 +2215,10 @@ function rosterGet() {
     return [headings, values, sheet, range, lastR, lastC];
 }
 function updateContactInfo(seisId, fldNm, fieldVal) {
+    Logger.log('seisid = %s, fldNm = %s, fieldVal = %s', seisId, fldNm, fieldVal);
     var _a = myGet('roster', 0, true), headings = _a[0], values = _a[1], sheet = _a[2], range = _a[3], lastR = _a[4], lastC = _a[5];
-    headings = headings.flat();
     Logger.log('headings is %s', JSON.stringify(headings));
+    headings = headings.shift();
     var row = values.indexOf(seisId);
     var col = headings.indexOf(fldNm);
     var el_range = sheet.getRange(row + 1, col + 1, 1, 1);
@@ -2730,4 +2739,28 @@ function updateRoster_old2() {
         range.setValues(deletedRecords);
     }
     Logger.log("done");
+}
+function getServiceProviders(seis_id = "2141390") {
+    var [headings, values, sheet, range, lastR, lastC] = myGet('services');
+    var id_index = 0;
+    var dnr_index = headings.indexOf("Marked DNR");
+    var providers = [];
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        if (seis_id.toString() === el[id_index]) {
+            let fieldIndex = 0;
+            for (let f = 0; f < headings.length; f++) {
+                const f_el = headings[f];
+
+                if ((f_el.search(/Provider - Oc/g) > -1 || f_el.search(/Licensed/g) > -1 || f_el.search(/Adaptive Phys/g) > -1) && el[dnr_index] !== "Yes" && el[f] !== "" && providers.indexOf(el[f] + "; ") == -1) {
+                    providers.push(el[f] + "; ");
+                }
+            }
+        }
+
+    }
+    var fldNm = 'notes2';
+        Logger.log("%s", JSON.stringify(providers));
+    var cleaned = JSON.stringify(providers).replace(/["\[\]]/g, " ").replace(/ +/g, " ");
+    return [ seis_id, fldNm, cleaned];
 }

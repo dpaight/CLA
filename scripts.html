@@ -238,8 +238,8 @@
       e.preventDefault();
       // open goal for editing
       // console.log('this is %s', JSON.stringify($(this).text()));
-      var thisGoal = JSON.parse($(this).text());
-      var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
+      // var thisGoal = JSON.parse($(this).text());
+      var gId = parseInt($(this).attr("data-obj"), 10); //[thisGoal.length - 1], 10);
       console.log("gId = %s", gId);
       google.script.run.withSuccessHandler(editGoalInModal).getGoal(gId);
     });
@@ -262,166 +262,135 @@
         var crntScrl = $(window).scrollTop();
       }
     });
-
-    // // shift-click clears a litte goal number box
-    // // click builds text blaze snippet from data in table
-    // $("body").on("click", ".gls", function (event) {
-    //   if (event.shiftKey) {
-    //     e.preventDefault();
-    //     $(this).val("");
-    //     $(this).attr("title", "");
-    //   } else {
-    //     var id = $("#seis_id").val();
-    //     var gId = $(this).val();
-    //     google.script.run
-    //       .withSuccessHandler(showTBsnippetGl)
-    //       .getOneGoalForEditing(gId);
-    //   }
+    // $(function () {
+    //   $('[data-toggle="tooltip"]').tooltip();
     // });
+  });
 
-    // $("body").on("click", "#emParentsMenuItem", emParents());
 
-    $(function () {
-      $('[data-toggle="tooltip"]').tooltip();
-    });
-    // console.log('gSmL is %s', gSmL);
+  // console.log('gSmL is %s', gSmL);
 
-    $("body").on("click", "#gVoiceMenuItem", function () {
-      firstSnipThenGvoice();
-    });
-    $(".alert").alert();
+  $("body").on("click", "#gVoiceMenuItem", function () {
+    firstSnipThenGvoice();
+  });
+  // $(".alert").alert();
 
-    //set cursor to pointer when entering a nav item
-    $("body").on("mouseenter", ".nav-link", function () {
-      $(this).css("cursor", "pointer");
-    });
+  //set cursor to pointer when entering a nav item
+  $("body").on("mouseenter", ".nav-link", function () {
+    $(this).css("cursor", "pointer");
+  });
 
-    // set cursor to pointer when entering table row
-    $("body").on("mouseenter", ".setStudent", function () {
-      $(".setStudent").css("cursor", "pointer");
-    });
+  // set cursor to pointer when entering table row
+  $("body").on("mouseenter", ".setStudent", function () {
+    $(".setStudent").css("cursor", "pointer");
+  });
 
-    //set cursor to pointer when entering an icon
-    $("body").on("mouseenter", ".material-icons", function () {
-      $(".setStudent").css("cursor", "pointer");
-    });
+  //set cursor to pointer when entering an icon
+  $("body").on("mouseenter", ".material-icons", function () {
+    $(".setStudent").css("cursor", "pointer");
+  });
 
-    // set cursor to normal when leaving an icon
-    $("body").on("mouseleave", ".material-icons", function () {
-      $(".setStudent").css("cursor", "default");
-    });
+  // set cursor to normal when leaving an icon
+  $("body").on("mouseleave", ".material-icons", function () {
+    $(".setStudent").css("cursor", "default");
+  });
 
-    // modals
-    $("body").on("show.srchModal.modal", function () { });
+  // modals
+  $("body").on("show.srchModal.modal", function () { });
 
-    $("body").on("show.bs.modal", function () {
-      // alert('event');
-      var addresses = (
-        $("#teachemail").val() +
-        "," +
-        $("#Parent_1_Email").val() +
-        "," +
-        $("#u3_Parent_1a_Email").val()
-      ).replace(/,$/, "");
-      var subject = $("#stuName").val();
-      // console.log(addresses);
-      $("#emailRecipients").val(addresses);
-      $("#emailSubject").val(subject);
-    });
-    // change the cursor to a pointer when entering a text Blaze field
-    $("body").on("mouseenter", '[name$="Copy"]', function () {
-      $("[name$='Copy']").css("cursor", "pointer");
-    });
+  $("body").on("show.bs.modal", function () {
+    // alert('event');
+    var addresses = (
+      $("#teachemail").val() +
+      "," +
+      $("#Parent_1_Email").val() +
+      "," +
+      $("#u3_Parent_1a_Email").val()
+    ).replace(/,$/, "");
+    var subject = $("#stuName").val();
+    // console.log(addresses);
+    $("#emailRecipients").val(addresses);
+    $("#emailSubject").val(subject);
+  });
+  // change the cursor to a pointer when entering a text Blaze field
+  $("body").on("mouseenter", '[name$="Copy"]', function () {
+    $("[name$='Copy']").css("cursor", "pointer");
+  });
 
-    // if shift key is down turning the cursor into a trash can and then delete on click (next function)
-    $("body").on("mousemove", ".gls", function () {
-      if (event.shiftKey) {
-        e.preventDefault();
-        $(".gls").css(
-          "cursor",
-          "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto"
-        );
-      } else {
-        $(".gls").css("cursor", "pointer");
-      }
-    });
+  // if shift key is down turning the cursor into a trash can and then delete on click (next function)
+  $("body").on("mousemove", ".gls", function () {
+    if (event.shiftKey) {
+      e.preventDefault();
+      $(".gls").css(
+        "cursor",
+        "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto"
+      );
+    } else {
+      $(".gls").css("cursor", "pointer");
+    }
+  });
 
-    $("body").on("click", ".snipThis", function (event) {
-      event.preventDefault();
-      snipInfo();
-    });
-    $(".btn").mouseup(function () {
-      $(this).blur();
-    });
-    // copy a text blaze snippet to clipboard when clicking on the item
-    $("body").on("click", '[name$="Copy"]', function () {
-      $(this).select();
-      document.execCommand("copy");
-    });
-    $(".btn-success").click(function () {
-      $(this).toggleClass("btn-active").siblings().removeClass("btn-active");
-      $(this).blur();
-    });
-    // when clicking on a table row, change the color of the field
-    $("body").on("mousedown", ".setStudent", function (event) {
-      event.preventDefault();
-      $(this).css("background-color", "#5bf5db");
-      // console.log('mouse down');
-    });
+  $("body").on("click", ".snipThis", function (event) {
+    event.preventDefault();
+    snipInfo();
+  });
+  $(".btn").mouseup(function () {
+    $(this).blur();
+  });
+  // copy a text blaze snippet to clipboard when clicking on the item
+  $("body").on("click", '[name$="Copy"]', function () {
+    $(this).select();
+    document.execCommand("copy");
+  });
+  $(".btn-success").click(function () {
+    $(this).toggleClass("btn-active").siblings().removeClass("btn-active");
+    $(this).blur();
+  });
+  // when clicking on a table row, change the color of the field
+  $("body").on("mousedown", ".setStudent", function (event) {
+    event.preventDefault();
+    $(this).css("background-color", "#5bf5db");
+    // console.log('mouse down');
+  });
 
-    // this goes with the one just above changing the color back to White
-    $("body").on("mouseup mouseleave", ".setStudent", function (event) {
-      event.preventDefault();
-      $(this).css("background-color", "#ffffff");
-      // console.log('mouse up');
-    });
+  // this goes with the one just above changing the color back to White
+  $("body").on("mouseup mouseleave", ".setStudent", function (event) {
+    event.preventDefault();
+    $(this).css("background-color", "#ffffff");
+    // console.log('mouse up');
+  });
 
-    // record edited fields
-    $("body").on("change", ".stuEdit", function () {
-      var seisId = $("#seis_id").val();
-      var fieldVal = $(this).val();
-      var fldNm = $(this).attr("id");
+  // record edited fields
+  $("body").on("change", ".stuEdit", function () {
+    var seisId = $("#seis_id").val();
+    var fldVal = $(this).val();
+    var fldNm = $(this).attr("name");
 
-      if (!seisId || !fieldVal || !fldNm) {
-        alert("missing data in html");
-        return;
-      }
-      // sessionStorage.removeItem('rec' + seisId);
-      // alert('rec' + seisId + ", " + seisId + ", " + fieldVal + ", " + fldNm);
-      if (fldNm.toString().search(/date/g) > -1) {
-        fieldVal = fieldVal.toString().replace(/-/g, "/");
-        $(this).val(fieldVal);
-      }
-      var cacheRec = JSON.parse(sessionStorage.getItem("rec" + seisId));
-      cacheRec[fldNm] = fieldVal;
-      sessionStorage.setItem("rec" + seisId, JSON.stringify(cacheRec));
+    if (!seisId || !fldVal || !fldNm) {
+      alert("missing data in html");
+      return;
+    }
+    writeProviders([seisId, fldNm, fldVal]);
+    // sessionStorage.removeItem('rec' + seisId);
+    // alert('rec' + seisId + ", " + seisId + ", " + fieldVal + ", " + fldNm);
 
-      google.script.run
-        .withSuccessHandler()
-        .updateContactInfo(seisId, fldNm, fieldVal);
-
-      setTimeout(() => {
-        google.script.run
-          .withSuccessHandler(showRosterTable)
-          .getTableData_roster();
-      }, 3000);
-    });
   });
 
   $("body").on("change", ".logWindow", function () {
     filterLogEntriesByDateWindow();
   });
-  //save changes to spreadsheet
-  $("body").on("change", "#notes2", function (event) {
-    var id = $("#seis_id").val();
-    var field = $(this).attr("id");
-    var value = $(this).val();
-
-    console.log("id = %s, field = %s, value = %s", id, field, value);
+  $("body").on("click", ".gettingProviders", function (event) {
+    event.preventDefault();
+    var id = $('#seis_id').val().toString();
     google.script.run
-      .withSuccessHandler(showNotes) // works with returned values: id, index, value
-      .getNotes([id, value]);
+      .withSuccessHandler(writeProviders)
+      .getServiceProviders(id);
   });
+
+  //save changes to spreadsheet
+  // $("body").on("change", "#notes2", function (event) {
+  //   event.preventDefault();
+  // });
 
   $("body").on("click", ".saveEntryBtn", function (event) {
     event.preventDefault();
@@ -756,6 +725,7 @@
     $("#nmjdob").val(record.nmjdob);
     $("#teachemail").val(record.teachemail);
     $("#notes2").val(record.notes2);
+    // $("#notes2").text(record.notes2);
 
     console.log("nmjdob = %s", nmjdob);
     // console.log('nmjdob = %s', $("#nmjdob").val());
@@ -1004,6 +974,8 @@
   function showRosterTable(dataStr) {
     // console.log('data is %s', dataStr);
     var data = JSON.parse(dataStr);
+    var n = data.length;
+    $("#caseCount").append(n);
     var loc = "loc00";
     var pending = ["#ffffff", "#000000"];
     for (let i = 0; i < data.length; i++) {
@@ -1477,7 +1449,6 @@
     }
     store(data);
     $("#spinner01").hide();
-
     return "rosterList", 0;
   }
   function lookForTemails(event) {
@@ -1785,10 +1756,10 @@
   }
 
   function updateSessionStorage(array) {
-    var [seisId, fldNm, fieldVal] = array;
+    var [seisId, fldNm, fldVal] = array;
     var key = sessionStorage.getItem("rec" + seisId);
     var cachedRecord = JSON.parse(sessionStorage.getItem(key));
-    cachedRecord[fldNm] = fieldVal;
+    cachedRecord[fldNm] = fldVal;
     sessionStorage.setItem(key, JSON.stringify(cachedRecord));
   }
   function haveGoals(data) {
@@ -1887,6 +1858,8 @@
     }
     document.body.style.cursor = "default";
   }
+
+
   function putSelGoals_client() {
     if (localStorage.getItem("selGoalsQueue") !== null) {
       var selGoalsQueue = JSON.parse(localStorage.getItem("selGoalsQueue"));
@@ -1910,28 +1883,27 @@
     google.script.run
       .withSuccessHandler(cacheAndDisplaySelGoals)
       .getSelGoals_server(selGoalsQueue);
-
-    function cacheAndDisplaySelGoals(array) {
-      for (let i = 0; i < array.length; i++) {
-        const el = array[i];
-        sessionStorage.setItem(el[0], el[1]);
-      }
-      var key = "selGoals_" + $("#seis_id").val();
-      var goals = JSON.parse(sessionStorage.getItem("goals"));
-      var count = 0;
-      $("#foundGoals").empty();
-      if (sessionStorage.getItem(key) !== null) {
-        // var count = 0;
-        var selGoals = JSON.parse(sessionStorage.getItem(key));
-        for (let i = 0; i < goals.length; i++) {
-          const element = goals[i];
-          if (selGoals.indexOf(element[0]) !== -1) {
-            let grbGoal = new Goal(element);
-            $("#foundGoals").append(grbGoal.checkboxItem(true));
-            count++;
-            if (count >= selGoals.length) {
-              break;
-            }
+  }
+  function cacheAndDisplaySelGoals(array) {
+    for (let i = 0; i < array.length; i++) {
+      const el = array[i];
+      sessionStorage.setItem(el[0], el[1]);
+    }
+    var key = "selGoals_" + $("#seis_id").val();
+    var goals = JSON.parse(sessionStorage.getItem("goals"));
+    var count = 0;
+    $("#foundGoals").empty();
+    if (sessionStorage.getItem(key) !== null) {
+      // var count = 0;
+      var selGoals = JSON.parse(sessionStorage.getItem(key));
+      for (let i = 0; i < goals.length; i++) {
+        const element = goals[i];
+        if (selGoals.indexOf(element[0]) !== -1) {
+          let grbGoal = new Goal(element);
+          $("#foundGoals").append(grbGoal.checkboxItem(true));
+          count++;
+          if (count >= selGoals.length) {
+            break;
           }
         }
       }
@@ -1951,7 +1923,74 @@
   }
   function sendIEPatGlance() {
     google.script.run
-      .withSuccessHandler(alert())
-      .sendContentsOfAtAGlanceFolder();
+      .withSuccessHandler(confirmThis)
+    function confirmThis(list) {
+
+      if (confirm("Are you sure you want to send emails to all teachers for these students: " + list) == true) {
+        google.script.run
+          .withSuccessHandler(alert)
+          .sendContentsOfAtAGlanceFolder();
+      }
+    }
   }
+  // function getProviders(e) {
+  //   e.preventDefault();
+  //   var id = $('#seis_id').val().toString();
+
+  //   google.script.run
+  //     // .withSuccessHandler()
+  //     .getServiceProviders(id);
+  // }
+
+  function getProviders() {
+    console.log('running script: %s', 'getProviders');
+    var id = $("#seis_id").val();
+    var field = $(this).attr("id");
+    var value = $("#notes2").val();
+
+    console.log("id = %s, field = %s, value = %s, event=%s", id, field, value, JSON.stringify(event));
+    google.script.run
+      .withSuccessHandler(showNotes) // works with returned values: id, index, value
+      .saveNotes([id, value]);
+
+  }
+  function writeProviders(array) {
+    var [seisId, fldNm, fldVal] = array;
+    if (fldNm.toString().search(/date/g) > -1) {
+      fldVal = fldVal.toString().replace(/-/g, "/");
+      $("#fldNm").val(fldVal);
+    }
+    var cacheRec = JSON.parse(sessionStorage.getItem("rec" + seisId));
+    cacheRec[fldNm] = fldVal;
+    sessionStorage.setItem("rec" + seisId, JSON.stringify(cacheRec));
+
+    google.script.run
+ ()     .withSuccessHandler()
+      .updateContactInfo(seisId, fldNm, fldVal);
+
+    setTimeout(() => {
+      google.script.run
+        .withSuccessHandler(showRosterTable)
+        .getTableData_roster();
+    }, 3000);
+    updateSessionStorage([seisId, fldNm, fldVal]);
+
+
+    var id = $("#seis_id").val();
+    var field = $(this).attr("id");
+
+    console.log("id = %s, field = %s, value = %s", id, field, cleaned,);
+    google.script.run
+      .withSuccessHandler(showNotes) // works with returned values: id, index, value
+      .saveNotes([id, providers]);
+  }
+
+  function showNotes(array) {
+    console.log('running script: %s', 'showNotes');
+    var [seisId, fldNm, fldVal] = array;
+    $("#notes2").val(fieldVal);
+    console.log('updating session storage: [%s, %s, %s]', JSON.stringify(seisId), JSON.stringify(fldNm), JSON.stringify(fldVal))
+    updateSessionStorage([seisId, fldNm, fldVal]);
+  };
+
 </script>

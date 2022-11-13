@@ -51,6 +51,10 @@
       style="font-weight: 500;" onclick="clearCache()">cLa
       <?=version?>
     </p>
+    <br>
+    <p class="navbar-brand data-toggle px-3 hiddenReload" title="clear session cache and reload"
+      style="font-weight: 400; font-size: 0.9rem; position: relative; left: -110px; bottom: -20px;" id="caseCount">
+      Cases: </p>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -67,7 +71,8 @@
           <a class="nav-link active" target="_blank" href="https://seis.org/dashboard">SEIS</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" target="_blank" href="https://aeries.hemetusd.org/Aeries.net/Login.aspx?IdP=1&Username=dpaight%40hemetusd.org&Page=100037">Aeries</a>
+          <a class="nav-link active" target="_blank"
+            href="https://aeries.hemetusd.org/Aeries.net/Login.aspx?IdP=1&Username=dpaight%40hemetusd.org&Page=100037">Aeries</a>
         </li>
         <li class="nav-item nav-link active snipThis" id="gVoiceMenuItem">GVoice
         </li>
@@ -90,8 +95,8 @@
                 href="https://www.sejda.com/sign-pdf?files=%5B%7B%22downloadUrl%22%3A%22https%3A%2F%2Fdrive.google.com%2Fuc%3Fexport%3Dview%26id%3D16v2LTCtaFY6n2f7IsJaZAFz9k5UXRf2Q%22%7D%5D&returnEmail=paight%40gmail.com"
                 target="_blank">IEP Completion Form</a>
             </li>
-            <li><a class="dropdown-item" href="https://drive.google.com/open?id=1-lWvtDik9enMSpfp9W-t0u75P8ZBl4Ab"
-                target="_blank">Aeries Change
+            <li><a class="dropdown-item" href="https://aeries.hemetusd.org/Aeries.net/Login.aspx?IdP=1&Username=dpaight%40hemetusd.org&Page=100037
+                target=_blank">Aeries Change
                 Form</a></li>
             <li><a class="dropdown-item"
                 href="https://docs.google.com/forms/d/1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg/edit?usp=sharing"
@@ -101,13 +106,14 @@
             </li>
             <li class="dropdown-item" href="#" onclick="findStuFolder()">Find Student Folder</li>
             <li class="dropdown-item" href="#" onclick="sendIEPatGlance()">Send all IEPs at a Glance</li>
-            <li id="sendLevelsMenu" class="dropdown-item" onclick="sendLevelsQues($('#searchField').val())">Send Present Levels Ques.</li>
+            <li id="sendLevelsMenu" class="dropdown-item" onclick="sendLevelsQues($('#searchField').val())">Send Present
+              Levels Ques.</li>
         </li>
       </ul>
     </div>
 
-   <button class="btn-sm btn-success mx-3" onclick="displaySearchNext()">Search</button>
-   <input id="searchField" style="margin-right: 2rem; width:8rem;">
+    <button class="btn-sm btn-success mx-3" onclick="displaySearchNext()">Search</button>
+    <input id="searchField" style="margin-right: 2rem; width:8rem;">
     </div>
   </nav>
   <div class="container-fluid">
@@ -223,9 +229,9 @@
                       <span class="input-group-text p-1 fs-5" id="stuName-pre"></span>
                     </div> -->
                   <input type="text" class="form-control fs-5" id="stuName" value="">
-                  <span style="height: auto; padding-left: 6px;">
+                  <span style="height: auto; padding-left: 6px; width: max-content;">
                     <div id="logEntryButtons" class="svChngs btn-group flex-row" role="group">
-                      <button id="snipThis" class="btn btn-sm btn-success snipThis">CLIP</button>
+                      <button id="snipThis" class="btn btn-sm btn-success snipThis" style="position: relative; left: 80%">CLIP</button>
 
                     </div>
                   </span>
@@ -308,7 +314,13 @@
 
             <div class="form-row"> </div>
 
-
+            <div class="input-group input-group-sm mx-1 my-2">
+              <button type="button" class="btn btn-sm btn-primary gettingProviders">SERVICE PROVIDERS</button>
+              <textarea id="notes2" class="stuEdit" name="notes2" style="width: 98%;"></textarea>
+              <!-- <input id="notes2"> -->
+              <!-- <textarea id="notes2" class="" >
+              </textarea> -->
+            </div>
             <div class="input-group input-group-sm mx-1 my-2     ml-0">
 
               <div class="input-group-prepend">
@@ -359,14 +371,6 @@
         </div>
 
 
-        <div class="form-row">
-          <div class="input-group input-group-sm mx-1 my-2">
-            <div class="input-group-prepend">
-              <span class="input-group-text p-1" id="notes2-pre">Notes</span>
-            </div>
-            <textarea type="text" title="" class="form-control spr" id="notes2">Notes</textarea>
-          </div>
-        </div>
 
         <input type="text" id="nmjdob" value="" hidden>
 
@@ -475,10 +479,13 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
+
+
                 <h5 class="modal-title">Log Entry</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
+
 
                 <div class="input-group input-group-sm mx-1 my-2 w-50">
                   <div class="input-group-prepend">
@@ -556,13 +563,18 @@
       <!-- goal modal -->
       <div class="modal fade centered" id="goalModal" tabindex="-1" role="dialog" aria-labelledby="goalModalLabel"
         aria-hidden="true" style="margin-top: 30px;">
-        <div class="modal-dialog" style="height: 500px;" role="document">
+        <div class="modal-dialog" style="height: 400px; overflow: scroll;" role="document">
           <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header sticky-top">
               <h5 class="modal-title" id="goalModalLabel">Edit Goal</h5>
               <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
+              <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">CANCEL</button>
+              <button type="button" class="btn btn-sm btn-success" data-bs-dismiss="modal"
+                onclick="saveGoal(-1)">SAVE/NEW</button>
+              <button type="button" class="btn btn-sm btn-warning" data-bs-dismiss="modal"
+                onclick="saveGoal()">SAVE/REPLACE</button>
             </div>
             <div container-fluid>
               <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
@@ -629,11 +641,6 @@
               </div>
               <div class="modal-footer">
                 <input id='glEditId' type='text' value='' style='background-color: lightyellow; width: 3rem;'>
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">CANCEL</button>
-                <button type="button" class="btn btn-sm btn-success" data-bs-dismiss="modal"
-                  onclick="saveGoal(-1)">SAVE/NEW</button>
-                <button type="button" class="btn btn-sm btn-warning" data-bs-dismiss="modal"
-                  onclick="saveGoal()">SAVE/REPLACE</button>
 
               </div>
 
@@ -834,7 +841,7 @@
                               <span class="input-group-text   col-12" id="s_stuName-pre">Name</span>
                             </div>
                             <input type="text" class="form-control" id="s_stuName"
-                              style="font-size: large; font-weight: bold;" value="">
+                              style="font-size: large; font-weight: bold; width: 100%;" value="">
                           </div>
 
                           <div class="input-group input-group-sm m-1 col-12 mb-3">
@@ -948,31 +955,32 @@
     </div>
   </div>
 
-<!-- Button trigger modal -->
-<!-- <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modelId">
+  <!-- Button trigger modal -->
+  <!-- <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modelId">
   
 </button> -->
 
-<!-- Modal -->
-<div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
+  <!-- Modal -->
+  <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">Modal title</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-      <div class="modal-body">
-        <div class="container-fluid">
-          Add rows here
+          <h5 class="modal-title">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save</button>
+        <div class="modal-body">
+          <div class="container-fluid">
+            Add rows here
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- toasts -->
 
