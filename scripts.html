@@ -364,8 +364,9 @@
   $("body").on("change", ".stuEdit", function () {
     var seisId = $("#seis_id").val();
     var fldVal = $(this).val();
-    var fldNm = $(this).attr("name");
-
+    var fldNm = $(this).attr("id");
+    console.log('seisId, fldVal, fldNm are: %s, %s, %s', seisId, fldVal, fldNm);
+    console.log('')
     if (!seisId || !fldVal || !fldNm) {
       alert("missing data in html");
       return;
@@ -382,6 +383,7 @@
   $("body").on("click", ".gettingProviders", function (event) {
     event.preventDefault();
     var id = $('#seis_id').val().toString();
+
     google.script.run
       .withSuccessHandler(writeProviders)
       .getServiceProviders(id);
@@ -1173,6 +1175,7 @@
     snip += ',"tem"="' + $("#teachemail").val() + '"';
     snip += ',"tch"="' + $("#teachname").val() + '"';
     snip += ',"sid"="' + $("#seis_id").val() + '"';
+    snip += ',"srvcPr"="' + $("#notes2").val() + '"';
 
     snip += ',"lst1"="' + $("#date_of_last_annual_plan_review").val() + '"';
     snip += ',"lst3"="' + $("#date_of_last_eligibility_evaluation").val() + '"';
@@ -1757,10 +1760,18 @@
 
   function updateSessionStorage(array) {
     var [seisId, fldNm, fldVal] = array;
-    var key = sessionStorage.getItem("rec" + seisId);
-    var cachedRecord = JSON.parse(sessionStorage.getItem(key));
-    cachedRecord[fldNm] = fldVal;
-    sessionStorage.setItem(key, JSON.stringify(cachedRecord));
+    console.log('updateSessionStorage says: seisId: %s, fldNm: %s, fldVal: %s', seisId, fldNm, fldVal);
+    // var key = sessionStorage.getItem("rec" + seisId.toString());
+    var cachedRecord = JSON.parse(sessionStorage.getItem("rec" + seisId.toString()));
+
+    // console.log('old cachedRecord is: key: %s, obj: %s', key, JSON.stringify(cachedRecord));
+
+    // console.log('trying to update cached record');
+
+    cachedRecord.notes2 = fldVal.toString();
+
+    sessionStorage.setItem("rec" + seisId.toString(), JSON.stringify(cachedRecord));
+    // console.log('new cachedRecord is: %s', JSON.stringify(cachedRecord));
   }
   function haveGoals(data) {
     var [headings, values, sheet, range, lastR, lastC] = data;
@@ -1950,47 +1961,47 @@
 
     console.log("id = %s, field = %s, value = %s, event=%s", id, field, value, JSON.stringify(event));
     google.script.run
-      .withSuccessHandler(showNotes) // works with returned values: id, index, value
+      .withSuccessHandler() // works with returned values: id, index, value
       .saveNotes([id, value]);
-
   }
   function writeProviders(array) {
     var [seisId, fldNm, fldVal] = array;
-    if (fldNm.toString().search(/date/g) > -1) {
-      fldVal = fldVal.toString().replace(/-/g, "/");
-      $("#fldNm").val(fldVal);
-    }
-    var cacheRec = JSON.parse(sessionStorage.getItem("rec" + seisId));
-    cacheRec[fldNm] = fldVal;
-    sessionStorage.setItem("rec" + seisId, JSON.stringify(cacheRec));
-
-    google.script.run
- ()     .withSuccessHandler()
-      .updateContactInfo(seisId, fldNm, fldVal);
-
-    setTimeout(() => {
-      google.script.run
-        .withSuccessHandler(showRosterTable)
-        .getTableData_roster();
-    }, 3000);
+    // if (fldNm.toString().search(/date/g) > -1) {
+    //   fldVal = fldVal.toString().replace(/-/g, "/");
+    //   $("#fldNm").val(fldVal);
+    // }
+    $("#notes2").val(fldVal);
+    var cachedRec = JSON.parse(sessionStorage.getItem("rec" + seisId));
+    cachedRec[fldNm] = fldVal;
     updateSessionStorage([seisId, fldNm, fldVal]);
-
-
-    var id = $("#seis_id").val();
-    var field = $(this).attr("id");
-
-    console.log("id = %s, field = %s, value = %s", id, field, cleaned,);
-    google.script.run
-      .withSuccessHandler(showNotes) // works with returned values: id, index, value
-      .saveNotes([id, providers]);
   }
+    // sessionStorage.setItem("rec" + seisId, JSON.stringify(cachedRec));
 
-  function showNotes(array) {
-    console.log('running script: %s', 'showNotes');
-    var [seisId, fldNm, fldVal] = array;
-    $("#notes2").val(fieldVal);
-    console.log('updating session storage: [%s, %s, %s]', JSON.stringify(seisId), JSON.stringify(fldNm), JSON.stringify(fldVal))
-    updateSessionStorage([seisId, fldNm, fldVal]);
-  };
+    // google.script.run
+    //   .withSuccessHandler()
+    //   .updateContactInfo(seisId, fldNm, fldVal);
+
+    // setTimeout(() => {
+    //   google.script.run
+    //     .withSuccessHandler(showRosterTable)
+    //     .getTableData_roster();
+    // }, 3000);
+
+
+    // var id = $("#seis_id").val();
+    // var field = $(this).attr("id");
+
+    // console.log("id = %s, field = %s, value = %s", id, fldNm, fldVal);
+    // google.script.run
+    //   .withSuccessHandler(updateSessionStorage) // works with returned values: id, index, value
+    //   .saveNotes([id, providers]);
+
+  // function showNotes(array) {
+  //   console.log('running script: %s', 'showNotes');
+  //   var [seisId, fldNm, fldVal] = array;
+  //   $("#notes2").val(fieldVal);
+  //   console.log('updating session storage: [%s, %s, %s]', JSON.stringify(seisId), JSON.stringify(fldNm), JSON.stringify(fldVal))
+  //   updateSessionStorage([seisId, fldNm, fldVal]);
+  // };
 
 </script>

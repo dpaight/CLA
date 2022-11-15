@@ -2214,16 +2214,16 @@ function rosterGet() {
     values.shift();
     return [headings, values, sheet, range, lastR, lastC];
 }
-function updateContactInfo(seisId, fldNm, fieldVal) {
-    Logger.log('seisid = %s, fldNm = %s, fieldVal = %s', seisId, fldNm, fieldVal);
+function updateContactInfo(seisId, fldNm, fldVal) {
+    Logger.log('seisid = %s, fldNm = %s, fldVal = %s', seisId, fldNm, fldVal);
     var _a = myGet('roster', 0, true), headings = _a[0], values = _a[1], sheet = _a[2], range = _a[3], lastR = _a[4], lastC = _a[5];
     Logger.log('headings is %s', JSON.stringify(headings));
     headings = headings.shift();
     var row = values.indexOf(seisId);
     var col = headings.indexOf(fldNm);
     var el_range = sheet.getRange(row + 1, col + 1, 1, 1);
-    el_range.setValue(fieldVal);
-    return [seisId, fldNm, fieldVal];
+    el_range.setValue(fldVal);
+    return [seisId, fldNm, fldVal];
 }
 function updateRoster() {
     // 
@@ -2604,143 +2604,10 @@ function getCellCounts() {
     range.setValues(dataRows);
     destSheet.setFrozenRows(1);
 }
-function updateRoster_old2() {
-    // 
-    // get seis data
-    // get seis data
-    var count = 0;
-    var newRecs = [];
-    var deletedRecords = [];
-    function reformatHeadings(array) {
-        var aryFmt = array.map(function (x, n, arr) {
-            return x.replace(/[^A-z^0-9+]/gi, "_").toLowerCase();
-        });
-        return aryFmt;
-    }
-    function indexHeadings(array) {
-        var obj, key, val;
-        obj = {};
-        for (var i = 0; i < array.length; i++) {
-            var el = array[i];
-            key = array[i];
-            val = i;
-            obj[key] = val;
-        }
-        return obj;
-    }
-    function getRecNmjdobInd(array, index) {
-        var indicesOfMatch = {};
-        for (var i = 0; i < array.length; i++) {
-            var el = array[i];
-            indicesOfMatch[el[index]] = i;
-        }
-        return indicesOfMatch;
-    }
-    // seis csv report
-    var sVals = parseCSV("roster_seis.csv");
-    for (var i = 0; i < sVals.length; i++) {
-        var element = sVals[i];
-        if (i === 0) {
-            element.unshift("nmjdob");
-        }
-        else {
-            element.unshift(makeMatchVar([element[1], element[2], element[3]]));
-        }
-    }
-    var sHeads = reformatHeadings(sVals.shift());
-    // roster -- the current roster sheet
-    var _a = myGet("roster"), rHeads = _a[0], rVals = _a[1], rSheet = _a[2], rRange = _a[3], rLastR = _a[4], rLastC = _a[5];
-    rHeads = reformatHeadings(rHeads);
-    // allPupils -- data from Aeries
-    var pSheet, pLast, pRange, pVals, pHeads, pMatch, sMatch, rMatch, x;
-    var ss2 = allPupilsSheet();
-    pSheet = ss2.getSheetByName("allPupilsModNames");
-    pLast = pSheet.getRange("a1:a").getValues().filter(String).length;
-    pRange = pSheet.getRange(1, 1, pLast - 1, pSheet.getLastColumn());
-    pVals = pRange.getDisplayValues();
-    pHeads = reformatHeadings(pVals[0]);
-    // now update existing records and add new records
-    //The IND objects havefield names as keys and indexes to those fields as values
-    //  fieldName: index within record
-    var rInd = indexHeadings(rHeads);
-    var pInd = indexHeadings(pHeads);
-    var sInd = indexHeadings(sHeads);
-    // The  match items are objects with 
-    // nmdjob: index,
-    rMatch = getRecNmjdobInd(rVals, rInd["nmjdob"]);
-    sMatch = getRecNmjdobInd(sVals, sInd["nmjdob"]);
-    pMatch = getRecNmjdobInd(pVals, pInd["nmjdob"]);
-    // find new records
-    // The y loop is going through records imported most recently from the Seis system
-    for (var y = 0; y < sVals.length; y++) {
-        var sEl = sVals[y];
-        if (y === 0) {
-            // initialize rIds and newrec
-            var rIds = [];
-            for (var r = 0; r < rVals.length; r++) {
-                var id = rVals[r][rInd['nmjdob']];
-                rIds.push(id);
-            }
-        }
-        if (rIds.indexOf(sEl[sInd['nmjdob']]) === -1) {
-            var newRec = [];
-            for (var r = 0; r < rVals[0].length; r++) {
-                newRec.push("");
-            }
-            newRec.splice(rInd["nmjdob"], 1, sEl[sInd["nmjdob"]]);
-            newRecs.push(newRec);
-        }
-    }
-    if (newRecs.length > 0) {
-        rVals = rVals.concat(newRecs);
-        newRecs = [];
-    }
-    // The J loop is going through records already in the roster
-    for (var j = 1; j < rVals.length; j++) {
-        var rEl = rVals[j];
-        var r_nmjdob = rEl[rInd["nmjdob"]];
-        if (sMatch[r_nmjdob] === undefined) {
-            // record is not in the seis file; assume deleted
-            deletedRecords.push(rEl);
-            rVals.splice(j, 1);
-        }
-        else {
-            for (var u = 0; u < rEl.length; u++) {
-                var nextField = sInd[rHeads[u]];
-                if (nextField > -1) {
-                    var col = sInd[rHeads[u]];
-                    var row = sMatch[r_nmjdob];
-                    rEl.splice(u, 1, sVals[row][col]);
-                }
-                else {
-                    var nextField = pInd[rHeads[u]];
-                    if (nextField > -1) {
-                        try {
-                            var row = pMatch[r_nmjdob];
-                            var col = pInd[rHeads[u]];
-                            rEl.splice(u, 1, pVals[row][col]);
-                        }
-                        catch (error) {
-                            // do nothing              
-                        }
-                    }
-                }
-            }
-        }
-    }
-    var dest = ss.getSheetByName("roster");
-    dest.clear();
-    var range = dest.getRange(1, 1, rVals.length, rVals[0].length);
-    range.setValues(rVals);
-    if (deletedRecords.length > 0) {
-        var dest = ss.getSheetByName("deleted");
-        dest.clear();
-        var range = dest.getRange(dest.getLastRow() + 1, 1, deletedRecords.length, deletedRecords[0].length);
-        range.setValues(deletedRecords);
-    }
-    Logger.log("done");
-}
 function getServiceProviders(seis_id = "2141390") {
+    var servicesValues = importCsv("services.csv");
+    ss.getSheetByName('services').getDataRange().clearContent();
+    ss.getSheetByName('services').getRange(1, 1, servicesValues.length, servicesValues[0].length).setValues(servicesValues);
     var [headings, values, sheet, range, lastR, lastC] = myGet('services');
     var id_index = 0;
     var dnr_index = headings.indexOf("Marked DNR");
@@ -2752,15 +2619,28 @@ function getServiceProviders(seis_id = "2141390") {
             for (let f = 0; f < headings.length; f++) {
                 const f_el = headings[f];
 
-                if ((f_el.search(/Provider - Oc/g) > -1 || f_el.search(/Licensed/g) > -1 || f_el.search(/Adaptive Phys/g) > -1) && el[dnr_index] !== "Yes" && el[f] !== "" && providers.indexOf(el[f] + "; ") == -1) {
+                if ((f_el.search(/pvdr/gi) > -1 ||
+                    f_el.search(/Licensed/gi) > -1 ||
+                    f_el.search(/Adaptive Phys/gi) > -1) &&
+                    el[dnr_index] !== "Yes" && el[f] !== "" &&
+                    providers.indexOf(el[f] + "; ") == -1) {
                     providers.push(el[f] + "; ");
                 }
             }
         }
-
     }
-    var fldNm = 'notes2';
-        Logger.log("%s", JSON.stringify(providers));
-    var cleaned = JSON.stringify(providers).replace(/["\[\]]/g, " ").replace(/ +/g, " ");
-    return [ seis_id, fldNm, cleaned];
+    var [rosHead, rosVals, rosRng, rosLstR, rosLastCol] = myGet('roster');
+    var notes2_index = rosHead.indexOf('notes2');
+    for (let p = 0; p < rosVals.length; p++) {
+        const el = rosVals[p];
+        if (el[0].toString() == seis_id.toString()) {
+            var destRng = ss.getSheetByName('roster')
+                .getRange(p + 1, notes2_index + 1, 1, 1);
+            var cleaned = JSON.stringify(providers).replace(/["\[\]]/g, " ").replace(/ +/g, " ");
+            destRng.setValue(cleaned);
+            var fldNm = 'notes2';
+        }
+    }
+    Logger.log('seid_id = %s, fldNm = %s, cleaned = ', seis_id, fldNm, cleaned);
+    return [seis_id, fldNm, cleaned];
 }
