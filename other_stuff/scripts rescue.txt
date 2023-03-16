@@ -656,14 +656,15 @@
       $( "#stuName" )
         .val()
         .toString()
-        .replace( /([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1" ) +
+        .replace( /([A-Z]{1}[a-z]+) ([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+$)/, "$1" ) +
       '"';
     snip +=
       ',"ln"="' +
       $( "#stuName" )
         .val()
         .toString()
-        .replace( /([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2" ) +
+        .replace( /([A-Z]{1}[a-z]+) ([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+$)/, "$2" ) +
+        .replace( /([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2 $3" ) +
       '"';
     snip += ',"dob"="' + $( "#dob" ).val() + '"';
     snip += ',"sex"="' + $( "#sex" ).val() + '"';

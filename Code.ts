@@ -54,15 +54,15 @@ var Goal = /** @class */ (function () {
     };
     Goal.prototype.snip = function () {
         var snip = "[" +
-            '"area" = "' +
+            '"area" : "' +
             // @ts-ignore
             this.area +
             '",' +
-            '"gl" = "' +
+            '"gl" : "' +
             // @ts-ignore
             this.annual +
             '",' +
-            '"strand" = "' +
+            '"strand" : "' +
             // @ts-ignore
             this.strand +
             '",' +
@@ -782,7 +782,7 @@ function levData(id) {
             return el;
         }
     }
-    return '["baseln"="for baseline data, refer to the appropriate section on the Levels of Performance page"]';
+    return '["baseln":"for baseline data, refer to the appropriate section on the Levels of Performance page"]';
 }
 function getPresentLevelsAsTextBlazeListItem(seisId, areas) {
     if (seisId === void 0) { seisId = "1010101"; }
@@ -895,7 +895,7 @@ function LevelsPerformance(el) {
             if (i > 0) {
                 partSnip += ", ";
             }
-            partSnip += '"' + element + '"=' + '"'; // opening " for value
+            partSnip += '"' + element + '":' + '"'; // opening " for value
             for (var j = 0; j < this.lvlsAry.length; j++) {
                 var kyval = this.lvlsAry[j];
                 var partialKey = kyval[0].toString().slice(0, 4);
@@ -908,7 +908,7 @@ function LevelsPerformance(el) {
                 wholeSnip += partSnip;
             }
             else {
-                wholeSnip += '"' + snipAreas[i] + '"=""';
+                wholeSnip += '"' + snipAreas[i] + '":""';
             }
             partSnip = "";
         }
@@ -949,8 +949,8 @@ function LevelsPerformance(el) {
                     }
                     if (counter >= 26) {
                         partSnip = partSnip.toString().replace(/"/, "'");
-                        partSnip = '"' + element + '"="' + partSnip + '"';
-                        // now we have "area"="value of area"
+                        partSnip = '"' + element + '":"' + partSnip + '"';
+                        // now we have "area":"value of area"
                         wholeSnip =
                             wholeSnip == "["
                                 ? // if this is the firs addition to wholeSnip, omit the comma
@@ -975,7 +975,7 @@ function LevelsPerformance(el) {
         // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
         // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
         var partSnip = this.getSnip(snipAreas);
-        partSnip = partSnip.toString().replace(/"snipAreas[0]="/, '"baseln"=');
+        partSnip = partSnip.toString().replace(/"snipAreas[0]="/, '"baseln":');
         partSnip = partSnip.toString().replace(/\]/, "");
         // a partSnip is a single snipArea
         // iterate through list of areas on which to make items in a snip list

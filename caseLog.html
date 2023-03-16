@@ -112,6 +112,11 @@
       </ul>
     </div>
 
+    <!-- <div class="input-group-prepend"> -->
+      <button class="btn btn-sm btn-success input-group-text p-1 addFromAeries"  id="addgetAeriesRec-pre2">AerRecOnly</button>
+    <!-- </div> -->
+    <input type="text" title="" style="width: 6rem; height: 2rem;" class="form-control" id="addgetAeriesRec" value="">
+
     <button class="btn-sm btn-success mx-3" onclick="displaySearchNext()">Search</button>
     <input id="searchField" style="margin-right: 2rem; width:8rem;">
     </div>
@@ -152,8 +157,8 @@
         </div>
       </div>
       <!-- card for log entries -->
-      <div class="card col-sm-12 col-lg-5 col-md-5 p-0 m-0 contactCaseLog d-flex"
-        style="background-color: white; height: 75px;">
+      <div class="card col-sm-12 col-lg-4 col-md-5 p-0 m-0 contactCaseLog d-flex"
+        style="background-color: white; height: 50px;">
         <div class='card-header fit-content'>
           <div class="d-flex">
             <h6> Log Entry</h6>
@@ -216,9 +221,9 @@
   <div class="row">
 
     <!-- card for general info -->
-    <div id="genStuData" class="card col-sm-12 col-lg-5 col-md-4  d-flex px-2 m-0 "
-      style="background-color: white; height: fit-content;">
-      <div class="card-body p-1 mx-1 ">
+    <div id="genStuData" class="card col-sm-12 col-lg-5 col-md-12  "
+      style="background-color: lightgrey; height: fit-content;">
+      <div class="card-body p-1 mx-0 ">
         <div id="stuData">
           <form>
             <div class="form-row">
@@ -229,17 +234,15 @@
                       <span class="input-group-text p-1 fs-5" id="stuName-pre"></span>
                     </div> -->
                   <input type="text" class="form-control fs-5" id="stuName" value="">
-                  <span style="height: auto; padding-left: 6px; width: max-content;">
-                    <div id="logEntryButtons" class="svChngs btn-group flex-row" role="group">
-                      <button id="snipThis" class="btn btn-sm btn-success snipThis" style="position: relative; left: 80%">CLIP</button>
+                  <span>
+                    <div id="clipBtn" class="svChngs btn-group flex-row" role="group">
+                      <button id="snipThis" class="btn btn-sm btn-success snipThis">CLIP</button>
 
                     </div>
                   </span>
                 </span>
 
 
-                <input type="text" class="form-control " id="first_name" hidden value="">
-                <input type="text" class="form-control " id="last_name" hidden value="">
               </div>
             </div>
 
@@ -270,7 +273,7 @@
                 </div>
                 <input type="text" class="form-control stuEdit  " data-fldNm="teachname" id="teachname" value="">
                 <input type="text" class="form-control stuEdit  " data-fldNm="teachemail" id="teachemail" value=""
-                  hidden>     
+                  hidden>
 
                 <div class="input-group-prepend success">
                   <span class="input-group-text p-1" id="grade_code-pre">Grade</span>
@@ -339,6 +342,8 @@
               <input type="text" class="form-control " id="parent_guardian_1_name" readonly value="">
             </div>
         </div>
+        <input type="text" class="form-control " id="first_name" hidden value="">
+        <input type="text" class="form-control " id="last_name" hidden value="">
 
         <div class="form-row">
           <div class="input-group input-group-sm mx-1 my-2">
@@ -367,6 +372,8 @@
               <span class="input-group-text p-1" id="addZip-pre2">Zip</span>
             </div>
             <input type="text" title="" class="form-control " id="addZip" readonly value="">
+
+            
           </div>
         </div>
 
@@ -398,7 +405,7 @@
 
 
     <!-- card for goal selection -->
-    <div class="card col-sm-12 col-lg-7 col-md-4 p-0 m-0 TBlaze d-flex" style="height: 350px;">
+    <div class="card col-sm-12 col-lg-6 col-md-4 p-0 m-0 TBlaze d-flex" style="height: 300px;">
       <div class="card-header">
         <div class="d-flex px-4 align-items-baseline">
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
@@ -462,7 +469,6 @@
 
       </div>
     </div>
-  </div>
   </div>
   <div class="row">
     <!-- card for basic data -->
